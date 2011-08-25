@@ -15,10 +15,11 @@ class Tracker:
 
         :param path: the relative or absolute path to the tracker
         '''
-        self.path = match_path(path)
-        if not os.path.exists(self.path):
-            print 'Supplied path does not exist'
-            raise SystemExit
+        if not os.path.exists(path):
+            path = match_path(path)
+            if path is None:
+                raise SystemExit('Supplied path does not exist')
+        self.path = path
         self.paths = {
                 'root': self.path,
                 'issues': os.path.join(self.path, 'issues'),
@@ -36,8 +37,7 @@ class Tracker:
         issues = os.path.join(root, 'issues')
         cache = os.path.join(root, 'cache')
 
-        repo = Repo()
-        repo.init(root, mkdir=True)
+        repo = Repo.init(root, mkdir=True)
         os.mkdir(issues)
         open(os.path.join(issues, 'empty'), 'w').close()
         os.mkdir(cache)

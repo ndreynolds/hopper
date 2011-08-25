@@ -8,21 +8,22 @@ from dulwich.objects import Blob, Tree, Commit
 class Repo:
     '''High-level Git interactions using Dulwich.'''
 
-    def __init__(self, path=None):
-        if path is None:
-            self.exists = False
-        else:
-            self.repo = DulwichRepo(path)
-
-    def init(self, path, mkdir=False, bare=False):
-        '''Initializes a normal or bare repository.'''
-        if bare:
-            self.repo = DulwichRepo.init_bare(path)
-        else:
-            self.repo = DulwichRepo.init(path, mkdir)
+    def __init__(self, path):
+        if not os.path.isdir(path):
+            raise SystemExit
+        self.repo = DulwichRepo(path)
         self.tree = Tree()
         self.blobs = []
         self.root = path
+
+    @classmethod
+    def init(cls, path, mkdir=False, bare=False):
+        '''Initializes a normal or bare repository.'''
+        if bare:
+            DulwichRepo.init_bare(path)
+        else:
+            DulwichRepo.init(path, mkdir)
+        return cls(path)
 
     def add_all(self, directory=None):
         '''
@@ -114,14 +115,3 @@ class Repo:
         self.commit = commit
         self._store_objects()
         self.branch('master')
-
-if __name__ == '__main__':
-    repo = Repo()
-    repo.init('test_dir', mkdir=True)
-    with open(os.path.join(repo.root, 'spam1'), 'w') as fp:
-        fp.write('testing, testing, testing\n')
-    with open(os.path.join(repo.root, 'spam2'), 'w') as fp:
-        fp.write('testing, testing\n')
-    repo.add_all()
-    repo.commit(author='Hopper <hopper@hopperhq.com',
-            message='Initial Commit\nAuto-commit by Hopper')
