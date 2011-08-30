@@ -8,11 +8,16 @@ import os
 import sys
 
 def to_json(data):
-    '''Abstracts the json.dumps method, providing error handling.'''
-    return json.dumps(data, sort_keys=True, indent=4)
+    '''
+    Returns sorted & indented JSON from the best json module available.
+
+    By defining json helpers here, we don't have to play the try-import
+    game in every file.
+    '''
+    return json.dumps(data, indent=4)
 
 def from_json(data):
-    '''Abstracts the json.loads method, providing error handling.'''
+    '''Returns python objects loaded from a JSON string.'''
     return json.loads(data)
 
 def get_hash(text):

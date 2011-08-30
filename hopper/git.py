@@ -3,15 +3,15 @@ import os
 import time
 
 from dulwich.repo import Repo as DulwichRepo
-from dulwich.objects import Blob, Tree, Commit
+from dulwich.objects import Commit as DulwichCommit
+from dulwich.objects import Blob, Tree
 
-class Repo:
+class Repo(object):
     '''High-level Git interactions using Dulwich.'''
 
     def __init__(self, path):
-        if not os.path.isdir(path):
-            raise SystemExit
         self.repo = DulwichRepo(path)
+        self._set_head()
         self.tree = Tree()
         self.blobs = []
         self.root = path
@@ -29,7 +29,7 @@ class Repo:
         '''
         Mimics the `git add .` command.
 
-        If :directory is supplied, add all files within that directory 
+        If :directory is supplied, stage all files within that directory 
         (recursively). :directory defaults to the repo root.  
         '''
         if directory is None:
@@ -41,42 +41,20 @@ class Repo:
                 # don't traverse the .git subdir
                 dirnames.remove('.git')
             for f in filenames:
-                self._add_to_tree(os.path.join(directory, f))
+                print directory, f
+                self.repo.stage(os.path.join(directory, f))
 
     def add(self, path):
         '''
         Mimics the `git add <file>` command.
 
-        :path is the path to the file to add.
+        :param path: the path to the file to add.
         '''
         self._add_to_tree(path)
 
     def branch(self, name):
         '''Create a new branch with the given name.'''
-        self.repo.refs['refs/heads/%s' % name] = self.commit.id
-
-    def _add_to_tree(self, path):
-        '''Create a blob from the given file and add the blob to the tree.'''
-        if os.path.isfile(path):
-            fname = os.path.split(path)[-1]
-            with open(path, 'r') as fp:
-                blob_string = fp.read()
-            blob = Blob.from_string(blob_string)
-            self.blobs.append(blob)
-            self.tree.add(fname, 0100644, blob.id)
-
-    def _store_objects(self):
-        '''Store the objects in the repo's object store.'''
-        if self.blobs:
-            obj_store = self.repo.object_store
-            for blob in self.blobs:
-                obj_store.add_object(blob)
-            obj_store.add_object(self.tree)
-            obj_store.add_object(self.commit)
-            return True
-        else:
-            print 'Nothing to store.' 
-            return False
+        self.repo.refs['refs/heads/%s' % name] = self.head.id
 
     def commit(self, **kwargs):
         '''
@@ -115,3 +93,53 @@ class Repo:
         self.commit = commit
         self._store_objects()
         self.branch('master')
+
+    def get_commits(self, n=10, branch=None):
+        if not hasattr(self, 'head'):
+            raise MissingHead
+        return self.repo.revision_history(self.head.id)[:n]
+
+    def get_commit(self, sha):
+        return self.repo.commit(sha)
+
+    def log(self):
+        return self.get_commits()
+
+    def tag(self, sha):
+        return self.repo.tag(sha)
+
+    def tree(self, sha):
+        return self.repo.tree(sha)
+
+    def _add_to_tree(self, path):
+        '''Create a blob from the given file and add the blob to the tree.'''
+        if os.path.isfile(path):
+            fname = os.path.split(path)[-1]
+            with open(path, 'r') as fp:
+                blob_string = fp.read()
+            blob = Blob.from_string(blob_string)
+            self.blobs.append(blob)
+            self.tree.add(fname, 0100644, blob.id)
+
+    def _store_objects(self):
+        '''Store the objects in the repo's object store.'''
+        if self.blobs:
+            obj_store = self.repo.object_store
+            for blob in self.blobs:
+                obj_store.add_object(blob)
+            obj_store.add_object(self.tree)
+            obj_store.add_object(self.commit)
+            return True
+        else:
+            print 'Nothing to store.' 
+            return False
+
+    def _set_head(self):
+        if self.repo.head:
+            return
+        if self.repo.refs.has_key('HEAD'):
+            self.head = self.repo.commit(self.repo.head())
+            self.head.tree = self.repo.tree(self.head.tree)
+
+class MissingHead(Exception):
+    '''The repository has no HEAD'''
