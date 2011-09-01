@@ -17,6 +17,22 @@ class Item(object):
         if self.fields.has_key(name):
             self.fields[name] = value
 
+    def __getattribute__(self, name):
+        '''
+        We want the attributes to contain the same value as
+        the fields[name] value. Assuming the fields dictionary was
+        modified directly, the corresponding attribute would not be 
+        in sync. To counter this, we get attributes directly from the
+        dictionary.
+        '''
+        # we don't want to mess with any special attributes.
+        if not name.startswith('__'):
+            # use the base class's method so we avoid infinite recursion.
+            fields = object.__getattribute__(self, 'fields')
+            if fields.has_key(name):
+                return self.fields[name]
+        return object.__getattribute__(self, name)
+
     def _set_fields(self):
         '''
         Sets the keys in self.fields as attributes, provided they don't

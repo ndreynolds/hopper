@@ -4,9 +4,10 @@ class Config(object):
     def __init__(self, path):
         self.path = path
         self.config = ConfigObj(path)
-        self.defautls = {
+        self.defaults = {
                 'name': None,
                 'creator': None,
                 }
 
-    def write():
+    def write(self):
+        pass

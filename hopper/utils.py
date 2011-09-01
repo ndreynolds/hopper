@@ -6,13 +6,15 @@ import hashlib
 import glob
 import os
 import sys
+import time
+import random
 
 def to_json(data):
     '''
     Returns sorted & indented JSON from the best json module available.
 
-    By defining json helpers here, we don't have to play the try-import
-    game in every file.
+    By defining json helpers here, we don't have to play the try-except 
+    import game in every file.
     '''
     return json.dumps(data, indent=4)
 
@@ -23,6 +25,12 @@ def from_json(data):
 def get_hash(text):
     '''SHA1 the text and return the hexdigest.'''
     return hashlib.sha1(text).hexdigest()
+
+def get_uuid(salt=None):
+    '''Return a UUID generated from the UTC ts and a random float.'''
+    if salt is None:
+        salt = str(random.random())
+    return get_hash(str(time.time()) + salt)
 
 def match_path(path, get_all=False):
     '''

@@ -41,8 +41,7 @@ class Repo(object):
                 # don't traverse the .git subdir
                 dirnames.remove('.git')
             for f in filenames:
-                print directory, f
-                self.repo.stage(os.path.join(directory, f))
+                self._add_to_tree(os.path.join(directory, f))
 
     def add(self, path):
         '''
@@ -52,9 +51,11 @@ class Repo(object):
         '''
         self._add_to_tree(path)
 
-    def branch(self, name):
+    def branch(self, name, head=None):
         '''Create a new branch with the given name.'''
-        self.repo.refs['refs/heads/%s' % name] = self.head.id
+        if head is None:
+            head = self.head.id
+        self.repo.refs['refs/heads/%s' % name] = head
 
     def commit(self, **kwargs):
         '''
@@ -86,13 +87,13 @@ class Repo(object):
             options['author_timezone'] = options['commit_timezone']
         if not options.has_key('committer'):
             options['committer'] = options['author']
-        commit = Commit()
+        commit = DulwichCommit()
         # Set the commit attributes from the dictionary
         for key in options.keys():
             setattr(commit, key, options[key])
         self.commit = commit
         self._store_objects()
-        self.branch('master')
+        self.branch('master', commit.id)
 
     def get_commits(self, n=10, branch=None):
         if not hasattr(self, 'head'):
@@ -135,6 +136,7 @@ class Repo(object):
             return False
 
     def _set_head(self):
+        '''Set the repo's head attribute.'''
         if self.repo.head:
             return
         if self.repo.refs.has_key('HEAD'):

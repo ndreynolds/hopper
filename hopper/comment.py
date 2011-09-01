@@ -20,11 +20,18 @@ class Comment(Item):
               'timestamp': None,
               'id': None
               }
-
+        # If an id was given, find the matching comment and merge its items
+        # with the defaults.
+        if id is not None:
+            print issue.fields['comments']
+            matches = filter(lambda x: x['id'] == id, issue.comments)
+            if len(matches) and type(matches[0]) is dict: 
+                comment = matches[0]
+                self.fields = dict(self.fields.items() + comment.items())
         self._set_fields()
         self.issue = issue
 
-    def add(self, save_issue=False):
+    def save(self, save_issue=False):
         '''
         Append the comment to the issue and call the issue's save
         method.
@@ -33,6 +40,8 @@ class Comment(Item):
         '''
         self.timestamp = time.time()
         self.id = get_hash(to_json(self.fields))
+        # delete the existing comment 
+        self.delete()
         self.issue.comments.append(self.fields)
         if save_issue:
             self.issue.save()

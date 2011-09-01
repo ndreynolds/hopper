@@ -25,8 +25,8 @@ class Issue(Item):
                 'labels': [],
                 'content': None,
                 'created': None,
-                'updated': None
-                'comments': [],
+                'updated': None,
+                'comments': []
                 }
         self.tracker = tracker
         self._set_fields()

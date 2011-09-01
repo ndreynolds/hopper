@@ -1,39 +1,41 @@
 import os
-from os.path import join as pjoin
 import time
 
 from git import Repo
-from utils import to_json, from_json, match_path
 from config import Config
 from item import Item
 from issue import Issue
+from utils import to_json, from_json, match_path
 
 class Tracker:
-    def __init__(self, path):
-        '''
-        Defines a Hopper tracker and provides paths to files within a 
-        tracker.
+    '''
+    Defines a Hopper tracker and provides paths to files within a 
+    tracker.
 
-        :param path: the relative or absolute path to the tracker
-        '''
+    :param path: the relative or absolute path to the tracker
+    '''
+    def __init__(self, path):
         if not os.path.exists(path):
             path = match_path(path)
             if path is None:
                 raise SystemExit('Supplied path does not exist')
         self.path = path
+        self.fields = {
+                'name': None,
+                'created': None
+                }
         self.paths = {
                 'root': self.path,
                 'issues': os.path.join(self.path, 'issues'),
-                'cache': os.path.join(self.path, 'cache')
+                'hopper': os.path.join(self.path, '.hopper')
                 }
-        self.config = Config()
         self.properties = {
                 'name': None
                 }
                 
     @classmethod
-    def create(cls, path):
-        '''Create a tracker with the given properties.'''
+    def new(cls, path):
+        '''Create and return tracker at the given path.'''
         root = path
         # stores issues
         issues = os.path.join(root, 'issues')
@@ -44,7 +46,7 @@ class Tracker:
         open(os.path.join(root, 'config'), 'w').close()
         os.mkdir(issues)
         open(os.path.join(issues, 'empty'), 'w').close()
-        os.mkdir(cache)
+        os.mkdir(hopper)
         open(os.path.join(hopper, 'empty'), 'w').close()
         repo.add_all()
         repo.commit(author='Hopper <hopper@hopperhq.com>',
@@ -72,7 +74,6 @@ class Tracker:
         :param reverse: sort the issues in reverse order.
         :param conditions: a dictionary of keys that correspond to Issue
                            attributes and their required values. 
-
         Example:
         
         Retrieve the last 12 (or fewer) issues.
