@@ -1,8 +1,8 @@
 import time
 import hashlib
 
-from item import Item
-from utils import to_json, get_hash
+from hopper.item import Item
+from hopper.utils import to_json, get_hash
 
 class Comment(Item):
     '''

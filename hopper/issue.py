@@ -2,9 +2,9 @@ from __future__ import with_statement
 import time
 import os
 
-from config import Config
-from item import Item
-from utils import to_json, from_json, get_hash
+from hopper.config import Config
+from hopper.item import Item
+from hopper.utils import to_json, from_json, get_hash
 
 class Issue(Item):
     '''

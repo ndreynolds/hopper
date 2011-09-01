@@ -29,7 +29,9 @@ def get_hash(text):
 def get_uuid(salt=None):
     '''Return a UUID generated from the UTC ts and a random float.'''
     if salt is None:
+        # user can provide a salt to use instead of the random float. 
         salt = str(random.random())
+    # probably overkill to use both random and time
     return get_hash(str(time.time()) + salt)
 
 def match_path(path, get_all=False):

@@ -1,11 +1,11 @@
 import os
 import time
 
-from git import Repo
-from config import Config
-from item import Item
-from issue import Issue
-from utils import to_json, from_json, match_path
+from hopper.git import Repo
+from hopper.config import Config
+from hopper.item import Item
+from hopper.issue import Issue
+from hopper.utils import to_json, from_json, match_path
 
 class Tracker:
     '''

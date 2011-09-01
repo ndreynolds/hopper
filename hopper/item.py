@@ -1,4 +1,4 @@
-from utils import to_json
+from hopper.utils import to_json
 
 class Item(object):
     '''
