@@ -12,8 +12,13 @@ class TestEnv(object):
     
     Methods to make a tracker.
     '''
-    def __init__(self):
-        self.tracker = self.make_tracker()
+    def __init__(self, make_tracker=True):
+        # init will automatically create a tracker unless told not to.
+        if make_tracker:
+            self.tracker = self.make_tracker()
+
+    def cleanup(self):
+        self.rm_tracker()
 
     def make_tracker(self, direc=None, name=None):
         '''

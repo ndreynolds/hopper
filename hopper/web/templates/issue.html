@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block body %}
+<div id="content-header">
+    Issue <span class="monospace">{{ issue.id[:6] }}</span> 
+    &nbsp; &nbsp; Opened {{ issue.created }} by {{ issue.user_id }}
+    {% if issue.status == 'open' %}
+        <a id="issue-close" class="button green" style="bottom:10px" 
+            href="{{ url_for('close', id=issue.id) }}">Open</a>
+    {% else %}
+        <a id="issue-open" class="button red" style="bottom:10px" 
+            href="{{ url_for('open', id=issue.id) }}">Closed</a>
+    {% endif %}
+</div>
+<div id="content">
+    <div class="issue">
+        <span style="font-size:130%; font-weight:bold;">{{ issue.title }}</span>
+        {{ issue.content|safe }}
+    </div>
+    <br>
+    {% if issue.comments %}
+        {% for comment in issue.comments %}
+        <div id="comment-{{ comment['id'][:6] }}" class="comment">
+            <span class="context">{{ comment['author']['name'] }} commented {{ comment['timestamp'] }}</span>
+            <br>
+            {{ comment.content|safe }}
+        </div>
+        <br>
+        {% endfor %}
+    {% endif %}
+    <form method="post">
+        <textarea name="content" style="height:85px"></textarea>
+        <br><br>
+        <input type="submit" value="Comment">
+    </form>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#issue-close').tipTip({
+            content: 'Click to close this Issue',
+            defaultPosition: 'top'
+        });
+        $('#issue-open').tipTip({
+            content: 'Click to reopen this Issue',
+            defaultPosition: 'top'
+        });
+    });
+</script>
+    
+{% endblock %}

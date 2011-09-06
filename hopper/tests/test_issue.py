@@ -10,21 +10,21 @@ class TestIssue(unittest.TestCase):
         self.tracker = self.env.tracker
 
     def tearDown(self):
-        self.env.rm_tracker()
+        self.env.cleanup()
 
     def test_setattr(self):
         issue = Issue(self.tracker)
         issue.title = 'test title'
         # Does the __setattr__ method work?
         # i.e.: setting issue.title shoud set issue.fields['title']
-        self.assertEqual(issue.title, issue.fields['title'])
+        assert issue.title == issue.fields['title']
 
     def test_getattribute(self):
         issue = Issue(self.tracker)
         issue.fields['title'] = 'test title'
         # Does the __getattribute__ method work?
         # i.e.: issue.title should return issue.fields['title'] 
-        self.assertEqual(issue.fields['title'], issue.title)
+        assert issue.fields['title'] == issue.title
 
     def test_read(self):
         issue1 = Issue(self.tracker)
@@ -34,7 +34,7 @@ class TestIssue(unittest.TestCase):
         issue2.title = 'different title'
         issue2.read(issue1.id)
         # issue2 should become a clone of issue1 after calling read().
-        self.assertEqual(issue1.fields, issue2.fields)
+        assert issue1.fields ==  issue2.fields
 
     def test_save(self):
         issue = Issue(self.tracker)
@@ -43,11 +43,17 @@ class TestIssue(unittest.TestCase):
 
         # Get the path to the issue and assert that it's there.
         path = self.tracker.get_issue_path(issue.id)
-        self.assertTrue(os.path.exists(path))
+        assert os.path.exists(path)
 
         # Does the issue initialized from file match the original?
         issue_clone = Issue(self.tracker, issue.id)
-        self.assertEqual(issue_clone.fields, issue.fields)
+        assert issue_clone.fields == issue.fields
+
+    def test_timestamps(self):
+        issue = Issue(self.tracker)
+        issue.title = 'test title'
+        issue.save()
+        assert issue.created == issue.updated
         
 if __name__ == '__main__':
     unittest.main()

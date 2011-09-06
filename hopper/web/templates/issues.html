@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block body %}
+<div id="content-header">
+    {% if status == 'open' %}
+        <a href="{{ url_for('issues', status='open') }}" id="open-issues" class="open-closed">Open</a>
+        <a href="{{ url_for('issues', status='closed') }}" id="closed-issues" class="open-closed active">Closed</a>
+    {% else %}
+        <a href="{{ url_for('issues', status='open') }}" id="open-issues" class="open-closed active">Open</a>
+        <a href="{{ url_for('issues', status='closed') }}" id="closed-issues" class="open-closed">Closed</a>
+    {% endif %}
+    <div id="add-filter" class="button gray" style="float:right; bottom:10px;">Add Filter</div>
+</div>
+<div id="content">
+    <table>
+        {% if issues is not none %}
+            <tr>
+                {% if sorted_by == 'id' and order == 'asc' %}
+                <th>
+                    <a href="{{ url_for('issues', status=status, s='id', o='desc') }}">Identifier &darr;</a>
+                </th>
+                {% elif sorted_by == 'id' and order == 'desc' %}
+                <th>
+                    <a href="{{ url_for('issues', status=status, s='id', o='asc') }}">Identifier &uarr;</a>
+                </th>
+                {% else %}
+                <th>
+                    <a href="{{ url_for('issues', status=status, s='id', o='asc') }}">Identifier</a>
+                </th>
+                {% endif %} 
+                {% if sorted_by == 'title' and order == 'asc' %}
+                <th>
+                    <a href="{{ url_for('issues', status=status, s='title', o='desc') }}">Title &darr;</a>
+                </th>
+                {% elif sorted_by == 'title' and order == 'desc' %}
+                <th>
+                    <a href="{{ url_for('issues', status=status, s='title', o='asc') }}">Title &uarr;</a>
+                </th>
+                {% else %}
+                <th>
+                    <a href="{{ url_for('issues', status=status, s='title', o='asc') }}">Title</a>
+                </th>
+                {% endif %} 
+                <th>Labels</th>
+                {% if sorted_by == 'updated' and (order == 'asc' or order is none) %}
+                <th>
+                    <a href="{{ url_for('issues', status=status, s='timestamp', o='desc') }}">Age &darr;</a>
+                </th>
+                {% elif sorted_by == 'updated' and order == 'desc' %}
+                <th>
+                    <a href="{{ url_for('issues', status=status, s='timestamp', o='asc') }}">Age &uarr;</a>
+                </th>
+                {% else %}
+                <th>
+                    <a href="{{ url_for('issues', status=status, s='timestamp', o='asc') }}">Age</a>
+                </th>
+                {% endif %} 
+            </tr>
+            {% for issue in issues %}
+            <tr class="content">
+                <td class="monospace">{{ issue.id[:6] }}</td>
+                <td style="max-width:250px">
+                    <a href="{{ url_for('issue', id=issue.id) }}">{{ issue.title }}</a>
+                </td>
+                <td>{{ issue.labels }}</td>
+                <td>{{ issue.created }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+        No Issues to Show
+        {% endif %}
+    </table>
+</div>
+<div id="content-footer">
+    Showing <b>{{ issues|count }}</b> of <b>{{ issues|count }}</b> issues
+</div>
+<script>
+    $(document).ready(function() {
+        var filter = '<div class="content-bar"><select><option>Labels</option><option>Title</option></select> is </div>'
+        $('#add-filter').click(function() {
+            if ($('.content-bar').length) {
+                $('.content-bar').last().after(filter);
+            }
+            else {
+                $('#content-header').after(filter);
+            }
+        });
+    });
+</script>
+{% endblock %}

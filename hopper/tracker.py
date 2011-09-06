@@ -1,13 +1,10 @@
 import os
-import time
 
 from hopper.git import Repo
-from hopper.config import Config
-from hopper.item import Item
 from hopper.issue import Issue
-from hopper.utils import to_json, from_json, match_path
+from hopper.utils import match_path
 
-class Tracker:
+class Tracker(object):
     '''
     Defines a Hopper tracker and provides paths to files within a 
     tracker.
@@ -18,7 +15,7 @@ class Tracker:
         if not os.path.exists(path):
             path = match_path(path)
             if path is None:
-                raise SystemExit('Supplied path does not exist')
+                raise OSError('Supplied path does not exist')
         self.path = path
         self.fields = {
                 'name': None,
@@ -65,12 +62,14 @@ class Tracker:
         '''Return the Issue object with the given SHA1'''
         return Issue(self, sha)
 
-    def issues(self, n=10, sort_by='updated', reverse=True, conditions=None):
+    def issues(self, n=None, sort_by='updated', reverse=True, conditions=None):
         '''
         Return a list of n Issue objects filtered by conditions.
 
-        :param n: the number of issues to return.
-        :param sort_by: an attribute to sort the issues by (e.g. title)
+        :param n: the number of issues to return. (returns all by default)
+        :param sort_by: an attribute to sort the issues by (e.g. title). By
+                        default it will sort by 'updated', which will contain
+                        the last-modified (or created) timestamp.
         :param reverse: sort the issues in reverse order.
         :param conditions: a dictionary of keys that correspond to Issue
                            attributes and their required values. 
@@ -83,29 +82,30 @@ class Tracker:
           True
           >>> issues[0].title
           'Some Issue' 
+
+        The conditions parameter allows for very basic (x == y) filtering. 
+        The Filter class has some more advanced methods. They can be used 
+        on the return list. 
         '''
         issues = [Issue(self, sha) for sha in self.get_issues()]
+        # filter first, sort second.
         if type(conditions) is dict:
             for key in conditions.keys():
                 issues = filter(lambda x: getattr(x, key) == conditions[key],
                                 issues)
         issues.sort(key=lambda x: getattr(x, sort_by), reverse=reverse)
+        if type(n) is int:
+            return issues[:n]
         return issues
 
-    def get_issue_path(self, sha, must_exist=True):
+    def get_issue_path(self, sha):
         '''
-        Returns the absolute path to the issue if an issue with the
-        given identifier exists, or if mustExist is False.  Returns
-        None if the issue does not exist and mustExist is True (default).
+        Returns the absolute path to the issue. It doesn't check if the issue
+        exists; this should be done afterwards if necessary.
 
-        :param identifier: the SHA1 that uniquely identifies an issue.
-        :param mustExist: whether or not the issue must exist to return a
-                          path
+        :param sha: the SHA1 that uniquely identifies an issue.
         '''
-        path = os.path.join(self.paths['issues'], sha)
-        if os.path.exists(path) or not must_exist:
-            return path
-        return None
+        return os.path.join(self.paths['issues'], sha)
 
     def get_issues(self):
         '''

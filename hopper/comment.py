@@ -22,27 +22,30 @@ class Comment(Item):
               }
         # If an id was given, find the matching comment and merge its items
         # with the defaults.
-        if id is not None:
-            print issue.fields['comments']
-            matches = filter(lambda x: x['id'] == id, issue.comments)
-            if len(matches) and type(matches[0]) is dict: 
-                comment = matches[0]
-                self.fields = dict(self.fields.items() + comment.items())
-        self._set_fields()
         self.issue = issue
+        if id is not None:
+            self.read(id)
+        self._set_fields()
+
+    def read(self, id):
+        '''Read in a comment from the issue.'''
+        matches = filter(lambda x: x.id == id, self.issue.comments)
+        if len(matches): 
+            comment = matches[0]
+            self.fields = dict(self.fields.items() + comment.fields.items())
 
     def save(self, save_issue=False):
         '''
-        Append the comment to the issue and call the issue's save
+        Append the comment to the issue and optionally call the issue's save
         method.
 
         :param save_issue: save the associated issue. 
         '''
         self.timestamp = time.time()
         self.id = get_hash(to_json(self.fields))
-        # delete the existing comment 
+        # delete the existing comment, if it exists.
         self.delete()
-        self.issue.comments.append(self.fields)
+        self.issue.comments.append(self)
         if save_issue:
             self.issue.save()
 
@@ -51,17 +54,17 @@ class Comment(Item):
         Delete the instantiated comment from the issue, if it's even
         there.
         '''
-        for comment in self.issue.fields['comments']:
-            if comment['id'] == self.id:
-                self.issue.fields['comments'].remove(comment)
+        for comment in self.issue.comments:
+            if comment.id == self.id:
+                self.issue.comments.remove(comment)
 
     @classmethod
     def rm(cls, issue, id, save_issue=False):
         '''
         Class method to remove the specified comment from the
         issue without needing to instantiate it. Use delete() to
-        delete an instantiated comment.
+        delete the instantiated comment.
         '''
         for comment in issue.comments:
-            if comment['id'] == id:
+            if comment.id == id:
                 issue.comments.remove(comment)

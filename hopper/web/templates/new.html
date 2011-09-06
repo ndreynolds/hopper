@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block body %}
+<div id="content-header">New Issue</div>
+<div id="content">
+    <form method="post">
+        <input type="text" id="title" name="title" class="unfocused" value="Issue Summary">
+        <br><br>
+        <div id="options-wrapper">
+            labels: <input type="text" name="labels" id="labels">
+            assign to: <input type="text" name="assign-to" id="assign-to">
+        </div>
+        <br><br>
+        <textarea name="content" id="content"></textarea>
+        <br><br>
+</div>
+<div id="content-footer">
+        <input type="submit" class="green" value="Create Issue" style="font-size:100%">
+    </form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('input#title').HopperFocusHelper();
+    });
+</script>
+{% endblock %}

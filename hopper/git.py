@@ -3,11 +3,22 @@ import os
 import time
 
 from dulwich.repo import Repo as DulwichRepo
-from dulwich.objects import Commit as DulwichCommit
-from dulwich.objects import Blob, Tree
+from dulwich.objects import Commit as DulwichCommit, Blob, Tree
+from dulwich.errors import CommitError
 
 class Repo(object):
-    '''High-level Git interactions using Dulwich.'''
+    '''
+    High-level Git repository interactions using Dulwich.
+
+    In some places this is purely a wrapper of dulwich.repo, in others
+    it uses low-level dulwich methods to achieve high-level ends such as 
+    the common git commands (e.g. add, commit, branch, log).
+
+    The underlying dulwich Repo object can always be accessed through
+    Repo.repo (as redundant as that is).
+
+    Batteries not included.
+    '''
 
     def __init__(self, path):
         self.repo = DulwichRepo(path)
@@ -15,6 +26,7 @@ class Repo(object):
         self.tree = Tree()
         self.blobs = []
         self.root = path
+        self.objects = self.repo.object_store
 
     @classmethod
     def init(cls, path, mkdir=False, bare=False):
@@ -35,7 +47,7 @@ class Repo(object):
         if directory is None:
             directory = self.root
         if not os.path.isdir(directory):
-            return False
+            raise OSError('Supplied path is not a directory')
         for directory, dirnames, filenames in os.walk(directory):
             if '.git' in dirnames:
                 # don't traverse the .git subdir
@@ -61,13 +73,16 @@ class Repo(object):
         '''
         Mimics the `git commit` command.
 
-        The commit method will accept any arguments accepted by 
-        Dulwich's Repo.commit(). It merges these arguments with some
-        sensible defaults. For example, commit_time will be handled
-        automatically. 
+        This method does a commit; use commits() to retrieve one 
+        or more commits.
 
-        Not all arguments have sensible defaults. At minimum you 
-        should provide:
+        The method will accept any arguments accepted by Dulwich's 
+        Repo.commit(). It merges these arguments with some sensible 
+        defaults. For example, commit_time will be handled automatically
+        unless supplied. 
+
+        Not all arguments are defaultable. At minimum you should 
+        provide:
 
             :param message: the commit message
             :param author: the commit author
@@ -80,28 +95,66 @@ class Repo(object):
                 'tree': self.tree.id
                 }
 
+        # merge defaults with kwargs
         options = dict(defaults.items() + kwargs.items())
+
+        # make sure we have everything we need:
         if not options.has_key('author_time'):
             options['author_time'] = options['commit_time']
         if not options.has_key('author_timezone'):
             options['author_timezone'] = options['commit_timezone']
         if not options.has_key('committer'):
             options['committer'] = options['author']
+
         commit = DulwichCommit()
         # Set the commit attributes from the dictionary
         for key in options.keys():
             setattr(commit, key, options[key])
-        self.commit = commit
-        self._store_objects()
-        self.branch('master', commit.id)
+        
+        # Get the ref param if it's there, otherwise HEAD
+        ref = 'HEAD'
+        if kwargs.has_key('ref'):
+            ref = kwargs['ref']
 
-    def get_commits(self, n=10, branch=None):
+        try:
+            old_head = self.repo.refs[ref]
+            commit.parents = [old_head]
+            self.repo.object_store.add_object(commit)
+            ok = self.repo.refs.set_if_equals(ref, old_head, commit.id)
+        except KeyError:
+            commit.parents = []
+            self.repo.object_store.add_object(commit)
+            ok = self.repo.refs.add_if_new(ref, commit.id)
+            # set the branch.
+            self.branch('master', commit.id)
+        if not ok:
+            raise CommitError("%s changed during commit" % (ref,))
+
+        # set the head attribute
+        self.head = commit
+        # return the Commit object
+        return commit
+
+    def commits(self, identifier=None, n=10):
+        '''
+        Return one or more commits from an identifier, or if omitted,
+        up to n-commits down from the HEAD.
+
+        :param identifer: a branch (not yet) or SHA. Given a SHA, the
+                          return value will be a single Commit object.
+                          Anything else gets you a list.
+        :param n: the maximum number of commits to return. The key word
+                  is 'maximum'. If fewer matching commits exist, only 
+                  they will be returned.
+        '''
+
+        # eventually this needs to check if the identifier is a branch
+        # or tag first, then look for an identifier.
+        if identifier is not None:
+            return self.repo[identifier]
         if not hasattr(self, 'head'):
             raise MissingHead
         return self.repo.revision_history(self.head.id)[:n]
-
-    def get_commit(self, sha):
-        return self.repo.commit(sha)
 
     def log(self):
         return self.get_commits()
@@ -139,6 +192,7 @@ class Repo(object):
         '''Set the repo's head attribute.'''
         if self.repo.head:
             return
+        print self.repo.refs
         if self.repo.refs.has_key('HEAD'):
             self.head = self.repo.commit(self.repo.head())
             self.head.tree = self.repo.tree(self.head.tree)

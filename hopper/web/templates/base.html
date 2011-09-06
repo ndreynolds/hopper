@@ -1,0 +1,56 @@
+<html>
+    <head>
+        <title>Hopper</title>
+        <link rel="stylesheet" 
+            type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="stylesheet" 
+            type="text/css" href="{{ url_for('static', filename='css/pygments.css') }}">
+        <link rel="stylesheet" type="text/css" 
+            href="{{ url_for('static', filename='js/tiptip/tipTip.css') }}">
+        <script type="text/javascript" src="{{ url_for('static', 
+            filename='js/jquery.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', 
+            filename='js/hopper.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', 
+            filename='js/tiptip/jquery.tipTip.minified.js') }}"></script>
+    </head>
+    <body>
+        <h1>Hopper</h1>
+        <div class="page">
+            <ul id="nav">
+                {% for link in links %}
+                    <li>
+                    {% if link == selected %}
+                    <a id="{{ link }}" href="{{ url_for(link) }}" 
+                        class="top-level selected">{{ link.capitalize() }}</a>
+                    {% else %}
+                    <a id="{{ link }}" href="{{ url_for(link) }}" 
+                        class="top-level">{{ link.capitalize() }}</a>
+                    {% endif %}
+                    </li>
+                {% endfor %}
+                <a id="new-issue" href="{{ url_for('new') }}" class="button green" style="float:right; bottom:4px; padding:10px;">New Issue</a>
+            </ul>
+            {% if get_flashed_messages() %}
+                <div id="flash">{{ get_flashed_messages()[0] }}</div>
+            {% endif %}
+            {% block body %}{% endblock %}
+        </div>
+        <div id="footer">
+        Powered by <a href="http://hopperhq.com/hopper">Hopper</a>
+        </div>
+        <script>
+            $(document).ready(function() {
+                $('#project-select-wrapper').mouseover(function() {
+                    $('#project-list').show();
+                });
+                $('#project-select-wrapper').mouseout(function() {
+                    $('#project-list').hide();
+                });
+                $('#new-issue').tipTip({
+                    content: 'Submit a new issue to the tracker'
+                });
+            });
+        </script>
+    </body>
+</html>

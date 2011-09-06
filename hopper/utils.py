@@ -8,6 +8,8 @@ import os
 import sys
 import time
 import random
+from datetime import datetime
+from markdown import markdown
 
 def to_json(data):
     '''
@@ -34,6 +36,31 @@ def get_uuid(salt=None):
     # probably overkill to use both random and time
     return get_hash(str(time.time()) + salt)
 
+def relative_time(ts):
+    '''Return a human-parseable time format from a UTC timestamp.'''
+    ts = datetime.fromtimestamp(ts)
+    delta = datetime.now() - ts
+    days = delta.days
+    hours = delta.seconds / 3600
+    minutes = delta.seconds % 3600 / 60
+    
+    if days > 0:
+        if days == 1:
+            return '1 day ago'
+        return '%d days ago' % days
+    if hours > 0:
+        if hours == 1:
+            return '1 hour ago'
+        return '%d hours ago' % hours
+    if minutes > 0:
+        if minutes == 1:
+            return '1 minute ago'
+        return '%d minutes ago' % minutes
+    return 'just now'
+
+def markdown_to_html(text):
+    return markdown(text, ['codehilite'])
+
 def match_path(path, get_all=False):
     '''
     Match a path using glob. Return scenarios:
@@ -51,3 +78,14 @@ def match_path(path, get_all=False):
         return glob.glob(path)[0]
     else:
         return None
+
+def map_attr(obj_list, attr, f):
+    '''
+    Apply the function, f, to attribute, attr, of each object in obj_list
+
+    Because it's easier than a map...
+    ''' 
+    for obj in obj_list:
+        val = getattr(obj, attr)
+        val = f(val)
+        setattr(obj, attr, val)
