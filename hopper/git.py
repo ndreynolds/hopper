@@ -1,9 +1,10 @@
 from __future__ import with_statement
 import os
 import time
+import subprocess
 
 from dulwich.repo import Repo as DulwichRepo
-from dulwich.objects import Commit as DulwichCommit, Blob, Tree
+from dulwich.objects import Commit, Blob, Tree
 from dulwich.errors import CommitError
 
 class Repo(object):
@@ -21,10 +22,17 @@ class Repo(object):
     '''
 
     def __init__(self, path):
-        self.repo = DulwichRepo(path)
-        self._set_head()
-        self.tree = Tree()
-        self.blobs = []
+        self.repo = DulwichRepo(path) # The inner Dulwich Repo object.
+        try:
+            self.head = self._get_head()
+        except KeyError:
+            self.head = None
+        try:
+            self.tree = self.head.tree
+            self.blobs = self.head.tree.blobs
+        except AttributeError:
+            self.tree = Tree()
+            self.blobs = []
         self.root = path
         self.objects = self.repo.object_store
 
@@ -69,6 +77,43 @@ class Repo(object):
             head = self.head.id
         self.repo.refs['refs/heads/%s' % name] = head
 
+    def checkout(self, identifier):
+        '''
+        Checkout a branch, commit, or file.
+        '''
+        pass
+
+    def cmd(self, cmd):
+        '''
+        Run a raw git command from the shell and return any output. Unlike 
+        other methods (which depend on Dulwich's git reimplementation and 
+        not git itself), this is dependant on the git shell command.
+
+        The given command and arguments are prefixed with:
+            git --git-dir=[/path/to/tracker/.git] --work-tree=[/path/to/tracker]
+
+        :param cmd: A list of command-line arguments (anything the subprocess 
+                    module will take).
+
+        Usage:
+          >>> Repo.cmd(['checkout', '-q', 'master'])
+          >>> Repo.cmd(['commit', '-q', '-a', '-m', 'Initial Commit'])
+          >>> Repo.cmd(['remote', '-v'])
+          "origin  git@ndreynolds.com:hopper2.git (fetch)\n\n origin ... "
+          >>> Repo.cmd(['log'])
+          "commit 68a116eaee458607a3a9cf852df4f358a02bdb92\nAuthor: Ni..."
+
+        As you can see, it doesn't do any parsing of the output. It's best 
+        used for actions with little or no output (e.g. checkouts, add/rm, 
+        remote add/rm, etc.). 
+        '''
+        if not type(cmd) is list:
+            raise TypeError('cmd must be a list')
+        git_dir = os.path.join(self.root, '.git')
+        prefix = ['git', '--git-dir', git_dir, '--work-tree', self.root]
+        # It would be nice to use check_output() here, but it's 2.7+
+        return subprocess.Popen(prefix + cmd, stdout=subprocess.PIPE).communicate()[0]
+
     def commit(self, **kwargs):
         '''
         Mimics the `git commit` command.
@@ -106,7 +151,7 @@ class Repo(object):
         if not options.has_key('committer'):
             options['committer'] = options['author']
 
-        commit = DulwichCommit()
+        commit = Commit()
         # Set the commit attributes from the dictionary
         for key in options.keys():
             setattr(commit, key, options[key])
@@ -143,9 +188,8 @@ class Repo(object):
         :param identifer: a branch (not yet) or SHA. Given a SHA, the
                           return value will be a single Commit object.
                           Anything else gets you a list.
-        :param n: the maximum number of commits to return. The key word
-                  is 'maximum'. If fewer matching commits exist, only 
-                  they will be returned.
+        :param n: the maximum number of commits to return. If fewer 
+                  matching commits exist, only they will be returned.
         '''
 
         # eventually this needs to check if the identifier is a branch
@@ -156,8 +200,14 @@ class Repo(object):
             raise MissingHead
         return self.repo.revision_history(self.head.id)[:n]
 
+    def diff(self, a, b):
+        '''
+        Return a diff of commits a and b.
+        '''
+        raise NotImplementedError
+
     def log(self):
-        return self.get_commits()
+        return self.commits()
 
     def tag(self, sha):
         return self.repo.tag(sha)
@@ -184,18 +234,16 @@ class Repo(object):
             obj_store.add_object(self.tree)
             obj_store.add_object(self.commit)
             return True
-        else:
-            print 'Nothing to store.' 
-            return False
+        return False
 
-    def _set_head(self):
-        '''Set the repo's head attribute.'''
-        if self.repo.head:
-            return
-        print self.repo.refs
-        if self.repo.refs.has_key('HEAD'):
-            self.head = self.repo.commit(self.repo.head())
-            self.head.tree = self.repo.tree(self.head.tree)
+    def _get_head(self):
+        '''Get and return the repo's HEAD.'''
+        if 'HEAD' in self.repo.refs.keys():
+            head = self.repo[self.repo.head()]
+            head.tree = self.repo[head.tree]
+            return head
+        else:
+            return None
 
 class MissingHead(Exception):
     '''The repository has no HEAD'''

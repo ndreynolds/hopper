@@ -83,6 +83,17 @@
             else {
                 $('#content-header').after(filter);
             }
+            var options = {}
+            options.status = 'open';
+            options.filters = '';
+            $.ajax({
+                type: 'POST',
+                url: 'api/issues', 
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                data: JSON.stringify({'test': 'test'}), 
+                success: function(data) { console.log(data) }
+            });
         });
     });
 </script>

@@ -3,6 +3,7 @@ import os
 
 from hopper.test_env import TestEnv
 from hopper.issue import Issue
+from hopper.comment import Comment
 
 class TestIssue(unittest.TestCase):
     def setUp(self):
@@ -26,15 +27,24 @@ class TestIssue(unittest.TestCase):
         # i.e.: issue.title should return issue.fields['title'] 
         assert issue.fields['title'] == issue.title
 
-    def test_read(self):
-        issue1 = Issue(self.tracker)
-        issue1.title = 'test title'
-        issue1.save()
-        issue2 = Issue(self.tracker)
-        issue2.title = 'different title'
-        issue2.read(issue1.id)
-        # issue2 should become a clone of issue1 after calling read().
-        assert issue1.fields ==  issue2.fields
+    def test_comments(self):
+        issue = Issue(self.tracker)
+        issue.save()
+        # Make some comments
+        comments = [Comment(issue) for i in range(20)]
+        for c in comments:
+            c.save()
+        assert type(issue.comments()) is list
+        assert len(issue.comments()) == 20
+        assert len(issue.comments(n=15)) == 15
+
+    def test_comment(self):
+        issue = Issue(self.tracker)
+        issue.save()
+        c = Comment(issue)
+        c.save()
+        assert type(issue.comment(c.id)) is Comment
+        assert issue.comment(c.id).fields == c.fields
 
     def test_save(self):
         issue = Issue(self.tracker)

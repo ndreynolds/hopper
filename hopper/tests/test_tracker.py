@@ -60,7 +60,7 @@ class TrackerTest(unittest.TestCase):
         invalid_sha = get_uuid()
         try:
             t.issue(invalid_sha)
-        except DoesNotExist:
+        except OSError:
             pass
         
     def test_issues(self):

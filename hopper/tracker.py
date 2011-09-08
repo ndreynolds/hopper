@@ -3,33 +3,39 @@ import os
 from hopper.git import Repo
 from hopper.issue import Issue
 from hopper.utils import match_path
+from hopper.json_file import JSONFile
+from hopper.base_file import BaseFile
 
-class Tracker(object):
+class Tracker(JSONFile):
     '''
     Defines a Hopper tracker and provides paths to files within a 
-    tracker.
+    tracker. It subclasses JSONFile to get methods for reading from
+    and writing to its JSON config file.
 
     :param path: the relative or absolute path to the tracker
     '''
     def __init__(self, path):
+        self.fields = {
+                'name': None,
+                'created': None
+                }
         if not os.path.exists(path):
             path = match_path(path)
             if path is None:
                 raise OSError('Supplied path does not exist')
         self.path = path
-        self.fields = {
-                'name': None,
-                'created': None
-                }
         self.paths = {
                 'root': self.path,
+                'config': os.path.join(self.path, 'config'),
                 'issues': os.path.join(self.path, 'issues'),
                 'hopper': os.path.join(self.path, '.hopper')
                 }
         self.properties = {
                 'name': None
                 }
-                
+        self.repo = Repo(path)
+        super(BaseFile, self).__init__()
+
     @classmethod
     def new(cls, path):
         '''Create and return tracker at the given path.'''
@@ -49,6 +55,11 @@ class Tracker(object):
         repo.commit(author='Hopper <hopper@hopperhq.com>',
                     message='Initial Commit')
         return cls(path)
+
+    def autocommit(self):
+        '''Commit any changes to the repo.'''
+        self.repo.cmd(['add', '.'])
+        self.repo.cmd(['commit', '-am', 'Did something'])
 
     def read(self):
         '''Read in the tracker's properties.'''
@@ -98,6 +109,13 @@ class Tracker(object):
             return issues[:n]
         return issues
 
+    def history(self, n=10):
+        '''
+        Return a list of dictionaries containing the action and the actor.
+        These are assembled from the Git repository's commit log.
+        '''
+        return self.repo.commits()
+
     def get_issue_path(self, sha):
         '''
         Returns the absolute path to the issue. It doesn't check if the issue
@@ -105,7 +123,7 @@ class Tracker(object):
 
         :param sha: the SHA1 that uniquely identifies an issue.
         '''
-        return os.path.join(self.paths['issues'], sha)
+        return os.path.join(self.paths['issues'], sha, 'issue')
 
     def get_issues(self):
         '''
@@ -114,5 +132,5 @@ class Tracker(object):
         Use Tracker.issues() to get them as Issue objects, filtered by various
         conditions.
         '''
-        # we'll just return any filenames in tracker/issues/ with 40 chars.
+        # we'll just return any paths in tracker/issues/ with 40 chars.
         return filter(lambda x: len(x) == 40, os.listdir(self.paths['issues']))

@@ -1,70 +1,37 @@
 import time
-import hashlib
+import os
 
-from hopper.item import Item
+from hopper.json_file import JSONFile
+from hopper.base_file import BaseFile
 from hopper.utils import to_json, get_hash
 
-class Comment(Item):
-    '''
-    Represents an issue's comment. The Comment class does not directly
-    write its objects to file, this is done through the Issue.save() method.
-    '''
+class Comment(JSONFile):
+    '''Represents an issue's comment.'''
     
     def __init__(self, issue, id=None, **kwargs):
         self.fields = {
               'author': {
                   'name': None,
-                  'email': None
+                  'email': None,
+                  'avatar': None
                   },
               'content': None,
               'timestamp': None,
               'id': None
               }
-        # If an id was given, find the matching comment and merge its items
-        # with the defaults.
         self.issue = issue
         if id is not None:
-            self.read(id)
-        self._set_fields()
+            self.from_file(issue.get_comment_path(id))
+        super(BaseFile, self).__init__()
 
-    def read(self, id):
-        '''Read in a comment from the issue.'''
-        matches = filter(lambda x: x.id == id, self.issue.comments)
-        if len(matches): 
-            comment = matches[0]
-            self.fields = dict(self.fields.items() + comment.fields.items())
-
-    def save(self, save_issue=False):
-        '''
-        Append the comment to the issue and optionally call the issue's save
-        method.
-
-        :param save_issue: save the associated issue. 
-        '''
+    def save(self):
+        '''Save the comment to file.'''
         self.timestamp = time.time()
         self.id = get_hash(to_json(self.fields))
-        # delete the existing comment, if it exists.
-        self.delete()
-        self.issue.comments.append(self)
-        if save_issue:
-            self.issue.save()
+        if not os.path.isdir(self.issue.paths['comments']):
+            os.mkdir(self.issue.paths['comments'])
+        self.to_file(self.issue.get_comment_path(self.id))
 
-    def delete(self, save_issue=False):
-        '''
-        Delete the instantiated comment from the issue, if it's even
-        there.
-        '''
-        for comment in self.issue.comments:
-            if comment.id == self.id:
-                self.issue.comments.remove(comment)
-
-    @classmethod
-    def rm(cls, issue, id, save_issue=False):
-        '''
-        Class method to remove the specified comment from the
-        issue without needing to instantiate it. Use delete() to
-        delete the instantiated comment.
-        '''
-        for comment in issue.comments:
-            if comment.id == id:
-                issue.comments.remove(comment)
+    def delete(self):
+        '''Delete the comment's disk representation.'''
+        os.remove(self.issue.get_comment_path(self.id))

@@ -5,7 +5,6 @@ except ImportError:
 import hashlib
 import glob
 import os
-import sys
 import time
 import random
 from datetime import datetime
@@ -89,3 +88,4 @@ def map_attr(obj_list, attr, f):
         val = getattr(obj, attr)
         val = f(val)
         setattr(obj, attr, val)
+    return obj_list # Lists are mutable so using this isn't necessary.

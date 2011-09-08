@@ -12,16 +12,6 @@ class CommentTest(unittest.TestCase):
     def tearDown(self):
         self.env.cleanup()
 
-    def test_read(self):
-        c1 = Comment(self.issue)
-        c1.content = 'red'
-        c1.save()
-        c2 = Comment(self.issue)
-        c2.content = 'blue'
-        c2.save()
-        c2.read(c1.id)
-        assert c2.fields == c1.fields
-
     def test_save(self):
         pass
 

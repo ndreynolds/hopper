@@ -2,7 +2,6 @@ from __future__ import with_statement
 import unittest
 import shutil
 import os
-import time
 
 from hopper.utils import get_uuid
 from hopper.git import Repo
@@ -29,12 +28,11 @@ class RepoTest(unittest.TestCase):
         r.add_all()
         # commit the changes
         r.commit(author='Joe Sixpack', message='Initial commit')
-        print dir(r)
         return r
 
     def test_init(self):
         # NOTE init is not __init__, but a @classmethod for creating 
-        # repositories. See test_constructor for __init__.
+        # repositories. See test_constructor() for __init__.
         r = Repo.init(self.path, mkdir=True)
         # make sure it created something.
         assert os.path.isdir(self.path)
@@ -50,7 +48,7 @@ class RepoTest(unittest.TestCase):
         # make sure it's a Repo object.
         assert type(r2) is Repo
         # a new repo should have no HEAD
-        assert not hasattr(r2, 'head')
+        assert r2.head == None
 
     def test_add_all(self):
         pass
@@ -58,7 +56,7 @@ class RepoTest(unittest.TestCase):
     def test_add(self):
         pass
 
-    def test_brach(self):
+    def test_branch(self):
         pass
 
     def test_commit(self):

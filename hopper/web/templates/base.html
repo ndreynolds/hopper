@@ -12,9 +12,17 @@
         <script type="text/javascript" src="{{ url_for('static', 
             filename='js/hopper.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', 
+            filename='js/showdown.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', 
             filename='js/tiptip/jquery.tipTip.minified.js') }}"></script>
     </head>
     <body>
+        {% if get_flashed_messages() %}
+            <div id="flash">
+                {{ get_flashed_messages()[0] }}
+                <span style="float:right; font-size:60%;">(Click to dismiss)</span>
+            </div>
+        {% endif %}
         <h1>Hopper</h1>
         <div class="page">
             <ul id="nav">
@@ -31,9 +39,6 @@
                 {% endfor %}
                 <a id="new-issue" href="{{ url_for('new') }}" class="button green" style="float:right; bottom:4px; padding:10px;">New Issue</a>
             </ul>
-            {% if get_flashed_messages() %}
-                <div id="flash">{{ get_flashed_messages()[0] }}</div>
-            {% endif %}
             {% block body %}{% endblock %}
         </div>
         <div id="footer">
@@ -49,6 +54,9 @@
                 });
                 $('#new-issue').tipTip({
                     content: 'Submit a new issue to the tracker'
+                });
+                $('#flash').click(function() {
+                    $(this).hide();
                 });
             });
         </script>

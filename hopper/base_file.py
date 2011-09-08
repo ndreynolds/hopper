@@ -1,15 +1,16 @@
-from hopper.utils import to_json
-
-class Item(object):
+class BaseFile(object):
     '''
-    Item subclasses have the 'fields' attribute, a dictionary that 
+    BaseFile subclasses have the 'fields' attribute, a dictionary that 
     specifies properties that will be saved to persistent memory.
     (Issues have 'content', 'timestamp', etc.)
 
-    To make life easier, the Item class provides attribute access and
+    To make life easier, the class provides attribute access and
     assignment to these keys, provided they don't clash with any existing
     attributes.
     '''
+
+    def __init__(self):
+        self._set_fields()
 
     def __setattr__(self, name, value):
         self.__dict__[name] = value

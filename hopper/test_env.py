@@ -1,6 +1,5 @@
 from hopper.tracker import Tracker
 from hopper.issue import Issue
-from hopper.comment import Comment
 from hopper.utils import get_uuid
 
 import os
