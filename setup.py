@@ -18,5 +18,10 @@ setup(name='Hopper',
                         'pygments', 
                         'dulwich', 
                         'configobj'],
+      entry_points={
+          'console_scripts': [
+              'hpr = hopper.hpr.hpr:main'
+              ]
+          },
       license='MIT'
      )

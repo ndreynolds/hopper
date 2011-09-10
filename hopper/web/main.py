@@ -3,7 +3,6 @@ from flask import Flask, render_template, url_for, request, redirect, \
 from hopper.tracker import Tracker
 from hopper.issue import Issue
 from hopper.comment import Comment
-from hopper.filter import Filter
 from hopper.config import Config
 from hopper.utils import relative_time, markdown_to_html, map_attr
 
@@ -11,24 +10,25 @@ import json
 
 app = Flask(__name__)
 app.secret_key = 'sdgasd6t4ry43y45SADGVQ43Y345RQw356y45sDGDSgSDG'
-TRACKER = None
-DEBUG = True
-FIRST_REQUEST = True
+config = {
+        'tracker': None,
+        'first_request': False,
+        'debug': False
+        }
 
 links = ['feed', 'issues', 'settings']
 
-def start(path, port=5000, debug=DEBUG, external=False):
+def start(path, port=5000, debug=False, external=False):
     '''
     Run the Hopper tracker at the given path. Allows for setting the port,
     debug mode, and whether or not it's externally visible. 
 
     Running it on port 80 is possible but will usually require being root.
     '''
-    global TRACKER
-    TRACKER = path
-
     # Try and get an int out of the port param, set to 5000 if anything
     # goes wrong.
+    global config
+    config['tracker'] = path
     if type(port) in [int, str]:
         try:
             port = int(port)
@@ -36,13 +36,12 @@ def start(path, port=5000, debug=DEBUG, external=False):
             port = 5000
     else:
         port = 5000
-
     if external:
         # Run the app on a public IP. Debug will be off.
         app.debug=False
         app.run(host='0.0.0.0', port=port)
     else:
-        # Run the app on the localhost, using the DEBUG const.
+        # Run the app on the localhost.
         app.debug = debug
         app.run(port=port)
 
@@ -55,12 +54,16 @@ def to_json(data):
     return app.response_class(json_response, mimetype='application/json')
 
 def get_tracker():
-    global FIRST_REQUEST
-    if FIRST_REQUEST:
+    '''
+    Return the tracker, set the flash message if this is the first
+    time this is called.
+    '''
+    global config
+    if config['first_request']:
         config = Config()
         flash('Running Hopper locally as %s' % config.user['name'])
-        FIRST_REQUEST = False
-    return Tracker(TRACKER_ROOT)
+        config['first_request'] = False
+    return Tracker(config['tracker'])
 
 @app.route('/')
 def feed():
@@ -85,7 +88,6 @@ def issues(status='open'):
     else:
         issues = tracker.issues(n=20, sort_by=sort_by, \
                 reverse=reverse, conditions={'status': 'open'})
-
     map_attr(issues, 'updated', relative_time)
     map_attr(issues, 'created', relative_time)
     if request.json is not None:
@@ -111,7 +113,7 @@ def new():
             flash('There was an error saving your issue')
             return render_template('new.html')
     else:
-        return render_template('new.html')
+        return render_template('new.html', links=links, selected='issues')
 
 @app.route('/issues/view/<id>', methods=['GET', 'POST'])
 def issue(id):
@@ -168,6 +170,6 @@ def open(id):
         return redirect(url_for('issue', id=issue.id))
 
 if __name__ == '__main__':
-    app.debug = DEBUG
-    TRACKER_ROOT = '/home/ndreynolds/repos/hopper2/hopper/new_tracker'
+    app.debug = True
+    config['tracker'] = '/home/ndreynolds/trackers/hopper'
     app.run()

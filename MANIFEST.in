@@ -1,0 +1,3 @@
+recursive-include hopper/web *
+recursive-include hopper/hpr *
+prune .git

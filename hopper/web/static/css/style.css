@@ -27,7 +27,7 @@ html, body {
 }
 html {
   margin: 0px;
-  background-color: #ddd;
+  background-color: #eee;
   font-family: Helvetica;
   color: #333;
 }
@@ -420,10 +420,10 @@ div#preview {
   -moz-border-radius: 5px;
   background-color: #eee;
   border: 2px dashed #888;
-  min-height: 50px;
   margin-left: 20px;
   margin-top: 5px;
   padding: 8px;
+  height: 50px;
 }
 div#preview pre {
   background-color: #002b36;

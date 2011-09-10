@@ -31,7 +31,7 @@
     <form method="post">
         <span style="font-size:80%; float:right;"><a>Toggle Preview</a></span>
         <br>
-        <div id="preview"></div>
+        <div id="preview" style="display:none"></div>
         <br>
         <textarea name="content" style="height:85px"></textarea>
         <span style="font-size:90%">
@@ -55,6 +55,8 @@
             defaultPosition: 'top'
         });
         $('textarea').keyup(function() {
+            $('#preview').fadeIn();
+            $('#preview').css('min-height', '50px');
             var converter = new Showdown.converter();
             $('#preview').html(converter.makeHtml($(this).val()));
         });
