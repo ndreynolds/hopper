@@ -143,7 +143,7 @@ def comment(args):
     path = template.open(editor)
     fields = template.parse(path)
     c.content = fields['content']
-    if c.save():
+    if c.save() and i.save():
         print 'Posted comment %s on issue %s' % (c.id[:6], i.id[:6])
 
 def reopen(args):

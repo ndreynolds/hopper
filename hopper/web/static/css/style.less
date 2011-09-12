@@ -55,7 +55,7 @@ html {
     color:#333;
 } 
 
-h1 {
+h1#header {
     background-color: @hopper-green;
     font-family:Nobile Bold Italic;
     text-shadow: 0 1px 1px darken(@hopper-green, 20%);
@@ -272,7 +272,7 @@ input[type=submit] {
 }
 
 input[type=submit]:hover {
-    .gradient();
+    .gradient(#ddd, #bbb);
     cursor:pointer;
 }
 
@@ -331,6 +331,14 @@ input[type=submit]:hover {
 
 .comment p, .issue p, #preview p {
     margin-bottom:10px;
+}
+
+.comment h1, .issue h1, #preview h1 {
+    font-size: 150%;
+}
+
+.comment h2, .issue h2, #preview h2 {
+    font-size: 130%;
 }
 
 div.codehilite {

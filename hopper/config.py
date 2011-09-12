@@ -8,9 +8,9 @@ class Config(ConfigFile):
     '''
     Reads and writes the .hprconfig file.
 
-    The Config class holds defaults for the configuration and depends 
-    on the parent class, ConfigFile, to do the actual reading and 
-    writing.
+    The Config class holds (and intelligently sets) defaults for 
+    the configuration. It depends on the parent class, ConfigFile, 
+    to do the actual reading and writing.
     '''
 
     def __init__(self, path=None):

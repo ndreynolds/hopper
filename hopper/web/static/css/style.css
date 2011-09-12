@@ -22,7 +22,7 @@ html {
   font-family: Helvetica;
   color: #333;
 }
-h1 {
+h1#header {
   background-color: #5f8a42;
   font-family: Nobile Bold Italic;
   text-shadow: 0 1px 1px #304521;
@@ -219,7 +219,7 @@ input[type=submit] {
   padding: 8px;
 }
 input[type=submit]:hover {
-  background: -webkit-gradient(linear, left top, left bottom, from(#888888), to(#666666));
+  background: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#bbbbbb));
   cursor: pointer;
 }
 #filter {
@@ -272,6 +272,12 @@ input[type=submit]:hover {
 }
 .comment p, .issue p, #preview p {
   margin-bottom: 10px;
+}
+.comment h1, .issue h1, #preview h1 {
+  font-size: 150%;
+}
+.comment h2, .issue h2, #preview h2 {
+  font-size: 130%;
 }
 div.codehilite {
   background-color: #002b36;

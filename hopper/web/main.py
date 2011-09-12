@@ -135,6 +135,7 @@ def issue(id):
         comment.author['name'] = config.user['name']
         comment.author['email'] = config.user['email']
         comment.save()
+        issue.save() # ping the issue (updated = now)
         return redirect(url_for('issue', id=issue.id))
     else:
         issue.updated = relative_time(issue.updated)

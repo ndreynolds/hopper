@@ -1,16 +1,16 @@
+import os
+import shutil
+
 from hopper.tracker import Tracker
 from hopper.issue import Issue
 from hopper.utils import get_uuid
 
-import os
-import shutil
-
 class TestEnv(object):
     '''
-    An environment for testing Hopper.
-    
-    Methods to make a tracker.
+    Create a test environment, making and cleaning up uniquely named
+    trackers.
     '''
+
     def __init__(self, make_tracker=True):
         # init will automatically create a tracker unless told not to.
         if make_tracker:

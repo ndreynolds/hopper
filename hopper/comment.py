@@ -29,7 +29,7 @@ class Comment(JSONFile):
         self.id = get_hash(to_json(self.fields))
         if not os.path.isdir(self.issue.paths['comments']):
             os.mkdir(self.issue.paths['comments'])
-        self.to_file(self.issue.get_comment_path(self.id))
+        return self.to_file(self.issue.get_comment_path(self.id))
 
     def delete(self):
         '''Delete the comment's disk representation.'''
