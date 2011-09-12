@@ -25,6 +25,7 @@ html {
 h1 {
   background-color: #5f8a42;
   font-family: Nobile Bold Italic;
+  text-shadow: 0 1px 1px #304521;
   color: #fff;
   padding: 10px;
 }
@@ -316,7 +317,7 @@ td.linenos {
   padding: 13px;
   height: 50px;
   text-decoration: none;
-  color: #dedede;
+  color: #eee;
   margin-left: 10px;
   text-shadow: 0 1px 1px #444;
 }

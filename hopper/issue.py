@@ -2,12 +2,13 @@ from __future__ import with_statement
 import time
 import os
 import shutil
+import glob
 
 from hopper.json_file import JSONFile
 from hopper.base_file import BaseFile
 from hopper.comment import Comment
 from hopper.utils import to_json, get_hash
-from hopper.errors import DoesNotExist
+from hopper.errors import BadReference, AmbiguousReference
 
 class Issue(JSONFile):
     '''
@@ -46,7 +47,7 @@ class Issue(JSONFile):
                 }
         self.tracker = tracker
         if id is not None:
-            self.id = id
+            self.id = self._resolve_id(id)
             self._set_paths()
             self.from_file(self.paths['issue'])
         super(BaseFile, self).__init__()
@@ -94,20 +95,38 @@ class Issue(JSONFile):
         (such as spam).
         '''
         if not hasattr(self, 'id'):
-            raise DoesNotExist('The issue does not exist on disk')
+            raise BadReference('No matching issue on disk')
         shutil.rmtree(self.paths['root'])
 
     def get_comment_path(self, sha):
         '''Get the path to the comment with the given SHA.'''
         if not hasattr(self, 'id'):
-            raise DoesNotExist('The issue does not exist on disk')
+            raise BadReference('No matching issue on disk')
         return os.path.join(self.paths['comments'], sha)
 
     def get_comments(self):
         '''Get the SHAs of all comments to the issue.'''
         if not hasattr(self, 'id'):
-            raise DoesNotExist('The issue does not exist on disk')
+            raise BadReference('No matching issue on disk')
         return filter(lambda x: len(x) == 40, os.listdir(self.paths['comments']))
+
+    def _resolve_id(self, id):
+        '''Resolve partial ids and verify the issue exists.'''
+        if len(id) == 40:
+            if os.path.exists(self.tracker.get_issue_path(id)):
+                return id
+            else:
+                raise BadReference('No matching issue on disk: %s' % id)
+        # glob the path returned by the tracker helper method
+        matches = glob.glob(self.tracker.get_issue_path(id) + '*')
+        # no matches, raise bad ref:
+        if not matches:
+            raise BadReference('No matching issue on disk: %s' % id)
+        # multiple matches, raise ambiguous ref:
+        if len(matches) > 1:
+            raise AmbiguousReference('Multiple issues matched that id fragment')
+        # one match, return the match
+        return matches[0]
 
     def _set_paths(self):
         '''

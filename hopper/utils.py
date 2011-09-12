@@ -89,3 +89,13 @@ def map_attr(obj_list, attr, f):
         val = f(val)
         setattr(obj, attr, val)
     return obj_list # Lists are mutable so using this isn't necessary.
+
+def wrap(text, width=80):
+    return reduce(lambda line, word, width=width: '%s%s%s' %
+                  (line,
+                   ' \n'[(len(line)-line.rfind('\n')-1
+                         + len(word.split('\n',1)[0]
+                              ) >= width)],
+                    word),
+                   text.split(' ')
+                  )

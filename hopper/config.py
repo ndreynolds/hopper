@@ -1,4 +1,5 @@
 import os
+import sys
 from configobj import ConfigObj
 
 from hopper.config_file import ConfigFile
@@ -14,6 +15,7 @@ class Config(ConfigFile):
     '''
 
     def __init__(self, path=None):
+        # set config file fields
         self.fields = {
                 'user': {
                     'name': None,
@@ -21,12 +23,15 @@ class Config(ConfigFile):
                     },
                 'core': {
                     'editor': 'vim',
-                    'autocommit': True
+                    'autocommit': True,
+                    'color': True
                     }
                 }
+        # set field types (so they're parsed correctly)
         self.types = {
                 'core': {
-                    'autocommit': bool
+                    'autocommit': bool,
+                    'color': bool
                     }
                 }
         if path is None:
@@ -57,6 +62,22 @@ class Config(ConfigFile):
 
     def save(self):
         self.to_file(self.path)
+
+    def decorate(self, color, text, force=False):
+        colors = {'purple' : '\033[95m',
+                  'blue'   : '\033[94m',
+                  'green'  : '\033[92m',
+                  'yellow' : '\033[93m',
+                  'red'    : '\033[91m',
+                  'bold'   : '\033[1m'
+                  }
+        end = '\033[0m'
+        # only output color if configed and output is not being
+        # redirected (unless force is set).
+        if self.core['color'] and (sys.stdout.isatty() or force):
+            return colors[color] + text + end
+        else:
+            return text
 
 def parse_gitconfig():
     '''Parse the .gitconfig file and return the dictionary.'''
