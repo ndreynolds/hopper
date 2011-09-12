@@ -4,8 +4,7 @@ import os
 import shutil
 import glob
 
-from hopper.json_file import JSONFile
-from hopper.base_file import BaseFile
+from hopper.files import BaseFile, JSONFile
 from hopper.comment import Comment
 from hopper.utils import to_json, get_hash
 from hopper.errors import BadReference, AmbiguousReference

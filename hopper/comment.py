@@ -1,8 +1,7 @@
 import time
 import os
 
-from hopper.json_file import JSONFile
-from hopper.base_file import BaseFile
+from hopper.files import BaseFile, JSONFile
 from hopper.utils import to_json, get_hash
 
 class Comment(JSONFile):

@@ -3,8 +3,7 @@ import os
 from hopper.git import Repo
 from hopper.issue import Issue
 from hopper.utils import match_path
-from hopper.json_file import JSONFile
-from hopper.base_file import BaseFile
+from hopper.files import BaseFile, JSONFile
 
 class Tracker(JSONFile):
     '''

@@ -2,8 +2,7 @@ import os
 import sys
 from configobj import ConfigObj
 
-from hopper.config_file import ConfigFile
-from hopper.base_file import BaseFile
+from hopper.files import BaseFile, ConfigFile
 
 class Config(ConfigFile):
     '''

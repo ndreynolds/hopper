@@ -2,7 +2,76 @@ from __future__ import with_statement
 import os
 from configobj import ConfigObj
 
-from hopper.base_file import BaseFile
+from hopper.utils import from_json, to_json
+
+class BaseFile(object):
+    '''
+    BaseFile subclasses have the 'fields' attribute, a dictionary that 
+    specifies properties that will be saved to persistent memory.
+    (Issues have 'content', 'timestamp', etc.)
+
+    To make life easier, the class provides attribute access and
+    assignment to these keys, provided they don't clash with any existing
+    attributes.
+    '''
+
+    def __init__(self):
+        self._set_fields()
+
+    def __setattr__(self, name, value):
+        self.__dict__[name] = value
+        # Update fields[name] if the key exists
+        if self.fields.has_key(name):
+            self.fields[name] = value
+
+    def __getattribute__(self, name):
+        '''
+        We want the attributes to contain the same value as
+        the fields[name] value. Assuming the fields dictionary was
+        modified directly, the corresponding attribute would not be 
+        in sync. To counter this, we get attributes directly from the
+        dictionary.
+        '''
+        # we don't want to mess with any special attributes.
+        if not name.startswith('__'):
+            # use the base class's method so we avoid infinite recursion.
+            fields = object.__getattribute__(self, 'fields')
+            if fields.has_key(name):
+                return self.fields[name]
+        return object.__getattribute__(self, name)
+
+    def _set_fields(self):
+        '''
+        Sets the keys in self.fields as attributes, provided they don't
+        already exist. This needs to be called manually inside __init__.
+        '''
+        for key in self.fields.iterkeys():
+            if not hasattr(self, key):
+                setattr(self, key, self.fields[key])
+
+
+class JSONFile(BaseFile):
+    '''
+    JSONFile subclasses the BaseFile class to provide methods
+    for reading and writing JSON to file.
+    '''
+
+    def from_file(self, f):
+        '''Read self.fields from file.'''
+        if not os.path.exists(f):
+            raise OSError('File does not exist')
+        with open(f, 'r') as fp:
+            self.fields = from_json(fp.read())
+        return True
+
+    def to_file(self, f):
+        '''Save self.fields to file.'''
+        if not type(self.fields) is dict:
+            raise TypeError('self.fields must be a dict')
+        with open(f, 'w') as fp:
+            fp.write(to_json(self.fields))
+        return True
+
 
 class ConfigFile(BaseFile):
     '''
