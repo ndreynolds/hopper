@@ -10,7 +10,7 @@ import json
 
 app = Flask(__name__)
 app.secret_key = 'sdgasd6t4ry43y45SADGVQ43Y345RQw356y45sDGDSgSDG'
-config = {
+VARS = {
         'tracker': None,
         'first_request': False,
         'debug': False
@@ -27,8 +27,8 @@ def start(path, port=5000, debug=False, external=False):
     '''
     # Try and get an int out of the port param, set to 5000 if anything
     # goes wrong.
-    global config
-    config['tracker'] = path
+    global VARS
+    VARS['tracker'] = path
     if type(port) in [int, str]:
         try:
             port = int(port)
@@ -53,27 +53,32 @@ def to_json(data):
     json_response = json.dumps(data, indent=None if request.is_xhr else 2)
     return app.response_class(json_response, mimetype='application/json')
 
-def get_tracker():
+def setup():
     '''
-    Return the tracker, set the flash message if this is the first
-    time this is called.
+    Return the tracker and config. 
+    
+    It also sets the flash to an environment warning to let the user know
+    they are running the tracker locally and as <name>. We only do this
+    the first time setup() is called per web server lifetime.
     '''
-    global config
-    if config['first_request']:
-        config = Config()
+    config = Config()
+    global VARS
+    if VARS['first_request']:
         flash('Running Hopper locally as %s' % config.user['name'])
-        config['first_request'] = False
-    return Tracker(config['tracker'])
+        VARS['first_request'] = False
+    return Tracker(VARS['tracker']), config
 
 @app.route('/')
 def feed():
-    tracker = get_tracker()
-    return to_json([i.fields for i in tracker.issues()])
+    tracker, config = setup()
+    issues = tracker.issues()
+    return render_template('issues.html', issues=issues, links=links, 
+            selected='feed')
 
 @app.route('/issues/<status>')
 @app.route('/issues/', methods=['GET', 'POST'])
 def issues(status='open'):
-    tracker = get_tracker()
+    tracker, config = setup()
     sort = request.args.get('sort')
     order = request.args.get('order')
     reverse = True 
@@ -98,9 +103,8 @@ def issues(status='open'):
 
 @app.route('/issues/new', methods=['GET', 'POST'])
 def new():
-    tracker = get_tracker()
+    tracker, config = setup()
     if request.method == 'POST':
-        config = Config()
         issue = Issue(tracker)
         issue.content = request.form['content']
         issue.title = request.form['title']
@@ -123,10 +127,9 @@ def issue(id):
     requests can contain filter objects. Filters are part of the UI
     and we must re-request the issues each time a filter changes.
     '''
-    tracker = get_tracker()
+    tracker, config = setup()
     issue = tracker.issue(id)
     if request.method == 'POST':
-        config = Config()
         comment = Comment(issue)
         comment.content = request.form['content']
         comment.author['name'] = config.user['name']
@@ -141,17 +144,18 @@ def issue(id):
         if comments:
             map_attr(comments, 'timestamp', relative_time)
             map_attr(comments, 'content', markdown_to_html)
-        return render_template('/issue.html', issue=issue, \
-                comments=comments, links=links, selected='issues')
+        return render_template('/issue.html', issue=issue,
+                comments=comments, links=links, selected='issues',
+                config=config)
 
 @app.route('/settings')
 def settings():
-    tracker = get_tracker()
+    tracker, config = setup()
     return render_template('/settings.html')
 
 @app.route('/issues/close/<id>')
 def close(id):
-    tracker = get_tracker()
+    tracker, config = setup()
     issue = tracker.issue(id)
     if issue:
         issue.status = 'closed'
@@ -161,7 +165,7 @@ def close(id):
 
 @app.route('/issues/open/<id>')
 def open(id):
-    tracker = get_tracker()
+    tracker, config = setup()
     issue = tracker.issue(id)
     if issue:
         issue.status = 'open'
@@ -171,5 +175,5 @@ def open(id):
 
 if __name__ == '__main__':
     app.debug = True
-    config['tracker'] = '/home/ndreynolds/trackers/hopper'
+    VARS['tracker'] = '/home/ndreynolds/trackers/hopper'
     app.run()

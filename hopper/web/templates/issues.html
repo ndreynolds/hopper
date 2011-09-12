@@ -62,7 +62,7 @@
                     <a href="{{ url_for('issue', id=issue.id) }}">{{ issue.title }}</a>
                 </td>
                 <td>{{ issue.labels }}</td>
-                <td>{{ issue.created }}</td>
+                <td>{{ issue.updated }}</td>
             </tr>
             {% endfor %}
         {% else %}

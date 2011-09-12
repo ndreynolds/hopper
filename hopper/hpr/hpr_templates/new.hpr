@@ -1,14 +1,14 @@
 
 
 
-
 # [New Issue]
 #
 # The first line should contain the issue's title in 60 
 # chars or less. Lines 3 to EOF contain the issue description. 
 # Lines starting with # are ignored.
 #
-# Parsed with Markdown. For syntax-highlighting indent code 4
-# spaces and start the block with: 
-#     #!javascript     (line numbers)
-#     :::javascript    (no line numbers)
+# Parsed with Markdown. For syntax-highlighting, indent code 4
+# spaces and start the block with either: 
+#     :::<language>  
+# or:
+#     #!<language> (shows line numbers)

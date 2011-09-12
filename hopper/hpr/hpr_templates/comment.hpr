@@ -1,0 +1,38 @@
+Ok here's what I think.
+
+
+<<<issue[1af264] 
+
+
+Nick Reynolds | ndreynolds@gmail.com | 12:40 PM | posted:
+================================================================================
+There's a problem with XYZ
+    
+It's not working and I don't like it.
+
+
+    Nick Reynolds (ndreynolds@gmail.com) commented @ 12:23:
+    ----------------------------------------------------------------------------
+    There's a problem with XYZ?
+
+
+    Nick Reynolds (ndreynolds@gmail.com) commented @ 12:40:
+    ----------------------------------------------------------------------------
+    it is really bad. Code:
+        :::python
+        def test():
+            pass
+
+
+    Joe Reynolds (ndreynolds@gmail.com) commented @ 12:56:
+    ----------------------------------------------------------------------------
+    I agree with and y and z, but not x.
+
+
+>>>
+
+# Parsed with Markdown. For syntax-highlighting indent code 4
+# spaces and start the block with either: 
+#     :::<language>  
+# or:
+#     #!<language> (shows line numbers)

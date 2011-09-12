@@ -13,15 +13,20 @@
 </div>
 <div id="content">
     <div class="issue">
-        <span style="font-size:130%; font-weight:bold;">{{ issue.title }}</span>
-        <br>
+        <span style="font-size:130%; font-weight:bold; text-shadow: 0 0 1px #fff;">{{ issue.title }}</span>
+        <br><br>
         {{ issue.content|safe }}
     </div>
     <br>
     {% if comments %}
         {% for comment in comments %}
+        <div class="comment-header">
+            <span id="author">{{ comment.author['name'] }}</span>
+            <span id="email">({{ comment.author['email'] }})</span>
+            commented 
+            <span id="time">{{ comment.timestamp }}</span>
+        </div>
         <div id="comment-{{ comment.id[:6] }}" class="comment">
-            <span class="context">{{ comment.author['name'] }} ({{ comment.author['email'] }}) commented {{ comment.timestamp }}</span>
             <br>
             {{ comment.content|safe }}
         </div>
@@ -29,9 +34,17 @@
         {% endfor %}
     {% endif %}
     <form method="post">
-        <span style="font-size:80%; float:right;"><a>Toggle Preview</a></span>
+        <span id="preview-toggle" style="display:none; font-size:80%; float:right;"><a>Toggle Preview</a></span>
         <br>
-        <div id="preview" style="display:none"></div>
+        <div id="preview-wrapper">
+            <div class="comment-header" style="margin-left:0px">
+                <span id="author">{{ config.user['name'] }}</span>
+                <span id="email">({{ config.user['email'] }})</span>
+                commented 
+                <span id="time">just now</span>
+            </div>
+            <div id="preview"></div>
+        </div>
         <br>
         <textarea name="content" style="height:85px"></textarea>
         <span style="font-size:90%">
@@ -46,6 +59,7 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function() {
+        var keyup_start = false;
         $('#issue-close').tipTip({
             content: 'Click to close this Issue',
             defaultPosition: 'top'
@@ -55,10 +69,22 @@
             defaultPosition: 'top'
         });
         $('textarea').keyup(function() {
-            $('#preview').fadeIn();
-            $('#preview').css('min-height', '50px');
+            if (!keyup_start) {
+                $('#preview-toggle').fadeIn();
+                $('#preview-wrapper').fadeIn();
+                $('#preview').css('min-height', '50px').height('auto');
+                keyup_start = true;
+            }
             var converter = new Showdown.converter();
             $('#preview').html(converter.makeHtml($(this).val()));
+        });
+        $('#preview-toggle').click(function() {
+            if ($('#preview').css('display') == 'none') {
+                $('#preview').css('visibilty', 'hidden').slideUp();
+            }
+            else {
+                $('#preview').slideDown().css('visibility', 'visible');
+            }
         });
     });
 </script>

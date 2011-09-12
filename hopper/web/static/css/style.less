@@ -13,16 +13,8 @@
     src: url('../fonts/DejaVuSansMono.ttf');
 }
 
-.dgray-gradient {
-    background: -webkit-gradient(linear, left top, left bottom, from(#888), to(#666));
-}
-
-.lgray-gradient {
-    background: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#ccc));
-}
-
-.green-gradient {
-    background: -webkit-gradient(linear, left top, left bottom, from(#62C462), to(#57A957));
+.gradient(@start: #888, @end: #666) {
+    background: -webkit-gradient(linear, left top, left bottom, from(@start), to(@end));
 }
 
 .rounded-corners (@radius: 5px) {
@@ -31,12 +23,18 @@
     -moz-border-radius: @radius;
 }
 
+.rounded-corners-bottom (@radius: 5px) {
+    border-bottom-left-radius: @radius;
+    border-bottom-right-radius: @radius;
+    -webkit-bottom-left-border-radius: @radius;
+    -webkit-bottom-right-border-radius: @radius;
+}
+
 .rounded-corners-top (@radius: 5px) {
     border-top-left-radius: @radius;
     border-top-right-radius: @radius;
     -webkit-top-left-border-radius: @radius;
     -webkit-top-right-border-radius: @radius;
-    -moz-border-radius: @radius;
 }
 
 @hopper-green: #5F8A42;
@@ -68,26 +66,8 @@ a.selected {
     background-color:#444;
     border:1px solid #333 !important;
     color:#eee !important;
+    text-shadow: 0 1px 1px #000;
 }
-
-#header-links {
-    font-size:60%;
-    float:right;
-}
-
-#header-links a {
-    position:relative;
-    top:25px;
-    margin-right:15px;
-    color:#223f59;
-    text-decoration:none;
-}
-
-#header-links a:hover {
-    color:#fff;
-    cursor:pointer;
-}
-
 
 span#arr {
     font-size:70%;
@@ -113,7 +93,7 @@ div#content-header, div#content-footer, div#content, div.content-bar {
 }
 
 div#content-header {
-    .dgray-gradient;
+    .gradient();
     margin-top:50px;
     border:1px solid #555;
     border-bottom:none;
@@ -126,7 +106,7 @@ div#content-header {
 }
 
 div#content-header .monospace {
-    .lgray-gradient;
+    .gradient(#ddd, #ccc);
     .rounded-corners(4px);
     border:1px solid #555;
     padding:4px;
@@ -135,7 +115,7 @@ div#content-header .monospace {
 }
 
 div#content-footer {
-    .dgray-gradient;
+    .gradient();
     min-height:0px;
     padding-bottom:5px;
     padding-top:5px;
@@ -153,7 +133,7 @@ div#content-header a {
 }
 
 div.content-bar {
-    .lgray-gradient;
+    .gradient(#ddd, #ccc);
     padding-top:5px;
     padding-bottom:5px;
     border:1px solid #999;
@@ -255,14 +235,14 @@ textarea#content {
 }
 
 .green {
-    .green-gradient;
+    .gradient(#62C462, #57A957);
     border:1px solid #5F8A42;
     text-shadow:1px 1px #888;
 }
 
 .gray {
     .rounded-corners(4px);
-    .lgray-gradient;
+    .gradient(#ddd, #ccc);
     border:1px solid #777;
     color:#333;
     text-shadow:1px 1px #fff;
@@ -270,7 +250,7 @@ textarea#content {
 }
 
 .gray:hover {
-    background: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#bbb));
+    .gradient(#ddd, #bbb);
     cursor:pointer;
 }
 
@@ -291,7 +271,7 @@ input[type=submit] {
 }
 
 input[type=submit]:hover {
-    background: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#ccc));
+    .gradient();
     cursor:pointer;
 }
 
@@ -316,21 +296,39 @@ input[type=submit]:hover {
     padding:10px;
 }
 
-.comment span.context {
-    color:#666;
-    font-size:90%;
+.comment-header {
+    .rounded-corners-top();
+    .gradient(#ddd, #ccc);
+    height:20px;
+    padding:10px;
+    margin-left:20px;
+    border:1px solid #bbb;
+    text-shadow:0 1px 1px #fff;
+}
+
+.comment-header span#author {
+    font-weight:bold;
+    color:#444;
+}
+
+.comment-header span#email {
+}
+        
+.comment-header span#time {
+    font-weight:bold;
+    color:#444;
 }
 
 .comment {
+    .rounded-corners-bottom();
     background-color:#eee;
     padding:10px;
-    border-radius:5px;
     border:1px solid #ccc;
+    border-top:none;
     margin-left:20px;
 }
 
 .comment p, .issue p, #preview p {
-    margin-top:10px;
     margin-bottom:10px;
 }
 
@@ -369,82 +367,23 @@ td.linenos {
 }
 
 #nav {
-    .dgray-gradient;
-    height:28px;
-    padding:10px;
-    line-height: 100%;
+    .gradient();
+    height:45px;
     border-top:1px solid #666;
     border-bottom:1px solid #666;
 }
 
-#nav li {
-    float: left;
-    position: relative;
-    list-style: none;
-}
-
-#nav a {
-    display:block;
-    margin-left:10px;
+#nav a.nav {
+    display:inline;
     position:relative;
-    bottom:3px;
-    border-radius:5px;
-    border:1px solid transparent;
+    top:14px;
+    margin:-5px;
+    padding:13px;
+    height:50px;
     text-decoration:none;
-    padding:8px;
-    color:#fff;
-}
-
-#nav a span#title {
-    font-size:130%;
-    width:100px;
-}
-
-#nav a span#title:hover {
-    cursor:pointer;
-}
-
-#nav ul li:hover a, #nav li:hover li a {
-    background: none;
-    border: none;
-}
-
-#nav li:hover > ul {
-    display: block;
-}
-
-#nav ul {
-    display: none;
-    margin: 0;
-    padding: 0;
-    width: 185px;
-    position: absolute;
-    top: 38px;
-    left: -10px;
-    background:-webkit-gradient(linear, left top, left bottom, from(#ccc), to(#eee));
-    border:1px solid #bbb;
-    border-top:1px solid #888;
-    border-left:1px solid #444;
-    opacity:0.95;
-    z-index:100;
-}
-
-#nav ul li {
-    float: none;
-    margin: 0;
-    padding: 0;
-}
-
-#nav li ul li a {
-    color: #444;
-}
-
-#nav li ul li:hover {
-    background-color:#444;
-}
-
-#nav li ul li:hover a {
-    color: #eee;
+    color:#dedede;
+    margin-left:10px;
+    text-shadow: 0 1px 1px #444;
 }
 
 pre, code {
@@ -474,7 +413,7 @@ a.open-closed {
     width:50px;
     margin-right:-5px;
     text-decoration:none;
-    text-shadow:none;
+    text-shadow:0 1px 1px #000;
 }
 
 #open-issues {
@@ -488,17 +427,22 @@ a.open-closed {
 }
 
 a.active {
-    .lgray-gradient;
+    .gradient(#ddd, #ccc);
     color:#444;
     border:1px solid #555;
+    text-shadow:0 1px 1px #fff;
+}
+
+div#preview-wrapper {
+    border:2px dashed #777;
+    .rounded-corners(5px);
+    display:none;
+    margin-left:20px;
 }
 
 div#preview {
-    .rounded-corners(5px);
+    .rounded-corners-bottom(5px);
     background-color:#eee;
-    border:2px dashed #888;
-    margin-left:20px;
-    margin-top:5px;
     padding:8px;
     height:50px;
 }
@@ -521,7 +465,7 @@ div#preview pre code {
 }
 
 div#flash {
-    background: -webkit-gradient(linear, left top, left bottom, from(#FFD10F), to(#FFDE20));
+    .gradient(#FFD10F, #FFDE20);
     font-size:120%;
     color:#333;
     text-align:center;

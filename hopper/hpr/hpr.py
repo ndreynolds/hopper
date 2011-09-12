@@ -5,9 +5,10 @@ import os
 # hopper imports
 from hopper.tracker import Tracker
 from hopper.issue import Issue
+from hopper.comment import Comment
 from hopper.config import Config
 from hopper.web.main import start
-from hopper.hpr.templates import IssueTemplate
+from hopper.hpr.templates import Template, IssueTemplate
 
 # utilities
 def get_tracker(path=None):
@@ -32,9 +33,11 @@ def main():
     '''Parse the sys args using argparse and call the appropriate function'''
     parser = ArgumentParser(description='Manage Hopper trackers and their issues', 
                             prog='hpr')
-    parser.add_argument('-v', '--version', action='version', version='1.0')
-    parser.add_argument('-t', '--tracker', action='store')
-    subparsers = parser.add_subparsers(help='sub-command help')
+    parser.add_argument('-v', '--version', action='version', version='1.0',
+            help='display version number')
+    parser.add_argument('--tracker', action='store', metavar='PATH',
+            help='set the path to the tracker, defaults to cwd.')
+    subparsers = parser.add_subparsers()
     
     # `new` subcommand
     newp = subparsers.add_parser('new', help='Create a new issue')
@@ -48,6 +51,10 @@ def main():
     editp = subparsers.add_parser('edit', help='Edit an existing issue')
     editp.add_argument('issue', help='an issue id (the first 4 chars is usually enough)')
     editp.set_defaults(func=edit)
+
+    # `list` subcommand
+    listp = subparsers.add_parser('list', help='Edit an existing issue')
+    listp.set_defaults(func=list_)
 
     # `serve` subcommand
     servep = subparsers.add_parser('serve', help='Serve a web interface \
@@ -63,6 +70,11 @@ def main():
     trackerp.add_argument('path', action='store', 
                         help='path that the tracker will be created at')
     trackerp.set_defaults(func=tracker)
+
+    # `comment` subcommand
+    commentp = subparsers.add_parser('comment', help='Comment on an issue.')
+    commentp.add_argument('issue', help='an issue id (the first 4 chars is usually enough)')
+    commentp.set_defaults(func=comment)
 
     # parse the args
     args = parser.parse_args(sys.argv[1:])
@@ -90,7 +102,7 @@ def new(args):
     i.title = fields['title']
     i.content = fields['content']
     if i.save():
-        print 'Created issue %s' % i.id
+        print 'Created issue %s' % i.id[:6]
 
 def edit(args):
     t = args['tracker']
@@ -98,6 +110,22 @@ def edit(args):
     if not i:
         print 'No such issue'
         return
+
+def comment(args):
+    t = args['tracker']
+    i = t.issue(args['issue'])
+    if not i:
+        print 'No such issue'
+        return
+    c = Comment(i)
+    conf = Config()
+    editor = args['editor'] if args['editor'] else conf.core['editor']
+    template = Template('comment.hpr')
+    path = template.open(editor)
+    fields = template.parse(path)
+    c.content = fields['content']
+    if c.save():
+        print 'Posted comment %s on issue %s' % (c.id[:6], i.id[:6])
 
 def reopen(args):
     t = args['tracker']
@@ -132,6 +160,22 @@ def show(args):
     print i.title
     print i.content
 
+def list_(args):
+    t = args['tracker']
+    issues = t.issues()
+    for i in issues:
+        print 'issue %s' % i.id
+        print 'Author: %s <%s>' % (i.author['name'], i.author['email'])
+        print 'Created: %s' % i.created
+        if i.updated != i.created:
+            print 'Updated: %s' % i.updated
+        print
+        print i.title
+        print
+        for line in i.content.splitlines():
+            print '    %s' % line
+        print
+
 ### Manage trackers
 def serve(args):
     t = args['tracker']
@@ -141,12 +185,5 @@ def tracker(args):
     Tracker.new(args['path'])
     print 'New tracker initialized. Edit %s to configure.' % \
             os.path.join(args['path'], 'config') 
-
-def lock_on(args):
-    print 'lock-on'
-
-def comment(args):
-    print 'comment'
-
 if __name__ == '__main__':
     main()
