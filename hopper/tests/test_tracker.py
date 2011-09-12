@@ -5,7 +5,7 @@ from hopper.test_env import TestEnv
 from hopper.tracker import Tracker
 from hopper.issue import Issue
 from hopper.utils import get_uuid
-from hopper.errors import DoesNotExist
+from hopper.errors import BadReference
 
 class TrackerTest(unittest.TestCase):
     def setUp(self):
@@ -56,11 +56,11 @@ class TrackerTest(unittest.TestCase):
         # verify that the issues match
         assert i1.fields == i2.fields
 
-        # invalid SHAs should raise DoesNotExist
+        # invalid SHAs should raise BadReference
         invalid_sha = get_uuid()
         try:
             t.issue(invalid_sha)
-        except OSError:
+        except BadReference:
             pass
         
     def test_issues(self):
