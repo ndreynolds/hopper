@@ -59,7 +59,7 @@
             <tr class="content">
                 <td class="monospace">{{ issue.id[:6] }}</td>
                 <td style="max-width:250px">
-                    <a href="{{ url_for('issue', id=issue.id) }}">{{ issue.title }}</a>
+                    <a href="{{ url_for('issue', id=issue.id[:6]) }}">{{ issue.title }}</a>
                 </td>
                 <td>{{ issue.labels }}</td>
                 <td>{{ issue.updated }}</td>

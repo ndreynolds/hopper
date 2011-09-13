@@ -117,7 +117,7 @@ class Issue(JSONFile):
             else:
                 raise BadReference('No matching issue on disk: %s' % id)
         # glob the path returned by the tracker helper method
-        matches = glob.glob(self.tracker.get_issue_path(id) + '*')
+        matches = glob.glob(self.tracker.get_issue_path(id + '*'))
         # no matches, raise bad ref:
         if not matches:
             raise BadReference('No matching issue on disk: %s' % id)
@@ -125,7 +125,9 @@ class Issue(JSONFile):
         if len(matches) > 1:
             raise AmbiguousReference('Multiple issues matched that id fragment')
         # one match, return the match
-        return matches[0]
+        head = os.path.split(matches[0])[0]
+        match_id = os.path.split(head)[1]
+        return match_id
 
     def _set_paths(self):
         '''

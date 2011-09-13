@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.secret_key = 'sdgasd6t4ry43y45SADGVQ43Y345RQw356y45sDGDSgSDG'
 VARS = {
         'tracker': None,
-        'first_request': False,
+        'first_request': True,
         'debug': False
         }
 

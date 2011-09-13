@@ -16,7 +16,9 @@ class Comment(JSONFile):
                   },
               'content': None,
               'timestamp': None,
-              'id': None
+              'id': None,
+              'event': False # use comments for event messages
+                             # e.g. 'Closed issue', 'Added labels'
               }
         self.issue = issue
         if id is not None:
