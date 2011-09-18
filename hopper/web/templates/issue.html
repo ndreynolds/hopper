@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% block body %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/issue.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('.static', filename='js/issue.js') }}"></script>
 <div id="content-header">
     Issue <span class="monospace">{{ issue.id[:6] }}</span> 
     &nbsp; &nbsp; Opened {{ issue.created }} by {{ issue.author['name'] }}
     {% if issue.status == 'open' %}
         <a id="issue-close" class="button green" style="height: 17px; bottom: 10px;" 
-            href="{{ url_for('close', id=issue.id) }}">Open</a>
+            href="{{ url_for('issues.close', id=issue.id) }}">Open</a>
     {% else %}
         <a id="issue-open" class="button red" style="height: 17px; bottom:10px" 
-            href="{{ url_for('open', id=issue.id) }}">Closed</a>
+            href="{{ url_for('issues.open', id=issue.id) }}">Closed</a>
     {% endif %}
 </div>
 <div id="content">

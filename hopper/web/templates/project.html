@@ -34,8 +34,8 @@
         <div id="content-header" class="auto-height">
             Tracker Git-Access <span class="hq">HQ</span>
             <div style="float:right">
-                <a href="{{ url_for('issues', status='open') }}" id="open-issues" class="open-closed">Read-Only</a>
-                <a href="{{ url_for('issues', status='closed') }}" id="closed-issues" class="open-closed active">Write</a>
+                <a href="{{ url_for('issues.index', status='open') }}" id="open-issues" class="open-closed">Read-Only</a>
+                <a href="{{ url_for('issues.index', status='closed') }}" id="closed-issues" class="open-closed active">Write</a>
             </div>
         </div>
         <div id="content" class="auto-height">

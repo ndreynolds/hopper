@@ -2,20 +2,20 @@
     <head>
         <title>Hopper</title>
         <link rel="stylesheet" 
-            type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+            type="text/css" href="{{ url_for('.static', filename='css/style.css') }}">
         <link rel="stylesheet" 
-            type="text/css" href="{{ url_for('static', filename='css/pygments.css') }}">
+            type="text/css" href="{{ url_for('.static', filename='css/pygments.css') }}">
         <link rel="stylesheet" type="text/css" 
-            href="{{ url_for('static', filename='js/tiptip/tipTip.css') }}">
-        <script type="text/javascript" src="{{ url_for('static', 
+            href="{{ url_for('.static', filename='js/tiptip/tipTip.css') }}">
+        <script type="text/javascript" src="{{ url_for('.static', 
             filename='js/jquery.min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', 
+        <script type="text/javascript" src="{{ url_for('.static', 
             filename='js/hopper.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', 
+        <script type="text/javascript" src="{{ url_for('.static', 
             filename='js/showdown.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', 
+        <script type="text/javascript" src="{{ url_for('.static', 
             filename='js/base.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', 
+        <script type="text/javascript" src="{{ url_for('.static', 
             filename='js/tiptip/jquery.tipTip.minified.js') }}"></script>
     </head>
     <body>
@@ -28,20 +28,18 @@
         <h1 id="header">Hopper</h1>
         <div class="page">
             <div id="nav">
-                {% for link in links %}
-                    {% if link == selected %}
-                    <a id="{{ link }}" href="{{ url_for(link) }}" 
-                        class="nav selected">{{ link.capitalize() }}</a>
-                    {% else %}
-                    <a id="{{ link }}" href="{{ url_for(link) }}"
-                        class="nav">{{ link.capitalize() }}</a>
-                    {% endif %}
-                {% endfor %}
-                <a id="new-issue" href="{{ url_for('new') }}" class="button green" 
+                <a id="project" href="{{ url_for('project.home') }}"
+                    class="{{ 'nav selected' if selected == 'project' else 'nav' }}">Project</a>
+                <a id="issues" href="{{ url_for('issues.index') }}"
+                    class="{{ 'nav selected' if selected == 'issues' else 'nav' }}">Issues</a>
+                <a id="settings" class="nav" href="{{ url_for('issues.settings') }}"
+                    class="{{ 'nav selected' if selected == 'settings' else 'nav' }}">Settings</a>
+                <a id="new-issue" href="{{ url_for('issues.new') }}" class="button green" 
                     style="float:right; margin-top:2px; margin-right:5px;">New Issue</a>
             </div>
             {% block body %}{% endblock %}
         </div>
+        <br>
         <div id="footer">
         Powered by <a href="http://hopperhq.com/hopper">Hopper</a>
         </div>
