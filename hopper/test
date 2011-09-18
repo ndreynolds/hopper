@@ -1,0 +1,127 @@
+commit 5b86e1a34ef32d38521bfc75d79e95ee34163879
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Mon Sep 12 23:38:41 2011 -0400
+
+    Working partial SHA matching.
+
+commit 6311f28f09b8ff622306e9f657b88d57fb6ac0c7
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Mon Sep 12 03:18:42 2011 -0400
+
+    Call issue.save() after comment creation so updated=now
+
+commit 6bb252fbaa302c2aa6788d242126280c62575686
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Mon Sep 12 03:01:26 2011 -0400
+
+    Move *_file.py classes to files.py, update imports
+
+commit 8e174b9f7a74eb105878be84b094e6be3b8b2d8d
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Mon Sep 12 02:49:41 2011 -0400
+
+    Fix typos that broke tests.
+
+commit 353ae8582b6d94608f6d63b2d74cb77e9e572c9e
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Mon Sep 12 02:42:29 2011 -0400
+
+    CLI less command args, wrap util, new exceptions
+    
+    * Minor stylesheet changes.
+    * Adds BadReference and AmbiguousReference exceptions.
+    * Adds Config.decorate() for wrapping text in ANSI codes.
+    * Adds utils.wrap() for wrapping text to n-columns.
+
+commit 11deb0a133a088fbd934ff3a63af15bb46559ac6
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Mon Sep 12 00:05:01 2011 -0400
+
+    Web style changes, CLI list and comment cmds
+
+commit 930fde0ccac87de467e2164be650c510c6185b43
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Sat Sep 10 03:56:54 2011 -0400
+
+    Adds a barebones CLI in hpr submodule.
+    
+    All the arg parsing is set up through argparse.
+    Most commands have basic functionality. Just need
+    to expand upon it.
+
+commit d2feb56073bf3b00659f4387a4a9fa53510cffb2
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Thu Sep 8 01:28:30 2011 -0400
+
+    Issue dir restructure; BaseFile, JSONFile, ConfigFile classes.
+    
+    Another night of hacking with too few commits:
+    
+    core:
+        * Comments are now stored as separate files.
+        * The issue SHA is the dir name.
+        * The issue is stored as a file, issue
+        * Still JSON-based.
+        * Delete Item class in favor of *File classes. The BaseFile
+          handles attribute getting and setting, subclasses handle
+          saving to disk using different formats.
+        * Working Config class, even includes a gitconfig parser.
+    
+    web:
+        * Adds showdown.js to web issue commenting (markdown preview)
+        * Various margin/color/padding/border tweaks.
+        * Flash message: 'Running Hopper locally as [name]'.
+    
+    hpr:
+        * Created the dir, will hold CLI tools.
+    
+    The tests probably don't pass.
+
+commit a7cd7111c9569568c7115776ff5fec43e0811c7b
+Merge: 68a116e 58f9191
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Tue Sep 6 15:05:40 2011 -0400
+
+    Merge branch 'master' of ndreynolds.com:hopper2
+
+commit 68a116eaee458607a3a9cf852df4f358a02bdb92
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Tue Sep 6 15:05:04 2011 -0400
+
+    Web module restructuring, additional tests
+
+commit 58f919187fb85706e0dda05c204a7097419d4333
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Tue Sep 6 15:02:10 2011 -0400
+
+    Add deps to setup.py
+
+commit d98a536b9bdae288ce8ec0e2121c50e826781edf
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Thu Sep 1 11:47:07 2011 -0400
+
+    Adds tests.
+
+commit 7b43720cab4cead6856e010710aaba4c98df53fc
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Wed Aug 31 23:56:40 2011 -0400
+
+    Milestone commit for tests and the TestEnv class
+
+commit 627332c8d00b9d7cba33e28f88e140decdef6448
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Mon Aug 29 22:27:01 2011 -0400
+
+    Tracker class methods to find issues.
+
+commit ab99564a5f0b741ab9e43f37efba729426dee638
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Wed Aug 24 21:45:10 2011 -0400
+
+    Adds @classmethod to Tracker and Repo.  New .gitignore
+
+commit 3a7fe32c4787e73e20363a3aba3dcaceff5a5bcc
+Author: Nick Reynolds <ndreynolds@gmail.com>
+Date:   Tue Aug 23 23:04:04 2011 -0400
+
+    Initial commit

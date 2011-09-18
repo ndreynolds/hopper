@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/issue.js') }}"></script>
 <div id="content-header">
     Issue <span class="monospace">{{ issue.id[:6] }}</span> 
     &nbsp; &nbsp; Opened {{ issue.created }} by {{ issue.author['name'] }}
@@ -14,7 +15,7 @@
 <div id="content">
     <div class="issue">
         <span style="font-size:130%; font-weight:bold; text-shadow: 0 0 1px #fff;">{{ issue.title }}</span>
-        <br><br>
+        <br>
         {{ issue.content|safe }}
     </div>
     <br>
@@ -51,42 +52,10 @@
             Hopper uses <a href="http://daringfireball.com/projects/markdown">Markdown</a> formatting.
             
         </span>
-        <br><br>
+        <br>
 </div>
 <div id="content-footer">
-        <input type="submit" value="Comment">
+        <input type="submit" class="button gray" style="font-size:90%" value="Comment">
     </form>
 </div>
-<script type="text/javascript">
-    $(document).ready(function() {
-        var keyup_start = false;
-        $('#issue-close').tipTip({
-            content: 'Click to close this Issue',
-            defaultPosition: 'top'
-        });
-        $('#issue-open').tipTip({
-            content: 'Click to reopen this Issue',
-            defaultPosition: 'top'
-        });
-        $('textarea').keyup(function() {
-            if (!keyup_start) {
-                $('#preview-toggle').fadeIn();
-                $('#preview-wrapper').fadeIn();
-                $('#preview').css('min-height', '50px').height('auto');
-                keyup_start = true;
-            }
-            var converter = new Showdown.converter();
-            $('#preview').html(converter.makeHtml($(this).val()));
-        });
-        $('#preview-toggle').click(function() {
-            if ($('#preview').css('display') == 'none') {
-                $('#preview').css('visibilty', 'hidden').slideUp();
-            }
-            else {
-                $('#preview').slideDown().css('visibility', 'visible');
-            }
-        });
-    });
-</script>
-    
 {% endblock %}

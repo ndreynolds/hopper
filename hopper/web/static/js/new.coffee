@@ -1,0 +1,2 @@
+$ ->
+    $('input#title').HopperFocusHelper()

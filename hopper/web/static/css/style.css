@@ -10,11 +10,13 @@
   font-family: 'DejaVu';
   src: url('../fonts/DejaVuSansMono.ttf');
 }
-* {
-  margin: 0px;
+.auto-height {
+  height: auto !important;
+  min-height: 0px !important;
 }
 html, body {
   height: 100%;
+  margin: 0px;
 }
 html {
   margin: 0px;
@@ -28,6 +30,7 @@ h1#header {
   text-shadow: 0 1px 1px #304521;
   color: #fff;
   padding: 10px;
+  margin: 0px;
 }
 a.selected {
   background-color: #444;
@@ -85,7 +88,6 @@ div#content-footer {
   padding-top: 5px;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
-  margin-bottom: 200px;
   border: 1px solid #666;
   color: #eee;
   text-shadow: 1px -1px #555555;
@@ -100,6 +102,32 @@ div.content-bar {
   padding-bottom: 5px;
   border: 1px solid #999;
   border-top: none;
+}
+div.content-bar input[type=text] {
+  height: 20px;
+  width: 100px;
+  padding: 0px;
+}
+div.content-bar div.close {
+  font-family: DejaVu;
+  font-size: 95%;
+  color: #666;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background-color: #bbb;
+  border: 1px solid #999;
+  float: right;
+  text-align: center;
+  position: relative;
+  top: 3px;
+  font-size: 88%;
+  vertical-align: middle;
+}
+div.content-bar div.close:hover {
+  color: #444;
+  cursor: pointer;
+  border: 1px solid #888;
 }
 div#content {
   background-color: #fff;
@@ -172,9 +200,19 @@ textarea#content {
   border-radius: 5px;
   color: #fff;
   text-decoration: none;
-  font-size: 16px !important;
-  position: relative;
-  bottom: 5px;
+  display: block;
+  vertical-align: middle;
+}
+.small-button {
+  padding: 10px;
+  border-radius: 5px;
+  color: #fff;
+  text-decoration: none;
+  display: block;
+  vertical-align: middle;
+  display: inline;
+  font-size: 85%;
+  padding: 6px;
 }
 .button:hover {
   cursor: pointer;
@@ -189,10 +227,9 @@ textarea#content {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   background: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#cccccc));
-  border: 1px solid #777;
+  border: 1px solid #666;
   color: #333;
   text-shadow: 1px 1px #fff;
-  padding: 8px;
 }
 .gray:hover {
   background: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#bbbbbb));
@@ -213,10 +250,9 @@ input[type=submit] {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   background: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#cccccc));
-  border: 1px solid #777;
+  border: 1px solid #666;
   color: #333;
   text-shadow: 1px 1px #fff;
-  padding: 8px;
 }
 input[type=submit]:hover {
   background: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#bbbbbb));
@@ -229,6 +265,16 @@ input[type=submit]:hover {
 .monospace {
   font-family: DejaVu;
   font-size: 95%;
+}
+.fancy-monospace {
+  background: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#cccccc));
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border: 1px solid #555;
+  padding: 4px;
+  color: #444;
+  text-shadow: 0 1px 1px #eee;
 }
 .bold {
   font-weight: bold;
@@ -266,17 +312,21 @@ input[type=submit]:hover {
   -webkit-bottom-right-border-radius: 5px;
   background-color: #eee;
   padding: 10px;
+  padding-top: 0px;
   border: 1px solid #ccc;
   border-top: none;
   margin-left: 20px;
 }
-.comment p, .issue p, #preview p {
-  margin-bottom: 10px;
-}
-.comment h1, .issue h1, #preview h1 {
+.comment h1,
+.issue h1,
+.doc h1,
+#preview h1 {
   font-size: 150%;
 }
-.comment h2, .issue h2, #preview h2 {
+.comment h2,
+.issue h2,
+.doc h2,
+#preview h2 {
   font-size: 130%;
 }
 div.codehilite {
@@ -284,7 +334,7 @@ div.codehilite {
   overflow: auto;
   font-family: Menlo, Andale Mono, DejaVu, monospace;
 }
-.comment > div.codehilite {
+.comment > div.codehilite, .issue > div.codehilite {
   margin-top: 10px;
   margin-bottom: 10px;
   padding: 7px;
@@ -411,4 +461,9 @@ div#flash {
 }
 div#flash span:hover {
   cursor: pointer;
+}
+span.hq {
+  font-size: 70%;
+  vertical-align: super;
+  font-weight: bold;
 }

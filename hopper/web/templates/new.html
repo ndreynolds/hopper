@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/new.js') }}"></script>
 <div id="content-header">New Issue</div>
 <div id="content">
     <form method="post">
@@ -14,13 +15,7 @@
         <br><br>
 </div>
 <div id="content-footer">
-        <input type="submit" class="green" value="Create Issue" style="font-size:100%">
+        <input type="submit" class="button green" value="Create Issue" style="font-size:100%">
     </form>
 </div>
-
-<script>
-    $(document).ready(function() {
-        $('input#title').HopperFocusHelper();
-    });
-</script>
 {% endblock %}

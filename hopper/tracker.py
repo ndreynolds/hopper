@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import os
 
 from hopper.git import Repo
@@ -60,9 +61,11 @@ class Tracker(JSONFile):
         self.repo.cmd(['add', '.'])
         self.repo.cmd(['commit', '-am', 'Did something'])
 
-    def read(self):
-        '''Read in the tracker's properties.'''
-        pass
+    def read(self, relpath, mode='r'):
+        '''Read a file relative to the tracker route.'''
+        path = os.path.join(self.paths['root'], relpath)
+        with open(path, mode) as fp:
+            return fp.read()
 
     def update(self):
         '''Update the tracker's properties.'''

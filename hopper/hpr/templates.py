@@ -1,12 +1,16 @@
 from __future__ import with_statement
 import os
-import subprocess
 import tempfile
 
 class Template(object):
     def __init__(self, template):
         if not os.path.exists(template):
-            raise OSError('The template, %s, does not exist' % template)
+            parent = os.path.split(__file__)[0]
+            tpath = os.path.join(parent, 'hpr_templates', template)
+            if os.path.exists(tpath):
+                template = tpath
+            else:
+                raise OSError('The template, %s, does not exist' % template)
         self.template = open(template, 'r').read()
 
     def open(self, editor):

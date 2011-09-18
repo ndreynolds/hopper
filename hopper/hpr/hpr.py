@@ -11,7 +11,8 @@ from hopper.web.main import start
 from hopper.hpr.templates import Template, IssueTemplate
 from hopper.utils import relative_time, wrap
 
-# utilities
+
+### utilities
 def get_tracker(path=None):
     '''Get the tracker or raise an error.'''
     if path is None:
@@ -30,15 +31,17 @@ def is_tracker(path):
     dirlist = os.listdir(path)
     return '.hopper' in dirlist and '.git' in dirlist
 
+
+### main script (arg parser)
 def main(args=sys.argv[1:]):
-    '''
+    ''' 
     Parse the sys args using argparse and call the appropriate function.
 
     :param args: arguments to use. This defaults to sys.argv[1:] (the sys
                  arguments after the command itself). Supplying a list for
                  args lets you call hpr commands from within python, for
                  whatever reason.
-    '''
+    ''' 
     parser = ArgumentParser(description='Manage Hopper trackers and their issues', 
                             epilog='See `hpr COMMAND -h` for command-specific help',
                             prog='hpr')
@@ -50,7 +53,10 @@ def main(args=sys.argv[1:]):
     
     # `comment` subcommand
     commentp = subparsers.add_parser('comment', help='Comment on an issue')
-    commentp.add_argument('issue', help='an issue id (the first 4 chars is usually enough)')
+    commentp.add_argument('issue', 
+            help='an issue id (the first 4 chars is usually enough)')
+    commentp.add_argument('-e', '--editor', action='store', 
+            help='use the given editor')
     commentp.set_defaults(func=comment)
 
     # `edit` subcommand
@@ -59,7 +65,8 @@ def main(args=sys.argv[1:]):
     editp.set_defaults(func=edit)
 
     # `list` subcommand
-    listp = subparsers.add_parser('list', help='List the (filtered) set of issues')
+    listp = subparsers.add_parser('list', 
+            help='List the (filtered) set of issues')
     listp.add_argument('-s', '--short', action='store_true', 
             help='display each issue in one line')
     listp.add_argument('-v', '--verbose', action='store_true',
@@ -87,6 +94,7 @@ def main(args=sys.argv[1:]):
 
     # `show` subcommand
     showp = subparsers.add_parser('show', help='Show a particular issue')
+    showp.add_argument('issue', help='an issue id (the first 4 chars is usually enough)')
     showp.set_defaults(func=show)
 
     # `tracker` subcommand
@@ -104,10 +112,17 @@ def main(args=sys.argv[1:]):
         argsd['tracker'] = get_tracker(argsd['tracker'])
     args.func(argsd)
 
-### Manage issues
+
+### Command functions
+
+# Manage issues
 def new(args):
+    '''Create a new issue.'''
     i = Issue(args['tracker'])
     conf = Config()
+    # set the author info
+    i.author['name'] = conf.user['name']
+    i.author['email'] = conf.user['email']
     if args['message'] is not None:
         i.title = args['message']
         i.content = '.'
@@ -124,6 +139,7 @@ def new(args):
         print 'Created issue %s' % i.id[:6]
 
 def edit(args):
+    '''Edit an existing issue'''
     t = args['tracker']
     i = t.issue(args['issue'])
     if not i:
@@ -131,6 +147,7 @@ def edit(args):
         return
 
 def comment(args):
+    '''Comment on an issue.'''
     t = args['tracker']
     i = t.issue(args['issue'])
     if not i:
@@ -138,6 +155,9 @@ def comment(args):
         return
     c = Comment(i)
     conf = Config()
+    # set the author info
+    c.author['name'] = conf.user['name']
+    c.author['email'] = conf.user['email']
     editor = args['editor'] if args['editor'] else conf.core['editor']
     template = Template('comment.hpr')
     path = template.open(editor)
@@ -147,6 +167,7 @@ def comment(args):
         print 'Posted comment %s on issue %s' % (c.id[:6], i.id[:6])
 
 def reopen(args):
+    '''Reopen a closed issue.'''
     t = args['tracker']
     i = t.issue(args['issue'])
     if not i:
@@ -159,6 +180,7 @@ def reopen(args):
         print 'Already open'
 
 def close(args):
+    '''Close an open issue.'''
     t = args['tracker']
     i = t.issue(args['issue'])
     if not i:
@@ -171,21 +193,37 @@ def close(args):
         print 'Already closed'
 
 def show(args):
+    '''Show an issue.'''
     t = args['tracker']
     i = t.issue(args['issue'])
+    c = Config()
     if not i:
         print 'No such issue'
         return
-    print i.title
-    print i.content
+    print '%s %s' % (c.decorate('red', 'issue'), i.id)
+    print '%s  %s <%s>' % (c.decorate('yellow', 'Author:'), i.author['name'], i.author['email'])
+    print '%s %s' % (c.decorate('yellow', 'Created:'), relative_time(i.created))
+    if i.updated != i.created:
+        print '%s %s' % (c.decorate('yellow', 'Updated:'), relative_time(i.updated))
+    print '%s  %s' % (c.decorate('yellow', 'Status:'), i.status)
+    print
+    print '    ' + c.decorate('bold', i.title)
+    print
+    content = wrap(i.content)
+    for line in content.splitlines():
+        print '    ' + line
+    print
 
 def list_(args):
+    '''List the tracker's issues (filtered by criteria)'''
     t = args['tracker']
     c = Config()
     issues = t.issues()
+    # short mode
     if args['short']:
         for i in issues:
             print '%s %s' % (c.decorate('red', i.id[:6]), i.title)
+    # verbose mode
     elif args['verbose']:
         for i in issues:
             print '%s %s' % (c.decorate('red', 'issue'), i.id)
@@ -201,6 +239,7 @@ def list_(args):
             for line in content.splitlines():
                 print '    ' + line
             print
+    # normal mode
     else:
         for i in issues:
             print '%s %s' % (c.decorate('red', 'issue'), i.id)
@@ -212,7 +251,7 @@ def list_(args):
             print '    ' + i.title
             print
 
-### Manage trackers
+# Manage trackers
 def serve(args):
     t = args['tracker']
     start(t.paths['root'], port=args['port'], debug=args['verbose'])
@@ -221,6 +260,7 @@ def tracker(args):
     Tracker.new(args['path'])
     print 'New tracker initialized. Edit %s to configure.' % \
             os.path.join(args['path'], 'config') 
+
 
 if __name__ == '__main__':
     main()

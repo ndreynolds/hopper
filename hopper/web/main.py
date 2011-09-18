@@ -16,7 +16,7 @@ VARS = {
         'debug': False
         }
 
-links = ['feed', 'issues', 'settings']
+links = ['project', 'issues', 'settings']
 
 def start(path, port=5000, debug=False, external=False):
     '''
@@ -69,11 +69,12 @@ def setup():
     return Tracker(VARS['tracker']), config
 
 @app.route('/')
-def feed():
+def project():
     tracker, config = setup()
-    issues = tracker.issues()
-    return render_template('issues.html', issues=issues, links=links, 
-            selected='feed')
+    readme = markdown_to_html(tracker.read('README.md'))
+    source = markdown_to_html(tracker.read('SOURCE.md'))
+    return render_template('project.html', readme=readme,
+            source=source, links=links, selected='project')
 
 @app.route('/issues/<status>')
 @app.route('/issues/', methods=['GET', 'POST'])
@@ -95,6 +96,13 @@ def issues(status='open'):
                 reverse=reverse, conditions={'status': 'open'})
     map_attr(issues, 'updated', relative_time)
     map_attr(issues, 'created', relative_time)
+    # Currently, some labels are CSV-formatted while the others are
+    # JSON arrays. To support the prototypes that used CSV we have
+    # to do the conversion. This should be taken out before 1.0.
+    for issue in issues:
+        if type(issue.labels) is not list:
+            # Filter anything that doesn't return True (i.e. '')
+            issue.labels = filter(lambda x: x, issue.labels.split(','))
     if request.json is not None:
         return to_json(request.json)
     else:
@@ -108,7 +116,7 @@ def new():
         issue = Issue(tracker)
         issue.content = request.form['content']
         issue.title = request.form['title']
-        issue.labels = request.form['labels']
+        issue.labels = request.form['labels'].split(',')
         issue.author['name'] = config.user['name']
         issue.author['email'] = config.user['email']
         if issue.save():
