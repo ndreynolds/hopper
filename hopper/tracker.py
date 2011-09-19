@@ -75,7 +75,8 @@ class Tracker(JSONFile):
         '''Return the Issue object with the given SHA1'''
         return Issue(self, sha)
 
-    def issues(self, n=None, offset=0, sort_by='updated', reverse=True, conditions=None):
+    def issues(self, n=None, offset=0, sort_by='updated', reverse=True, 
+               return_num=False, conditions=None):
         '''
         Return a list of n Issue objects filtered by conditions.
 
@@ -88,6 +89,9 @@ class Tracker(JSONFile):
                         default it will sort by 'updated', which will contain
                         the last-modified (or created) timestamp.
         :param reverse: return the sorted issues in reverse order.
+        :param return_num: instead of only the list, return a tuple containing 
+                           the list of issues and the total number of issues 
+                           after filtering.
         :param conditions: a dictionary of keys that correspond to Issue
                            attributes and their required values. 
         Example:
@@ -111,9 +115,20 @@ class Tracker(JSONFile):
                 issues = filter(lambda x: getattr(x, key) == conditions[key],
                                 issues)
         issues.sort(key=lambda x: getattr(x, sort_by), reverse=reverse)
+        num_issues = len(issues)
+
         if type(n) is int:
-            return issues[offset:(offset + n)]
-        return issues[offset:]
+            issues = issues[offset:(offset + n)]
+        else:
+            issues = issues[offset:]
+
+        if return_num:
+            return issues, num_issues
+        else:
+            return issues
+
+    def num_issues(self):
+        '''Return (an estimate of) the number of issues.'''
 
     def history(self, n=10):
         '''

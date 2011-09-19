@@ -2,13 +2,9 @@ var Filter;
 Filter = (function() {
   function Filter() {
     var base, that;
-    base = '<div class="content-bar">';
-    if ($('.content-bar').length) {
-      $('.content-bar').last().after(base);
-    } else {
-      $('#content-header').after(base);
-    }
-    this.el = $('.content-bar').last();
+    base = '<div class="content-bar filter">';
+    $('#content').before(base);
+    this.el = $('.filter').last();
     this.set();
     that = this;
     $(this.el.find('select')).live('change', function() {

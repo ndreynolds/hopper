@@ -1,3 +1,6 @@
+# For development
+import sys
+sys.path.insert(0, '/home/ndreynolds/repos/hopper2')
 from hopper.web.app import app
 
 def start(path, port=5000, debug=False, external=False):
@@ -27,4 +30,4 @@ def start(path, port=5000, debug=False, external=False):
         app.run(port=port)
 
 if __name__ == '__main__':
-    start('/Users/ndreynolds/trackers/hopper', debug=True)
+    start('/home/ndreynolds/trackers/test2', debug=True)

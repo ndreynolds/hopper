@@ -22,20 +22,40 @@ def index(status='open'):
     # get the url params
     sort = request.args.get('sort')
     order = request.args.get('order')
-    page = request.args.get('page') if True else 1
+    try:
+        page = int(request.args.get('page'))
+    except TypeError:
+        page = 1
+    except ValueError:
+        page = 1
 
     reverse = True 
     sort_by = 'updated'
+    issues_per_page = 15 
+
     if order == 'asc':
         reverse = False
     if sort in ['id', 'title', 'updated']:
         sort_by = sort
-    if status == 'closed':
-        issues_ = tracker.issues(n=20, sort_by=sort_by, \
-                reverse=reverse, conditions={'status': 'closed'})
+    if page > 1: 
+        # If we're on page 3, the offset should be 50.
+        offset = (page - 1) * issues_per_page
+        issues_, n = tracker.issues(n=issues_per_page, offset=offset, 
+                                    sort_by=sort_by, reverse=reverse, 
+                                    return_num=True, conditions={'status': status})
     else:
-        issues_ = tracker.issues(n=20, sort_by=sort_by, \
-                reverse=reverse, conditions={'status': 'open'})
+        issues_, n = tracker.issues(n=issues_per_page, sort_by=sort_by, 
+                                    reverse=reverse, return_num=True, 
+                                    conditions={'status': status})
+
+    # get the number of pages
+    num_pages = n / issues_per_page
+
+    # get pages to link to
+    if num_pages > 1:
+        pages = pager(page, num_pages)
+    else:
+        pages = None
 
     # humanize the timestamps
     map_attr(issues_, 'updated', relative_time)
@@ -53,8 +73,9 @@ def index(status='open'):
         return to_json(request.json)
     else:
         return render_template('issues.html', issues_=issues_, 
-                selected='issues', status=status, sorted_by=sort_by, 
-                page=page, order=order)
+                               selected='issues', status=status, 
+                               sorted_by=sort_by, page=page, pages=pages,
+                               num_pages=num_pages, order=order)
 
 @issues.route('/new', methods=['GET', 'POST'])
 def new():
@@ -101,8 +122,8 @@ def view(id):
             map_attr(comments, 'timestamp', relative_time)
             map_attr(comments, 'content', markdown_to_html)
         return render_template('/issue.html', issue=issue,
-                comments=comments, selected='issues',
-                config=config)
+                               comments=comments, selected='issues',
+                               config=config)
 
 @issues.route('/settings')
 def settings():
@@ -128,3 +149,22 @@ def open(id):
         if not issue.save():
             flash('Could not reopen the issue')
         return redirect(url_for('issue', id=issue.id))
+
+def pager(page, num_pages):
+    '''
+    Generates a list of pages to link to based on the current page
+    and the total number of pages.
+
+    For example, if page=1 and there are at least 8 pages, it will 
+    return [1,2,3,4,5,6,7,8].
+    '''
+    if page == 1:
+        pages = [p for p in range(1, page + 6) if p in range(1, num_pages + 1)]
+    else:
+        pages = [p for p in range(page - 3, page + 4) if p in range(1, num_pages + 1)]
+    if not num_pages - 1 in pages:
+        pages += [False, num_pages - 1, num_pages]
+    if not 2 in pages: 
+        pages = [1, 2, False] + pages
+    print pages
+    return pages

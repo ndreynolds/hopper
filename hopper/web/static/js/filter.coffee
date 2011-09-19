@@ -4,14 +4,11 @@ class Filter
     # Server-side does the actual filtering, client-side
     # has to format the request.
     constructor: ->
-        base = '<div class="content-bar">'
-        if $('.content-bar').length
-            $('.content-bar').last().after(base)
-        else
-            $('#content-header').after(base)
+        base = '<div class="content-bar filter">'
+        $('#content').before(base);
 
         # get the jQuery element we just inserted.
-        @el = $('.content-bar').last()
+        @el = $('.filter').last()
         @.set()
         
         that = @

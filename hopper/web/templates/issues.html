@@ -78,6 +78,29 @@
         {% endif %}
     </table>
 </div>
+{% if pages %}
+<div class="content-bar">
+    <div id="paging">
+        {% if page != 1 %}
+            <a href="{{ url_for('issues.index', status=status, page=(page-1)) }}">&laquo; Previous</a>
+        {% endif %}
+        &nbsp;
+        {% for p in pages %}
+            {% if not p %}
+                &nbsp;...&nbsp;
+            {% elif p == page %}
+                <a class="cur-page" href="{{ url_for('issues.index', status=status, page=p) }}">{{ p }}</a>
+            {% else %}
+                <a href="{{ url_for('issues.index', status=status, page=p) }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+        &nbsp;
+        {% if page != num_pages %}
+            <a href="{{ url_for('issues.index', status=status, page=(page+1)) }}">Next &raquo;</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
 <div id="content-footer">
     Showing <b>{{ issues_|count }}</b> of <b>{{ issues_|count }}</b> issues
 </div>

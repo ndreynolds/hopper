@@ -101,6 +101,7 @@ div#content-footer {
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   border: 1px solid #666;
+  border-top: none;
   color: #eee;
   text-shadow: 1px -1px #555555;
 }
@@ -522,4 +523,14 @@ span.hq {
   font-size: 70%;
   vertical-align: super;
   font-weight: bold;
+}
+div#paging a {
+  text-decoration: none;
+  color: #5f8a42;
+  font-weight: bold;
+  text-shadow: 0 1px 1px #eee;
+  font-size: 95%;
+}
+div#paging a.cur-page {
+  color: #444;
 }
