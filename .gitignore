@@ -1,2 +1,27 @@
+*.py[co]
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+
+# Vim swaps
 *.swp
-*.pyc
+
+# This file contains a generated UUID unique to each install:
+SECRET_KEY

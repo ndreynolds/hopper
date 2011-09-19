@@ -1,4 +1,4 @@
-from hopper.web.app import app, GLOBALS
+from hopper.web.app import app
 
 def start(path, port=5000, debug=False, external=False):
     '''
@@ -9,8 +9,7 @@ def start(path, port=5000, debug=False, external=False):
     '''
     # Try and get an int out of the port param, set to 5000 if anything
     # goes wrong.
-    global GLOBALS
-    GLOBALS['tracker'] = path
+    app.GLOBALS['tracker'] = path
     if type(port) in [int, str]:
         try:
             port = int(port)

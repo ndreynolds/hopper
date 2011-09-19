@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
-<script type="text/javascript" src="{{ url_for('.static', filename='js/issue.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/issue.js') }}"></script>
 <div id="content-header">
     Issue <span class="monospace">{{ issue.id[:6] }}</span> 
     &nbsp; &nbsp; Opened {{ issue.created }} by {{ issue.author['name'] }}

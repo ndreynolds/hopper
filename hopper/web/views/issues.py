@@ -3,14 +3,16 @@ Views for issues:
     index, view, new, action/ACTION
 '''
 
-from flask import Module, request, redirect, url_for, render_template
+from flask import Blueprint, request, redirect, url_for, render_template, \
+                  flash
 
 from hopper.issue import Issue
 from hopper.comment import Comment
 from hopper.utils import relative_time, markdown_to_html, map_attr
+
 from hopper.web.utils import setup, to_json
 
-issues = Module(__name__)
+issues = Blueprint('issues', __name__)
 
 @issues.route('/<status>')
 @issues.route('/', methods=['GET', 'POST'])

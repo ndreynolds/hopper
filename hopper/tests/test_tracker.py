@@ -68,7 +68,6 @@ class TrackerTest(unittest.TestCase):
         # make a bunch of issues
         issues = [Issue(t) for i in range(50)]
 
-
     def test_get_issue_path(self):
         pass
 

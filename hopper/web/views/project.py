@@ -1,9 +1,9 @@
-from flask import Module, render_template
+from flask import Blueprint, render_template
 
 from hopper.web.utils import setup
 from hopper.utils import markdown_to_html
 
-project = Module(__name__)
+project = Blueprint('project', __name__)
 
 @project.route('/')
 def home():
