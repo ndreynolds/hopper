@@ -7,7 +7,7 @@ from hopper.tracker import Tracker
 from hopper.issue import Issue
 from hopper.comment import Comment
 from hopper.config import Config
-from hopper.web.main import start
+from hopper.web.manage import start
 from hopper.hpr.templates import Template, IssueTemplate
 from hopper.utils import relative_time, wrap
 
