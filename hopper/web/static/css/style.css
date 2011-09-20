@@ -357,10 +357,12 @@ input[type=submit]:hover {
   -webkit-bottom-right-border-radius: 5px;
   background-color: #eee;
   padding: 10px;
-  padding-top: 0px;
   border: 1px solid #ccc;
   border-top: none;
   margin-left: 20px;
+}
+.comment p:first-child {
+  margin-top: 0.5em;
 }
 .comment h1,
 .issue h1,

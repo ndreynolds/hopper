@@ -47,6 +47,19 @@ class Tracker(JSONFile):
 
         repo = Repo.init(root, mkdir=True)
         open(os.path.join(root, 'config'), 'w').close()
+        open(os.path.join(root, 'README.md'), 'w').close()
+
+        readme_notes = '''\
+**This is your Project Overview.**
+
+It might contain notes on submitting issues, information about your
+project, or both.
+
+To replace this default message, edit the file `README.md` under 
+`$TRACKER/README.md`.'''
+
+        with open(os.path.join(root, 'README.md'), 'w') as fp:
+            fp.write(readme_notes)
         os.mkdir(issues)
         open(os.path.join(issues, 'empty'), 'w').close()
         os.mkdir(hopper)
@@ -126,9 +139,6 @@ class Tracker(JSONFile):
             return issues, num_issues
         else:
             return issues
-
-    def num_issues(self):
-        '''Return (an estimate of) the number of issues.'''
 
     def history(self, n=10):
         '''

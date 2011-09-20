@@ -112,7 +112,7 @@ def view(id):
         comment.author['email'] = config.user['email']
         comment.save()
         issue.save() # ping the issue (updated = now)
-        return redirect(url_for('issue', id=issue.id))
+        return redirect(url_for('issues.view', id=issue.id))
     else:
         issue.updated = relative_time(issue.updated)
         issue.created = relative_time(issue.created)
@@ -121,7 +121,7 @@ def view(id):
         if comments:
             map_attr(comments, 'timestamp', relative_time)
             map_attr(comments, 'content', markdown_to_html)
-        return render_template('/issue.html', issue=issue,
+        return render_template('issue.html', issue=issue,
                                comments=comments, selected='issues',
                                config=config)
 
@@ -138,7 +138,7 @@ def close(id):
         issue.status = 'closed'
         if not issue.save():
             flash('Could not close the issue')
-        return redirect(url_for('issue', id=issue.id))
+        return redirect(url_for('issues.view', id=issue.id))
 
 @issues.route('/action/open/<id>')
 def open(id):
@@ -148,7 +148,7 @@ def open(id):
         issue.status = 'open'
         if not issue.save():
             flash('Could not reopen the issue')
-        return redirect(url_for('issue', id=issue.id))
+        return redirect(url_for('issues.view', id=issue.id))
 
 def pager(page, num_pages):
     '''

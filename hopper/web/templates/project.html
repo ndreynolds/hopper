@@ -10,36 +10,9 @@
                 {{ readme|safe }}
             </div>
         </div>
-        <div id="content-footer" style="padding:15px">
+        <div id="content-footer" style="padding:15px; padding-top:10px;">
             <div class="small-button gray">Edit</div>
             <div class="small-button gray">Raw</div>
-        </div>
-    </div>
-    <div>
-        <div id="content-header" class="auto-height">
-            Source Code 
-            <span class="monospace" style="font-size:80%; float:right;">$TRACKER/SOURCE.md</span>
-        </div>
-        <div id="content" class="auto-height">
-            <div class="issue">
-                {{ source|safe }}
-            </div>
-        </div>
-        <div id="content-footer" style="padding:15px">
-            <div class="small-button gray">Edit</div>
-            <div class="small-button gray">Raw</div>
-        </div>
-    </div>
-    <div>
-        <div id="content-header" class="auto-height">
-            Tracker Git-Access <span class="hq">HQ</span>
-            <div style="float:right">
-                <a href="{{ url_for('issues.index', status='open') }}" id="open-issues" class="open-closed">Read-Only</a>
-                <a href="{{ url_for('issues.index', status='closed') }}" id="closed-issues" class="open-closed active">Write</a>
-            </div>
-        </div>
-        <div id="content" class="auto-height">
-            <input type="text" id="title" style="font-size:80%" value="git@hopperhq.com:ndreynolds/hopper.git" />
         </div>
     </div>
     <br>
