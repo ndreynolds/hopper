@@ -25,23 +25,37 @@
                 <span style="float:right; font-size:60%;">(Click to dismiss)</span>
             </div>
         {% endif %}
-        <h1 id="header">Hopper</h1>
-        <div class="page">
-            <div id="nav">
-                <a id="project" href="{{ url_for('project.home') }}"
-                    class="{{ 'nav selected' if selected == 'project' else 'nav' }}">Project</a>
-                <a id="issues" href="{{ url_for('issues.index') }}"
-                    class="{{ 'nav selected' if selected == 'issues' else 'nav' }}">Issues</a>
-                <a id="settings" class="nav" href="{{ url_for('issues.settings') }}"
-                    class="{{ 'nav selected' if selected == 'settings' else 'nav' }}">Settings</a>
-                <a id="new-issue" href="{{ url_for('issues.new') }}" class="button green" 
-                    style="float:right; margin-top:2px; margin-right:5px;">New Issue</a>
+        <div id="top-header">
+            <div id="title">
+                Hopper
             </div>
+            <div id="nav">
+                <a class="{{ 'nav selected' if selected == 'feed' else 'nav' }}"
+                    href="{{ url_for('issues.index') }}">Feed</a>
+                <a class="{{ 'nav selected' if selected == 'issues' else 'nav' }}"
+                    href="{{ url_for('issues.index') }}">Issues</a>
+                <a class="{{ 'nav selected' if selected == 'project' else 'nav' }}"
+                    href="{{ url_for('project.home') }}">Docs</a>
+                <a class="{{ 'nav selected' if selected == 'settings' else 'nav' }}"
+                    href="{{ url_for('project.home') }}">Settings</a>
+            </div>
+            <div id="search">
+                <input type="text" class="unfocused" value="Search issues...">
+            </div>
+        </div>
+        <div id="mid-header">
+            {% if header %}
+                {{ header }}
+            {% else %}
+                No Header
+            {% endif %}
+        </div>
+        <div class="page">
             {% block body %}{% endblock %}
         </div>
         <br>
         <div id="footer">
-        Powered by <a href="http://hopperhq.com/hopper">Hopper</a>
+            Proudly powered by <a href="http://hopperhq.com/hopper">Hopper</a>
         </div>
     </body>
 </html>

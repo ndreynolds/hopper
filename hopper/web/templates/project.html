@@ -1,19 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
-    <div>
-        <div id="content-header" class="auto-height">
-            Project Overview
-            <span class="monospace" style="font-size:80%; float:right;">$TRACKER/README.md</span>
-        </div>
-        <div id="content">
-            <div class="issue">
-                {{ readme|safe }}
-            </div>
-        </div>
-        <div id="content-footer" style="padding:15px; padding-top:10px;">
-            <div class="small-button gray">Edit</div>
-            <div class="small-button gray">Raw</div>
-        </div>
+    <div class="issue">
+        {{ readme|safe }}
     </div>
-    <br>
 {% endblock %}

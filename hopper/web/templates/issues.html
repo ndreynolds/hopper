@@ -3,8 +3,7 @@
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/issues.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/filter.js') }}"></script>
-
-<div id="content-header">
+<div id="menu">
     {% if status == 'open' %}
         <a href="{{ url_for('issues.index', status='open') }}" id="open-issues" class="open-closed">Open</a>
         <a href="{{ url_for('issues.index', status='closed') }}" id="closed-issues" class="open-closed active">Closed</a>
@@ -12,9 +11,7 @@
         <a href="{{ url_for('issues.index', status='open') }}" id="open-issues" class="open-closed active">Open</a>
         <a href="{{ url_for('issues.index', status='closed') }}" id="closed-issues" class="open-closed">Closed</a>
     {% endif %}
-    <div id="add-filter" class="small-button gray" style="float:right; position:relative; bottom:5px;">Add Filter</div>
 </div>
-<div id="content">
     <table>
         {% if issues_ is not none %}
             <tr>
@@ -77,9 +74,7 @@
         No Issues to Show
         {% endif %}
     </table>
-</div>
 {% if pages %}
-<div class="content-bar">
     <div id="paging">
         {% if page != 1 %}
             <a href="{{ url_for('issues.index', status=status, page=(page-1)) }}">&laquo; Previous</a>
@@ -99,9 +94,7 @@
             <a href="{{ url_for('issues.index', status=status, page=(page+1)) }}">Next &raquo;</a>
         {% endif %}
     </div>
-</div>
 {% endif %}
-<div id="content-footer">
-    Showing <b>{{ issues_|count }}</b> of <b>{{ issues_|count }}</b> issues
-</div>
+<br>
+<small>Showing {{ issues_|count }} of {{ n }} issues.</small>
 {% endblock %}

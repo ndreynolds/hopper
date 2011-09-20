@@ -10,6 +10,10 @@
   font-family: 'DejaVu';
   src: url('../fonts/DejaVuSansMono.ttf');
 }
+.centered {
+  margin-left: auto;
+  margin-right: auto;
+}
 .auto-height {
   height: auto !important;
   min-height: 0px !important;
@@ -17,34 +21,108 @@
 html, body {
   height: 100%;
   margin: 0px;
+  background-color: #cccccc;
 }
 html {
   margin: 0px;
-  background-color: #eee;
   font-family: Helvetica;
   color: #333;
 }
-h1#header {
-  background-color: #5f8a42;
+div#mid-header {
+  background-color: #92bd75;
   font-family: Nobile Bold Italic;
+  font-weight: bold;
   text-shadow: 0 1px 1px #304521;
   color: #fff;
   padding: 10px;
-  margin: 0px;
+  margin: 20px;
+  margin-bottom: 0px;
+  border: 1px solid #5f8a42;
 }
-a.selected {
-  background-color: #444;
-  border: 1px solid #333 !important;
+div#top-header {
+  height: 60px;
+}
+div#search {
+  float: right;
+  position: relative;
+  right: 88px;
+  bottom: 20px;
+}
+div#title {
+  position: relative;
+  top: 40px;
+  left: 24px;
+  font-family: Nobile;
+  font-size: 150%;
+  font-weight: bold;
+  color: #333;
+  text-shadow: 0 1px 1px #fff;
+}
+div#search input {
+  width: 140%;
+  height: 30px;
+}
+div#menu {
+  background-image: -webkit-linear-gradient(top, #888888, #666666);
+  background-image: -moz-linear-gradient(top, #888888, #666666);
+  background-image: -ms-linear-gradient(top, #888888, #666666);
+  background-image: -o-linear-gradient(top, #888888, #666666);
+  background-image: linear-gradient(top, #888888, #666666);
+  margin: -20px;
+  margin-bottom: 20px;
+  text-shadow: 0 1px 1px #444;
+  font-size: 105%;
+  color: #eee;
+  padding: 15px;
+}
+div.issue-header {
+  background-image: -webkit-linear-gradient(top, #888888, #666666);
+  background-image: -moz-linear-gradient(top, #888888, #666666);
+  background-image: -ms-linear-gradient(top, #888888, #666666);
+  background-image: -o-linear-gradient(top, #888888, #666666);
+  background-image: linear-gradient(top, #888888, #666666);
+  margin-left: auto;
+  margin-right: auto;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  -webkit-top-left-border-radius: 5px;
+  -webkit-top-right-border-radius: 5px;
+  text-shadow: 0 1px 1px #444;
+  font-size: 105%;
+  color: #eee;
+  padding: 10px;
+  width: 800px;
+  border: 1px solid #555;
+}
+div.issue-header a {
+  float: right;
+  position: relative;
+  bottom: 11px;
   color: #eee !important;
-  text-shadow: 0 1px 1px #000;
+}
+div#comment-form {
+  margin-left: auto;
+  margin-right: auto;
+  width: 820px;
+}
+div#comment-form textarea {
+  width: 100%;
+  height: 85px;
 }
 span#arr {
   font-size: 70%;
 }
-div#page, div#footer {
-  margin: 8px;
+div.page {
+  margin: 20px;
+  margin-top: 0px;
+  background-color: white;
+  padding: 20px;
+}
+div.page a {
+  color: #5F8A42;
 }
 div#footer {
+  margin: 20px;
   padding-bottom: 10px;
 }
 div#footer a {
@@ -54,24 +132,24 @@ div#content-header,
 div#content-footer,
 div#content,
 div.content-bar {
-  width: 800px;
-  padding: 15px;
   margin-left: auto;
   margin-right: auto;
+  width: 800px;
+  padding: 15px;
 }
 div#content-header {
-  background-image: -webkit-linear-gradient(top, #888888, #666666);
-  background-image: -moz-linear-gradient(top, #888888, #666666);
-  background-image: -ms-linear-gradient(top, #888888, #666666);
-  background-image: -o-linear-gradient(top, #888888, #666666);
-  background-image: linear-gradient(top, #888888, #666666);
+  background-image: -webkit-linear-gradient(top, #888888, #777777);
+  background-image: -moz-linear-gradient(top, #888888, #777777);
+  background-image: -ms-linear-gradient(top, #888888, #777777);
+  background-image: -o-linear-gradient(top, #888888, #777777);
+  background-image: linear-gradient(top, #888888, #777777);
   margin-top: 50px;
-  border: 1px solid #555;
+  border: 1px solid #bbb;
   border-bottom: none;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-  color: #eee;
-  text-shadow: 1px -1px #333333;
+  color: #ddd;
+  text-shadow: 0 1px 1px #444;
   font-size: 105%;
   height: 20px;
 }
@@ -104,10 +182,6 @@ div#content-footer {
   border-top: none;
   color: #eee;
   text-shadow: 1px -1px #555555;
-}
-div#content-header a {
-  position: relative;
-  float: right;
 }
 div.content-bar {
   background-image: -webkit-linear-gradient(top, #dddddd, #cccccc);
@@ -151,9 +225,6 @@ div#content {
   min-height: 200px;
   border: 1px solid #bbb;
   border-top: none;
-}
-div#content a {
-  color: #5F8A42;
 }
 #sidebar {
   display: none;
@@ -321,10 +392,16 @@ input[type=submit]:hover {
   font-weight: bold;
 }
 .issue {
+  margin-left: auto;
+  margin-right: auto;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  -webkit-bottom-left-border-radius: 5px;
+  -webkit-bottom-right-border-radius: 5px;
   background-color: #eee;
-  border-radius: 5px;
   border: 1px solid #ccc;
   padding: 10px;
+  width: 800px;
 }
 .comment-header {
   border-top-left-radius: 5px;
@@ -336,9 +413,11 @@ input[type=submit]:hover {
   background-image: -ms-linear-gradient(top, #dddddd, #cccccc);
   background-image: -o-linear-gradient(top, #dddddd, #cccccc);
   background-image: linear-gradient(top, #dddddd, #cccccc);
+  margin-left: auto;
+  margin-right: auto;
+  width: 800px;
   height: 20px;
   padding: 10px;
-  margin-left: 20px;
   border: 1px solid #bbb;
   text-shadow: 0 1px 1px #fff;
 }
@@ -355,11 +434,13 @@ input[type=submit]:hover {
   border-bottom-right-radius: 5px;
   -webkit-bottom-left-border-radius: 5px;
   -webkit-bottom-right-border-radius: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 800px;
   background-color: #eee;
   padding: 10px;
   border: 1px solid #ccc;
   border-top: none;
-  margin-left: 20px;
 }
 .comment p:first-child {
   margin-top: 0.5em;
@@ -407,26 +488,37 @@ td.linenos {
   text-align: right;
 }
 #nav {
-  background-image: -webkit-linear-gradient(top, #888888, #666666);
-  background-image: -moz-linear-gradient(top, #888888, #666666);
-  background-image: -ms-linear-gradient(top, #888888, #666666);
-  background-image: -o-linear-gradient(top, #888888, #666666);
-  background-image: linear-gradient(top, #888888, #666666);
-  height: 45px;
-  border-top: 1px solid #666;
-  border-bottom: 1px solid #666;
+  height: 30px;
+  margin: 0px;
+  position: relative;
+  top: 20px;
+  left: 200px;
+  width: 100%;
 }
 #nav a.nav {
   display: inline;
-  position: relative;
-  top: 14px;
-  margin: -5px;
-  padding: 13px;
-  height: 50px;
+  color: #777;
+  font-size: 95%;
+  font-weight: bold;
   text-decoration: none;
-  color: #eee;
+  text-shadow: 0 1px 1px #fff;
   margin-left: 10px;
-  text-shadow: 0 1px 1px #444;
+  background-color: #dedede;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid #bbb;
+  border-bottom: none;
+}
+#nav a.nav.selected {
+  background-color: #92bd75;
+  color: #444;
+  text-shadow: 0 1px 1px #ddd;
+  position: relative;
+  height: 31px;
+  border: 1px solid #5f8a42;
+  border-bottom: none;
+  top: 1px;
 }
 pre, code {
   font-family: Menlo, DejaVu;
@@ -446,8 +538,7 @@ code {
   padding: 1px;
 }
 a.open-closed {
-  float: none !important;
-  color: #eee;
+  color: #eee !important;
   padding: 7px;
   background-color: #444;
   border: 1px solid #333;
@@ -455,6 +546,7 @@ a.open-closed {
   margin-right: -5px;
   text-decoration: none;
   text-shadow: 0 1px 1px #000;
+  position: relative;
 }
 #open-issues {
   border-top-left-radius: 5px;
@@ -470,7 +562,7 @@ a.active {
   background-image: -ms-linear-gradient(top, #dddddd, #cccccc);
   background-image: -o-linear-gradient(top, #dddddd, #cccccc);
   background-image: linear-gradient(top, #dddddd, #cccccc);
-  color: #444;
+  color: #444 !important;
   border: 1px solid #555;
   text-shadow: 0 1px 1px #fff;
 }
@@ -479,8 +571,10 @@ div#preview-wrapper {
   border-radius: 5px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
+  margin-left: auto;
+  margin-right: auto;
   display: none;
-  margin-left: 20px;
+  width: 822px;
 }
 div#preview {
   border-bottom-left-radius: 5px;
@@ -489,6 +583,7 @@ div#preview {
   -webkit-bottom-right-border-radius: 5px;
   background-color: #eee;
   padding: 8px;
+  width: 806px;
   height: 50px;
 }
 div#preview pre {

@@ -21,6 +21,11 @@
     background-image:         linear-gradient(top, @start, @end);
 }
 
+.centered {
+    margin-left:auto;
+    margin-right:auto;
+}
+
 .rounded-corners (@radius: 5px) {
     border-radius: @radius;
     -webkit-border-radius: @radius;
@@ -48,44 +53,115 @@
 
 @hopper-green: #5F8A42;
 @font-color: #333;
+@background: #ccc;
 
 html, body {
     height:100%;
     margin: 0px;
+    background-color: @background;
 }
 
 html {
     margin:0px;
-    background-color:#eee;
     font-family:Helvetica;
     color:#333;
 } 
 
-h1#header {
-    background-color: @hopper-green;
+div#mid-header {
+    background-color: lighten(@hopper-green, 20%);
     font-family:Nobile Bold Italic;
+    font-weight:bold;
     text-shadow: 0 1px 1px darken(@hopper-green, 20%);
     color:#fff;
     padding:10px;
-    margin:0px;
+    margin:20px;
+    margin-bottom:0px;
+    border: 1px solid @hopper-green;
 }
 
-a.selected {
-    background-color:#444;
-    border:1px solid #333 !important;
+div#top-header {
+    height:60px;
+}
+
+div#search {
+    float:right;
+    position:relative;
+    right:88px;
+    bottom:20px;
+}
+
+div#title {
+    position:relative;
+    top:40px;
+    left:24px;
+    font-family: Nobile;
+    font-size:150%;
+    font-weight:bold;
+    color:#333;
+    text-shadow: 0 1px 1px #fff;
+}
+
+div#search input {
+    width:140%;
+    height:30px;
+}
+
+div#menu {
+    .gradient();
+    margin:-20px;
+    margin-bottom:20px;
+    text-shadow: 0 1px 1px #444;
+    font-size:105%;
+    color:#eee;
+    padding:15px;
+}
+
+div.issue-header {
+    .gradient();
+    .centered;
+    .rounded-corners-top();
+    text-shadow: 0 1px 1px #444;
+    font-size:105%;
+    color:#eee;
+    padding:10px;
+    width:800px;
+    border:1px solid #555;
+}
+    
+div.issue-header a {
+    float:right;
+    position:relative;
+    bottom:11px;
     color:#eee !important;
-    text-shadow: 0 1px 1px #000;
+}
+
+div#comment-form {
+    .centered;
+    width:820px;
+}
+
+div#comment-form textarea {
+    width:100%;
+    height:85px;
 }
 
 span#arr {
     font-size:70%;
 }
 
-div#page, div#footer {
-    margin:8px;
+div.page {
+    margin:20px;
+    margin-top:0px;
+    background-color:white;
+    padding:20px;
+}
+
+div.page a {
+    color:#5F8A42;
 }
 
 div#footer {
+    margin:20px;
     padding-bottom:10px;
 }
 
@@ -94,21 +170,20 @@ div#footer a {
 }
 
 div#content-header, div#content-footer, div#content, div.content-bar {
+    .centered;
     width:800px;
     padding:15px;
-    margin-left:auto;
-    margin-right:auto;
 }
 
 div#content-header {
-    .gradient();
+    .gradient(#888, #777);
     margin-top:50px;
-    border:1px solid #555;
+    border:1px solid #bbb;
     border-bottom:none;
     border-top-left-radius:10px;
     border-top-right-radius:10px;
-    color:#eee;
-    text-shadow:1px -1px #333;
+    color:#ddd;
+    text-shadow: 0 1px 1px #444;
     font-size:105%;
     height:20px;
 }
@@ -135,10 +210,6 @@ div#content-footer {
     text-shadow:1px -1px #555;
 }
 
-div#content-header a {
-    position:relative;
-    float:right;
-}
 
 div.content-bar {
     .gradient(#ddd, #ccc);
@@ -181,10 +252,6 @@ div#content {
     min-height:200px;
     border:1px solid #bbb;
     border-top:none;
-}
-
-div#content a {
-    color:#5F8A42;
 }
 
 #sidebar {
@@ -340,18 +407,21 @@ input[type=submit]:hover {
 }
 
 .issue {
+    .centered;
+    .rounded-corners-bottom();
     background-color:#eee;
-    border-radius:5px;
     border:1px solid #ccc;
     padding:10px;
+    width:800px;
 }
 
 .comment-header {
     .rounded-corners-top();
     .gradient(#ddd, #ccc);
+    .centered;
+    width:800px;
     height:20px;
     padding:10px;
-    margin-left:20px;
     border:1px solid #bbb;
     text-shadow:0 1px 1px #fff;
 }
@@ -371,11 +441,12 @@ input[type=submit]:hover {
 
 .comment {
     .rounded-corners-bottom();
+    .centered;
+    width:800px;
     background-color:#eee;
     padding:10px;
     border:1px solid #ccc;
     border-top:none;
-    margin-left:20px;
 }
 
 .comment p:first-child {
@@ -425,23 +496,39 @@ td.linenos {
 }
 
 #nav {
-    .gradient();
-    height:45px;
-    border-top:1px solid #666;
-    border-bottom:1px solid #666;
+    height:30px;
+    margin:0px;
+    position:relative;
+    top:20px;
+    left:200px;
+    width:100%;
 }
 
 #nav a.nav {
     display:inline;
-    position:relative;
-    top:14px;
-    margin:-5px;
-    padding:13px;
-    height:50px;
+    color: #777;
+    font-size:95%;
+    font-weight:bold;
     text-decoration:none;
-    color:#eee;
+    text-shadow:0 1px 1px #fff;
     margin-left:10px;
-    text-shadow: 0 1px 1px #444;
+    background-color: lighten(@background, 7%);
+    padding:5px;
+    padding-left:10px;
+    padding-right:10px;
+    border:1px solid #bbb;
+    border-bottom:none;
+}
+
+#nav a.nav.selected {
+    background-color: lighten(@hopper-green, 20%);
+    color:#444;
+    text-shadow:0 1px 1px #ddd;
+    position:relative;
+    height:31px;
+    border:1px solid @hopper-green;
+    border-bottom:none;
+    top:1px;
 }
 
 pre, code {
@@ -463,8 +550,7 @@ code {
 }
 
 a.open-closed {
-    float:none !important;
-    color:#eee;
+    color:#eee !important;
     padding:7px;
     background-color:#444;
     border:1px solid #333;
@@ -472,6 +558,7 @@ a.open-closed {
     margin-right:-5px;
     text-decoration:none;
     text-shadow:0 1px 1px #000;
+    position:relative;
 }
 
 #open-issues {
@@ -486,7 +573,7 @@ a.open-closed {
 
 a.active {
     .gradient(#ddd, #ccc);
-    color:#444;
+    color:#444 !important;
     border:1px solid #555;
     text-shadow:0 1px 1px #fff;
 }
@@ -494,14 +581,16 @@ a.active {
 div#preview-wrapper {
     border:2px dashed #777;
     .rounded-corners(5px);
+    .centered;
     display:none;
-    margin-left:20px;
+    width:822px;
 }
 
 div#preview {
     .rounded-corners-bottom(5px);
     background-color:#eee;
     padding:8px;
+    width:806px;
     height:50px;
 }
 

@@ -30,4 +30,4 @@ def start(path, port=5000, debug=False, external=False):
         app.run(port=port)
 
 if __name__ == '__main__':
-    start('/home/ndreynolds/trackers/hopper', debug=True)
+    start('/home/ndreynolds/trackers/test2', debug=True)

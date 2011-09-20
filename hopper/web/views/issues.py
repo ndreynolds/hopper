@@ -57,6 +57,9 @@ def index(status='open'):
     else:
         pages = None
 
+    # set the context header
+    header = 'Viewing issues for %s' % 'Hopper'
+
     # humanize the timestamps
     map_attr(issues_, 'updated', relative_time)
     map_attr(issues_, 'created', relative_time)
@@ -75,11 +78,13 @@ def index(status='open'):
         return render_template('issues.html', issues_=issues_, 
                                selected='issues', status=status, 
                                sorted_by=sort_by, page=page, pages=pages,
-                               num_pages=num_pages, order=order)
+                               num_pages=num_pages, order=order,
+                               header=header, n=n)
 
 @issues.route('/new', methods=['GET', 'POST'])
 def new():
     tracker, config = setup()
+    header = 'Create a new issue'
     if request.method == 'POST':
         issue = Issue(tracker)
         issue.content = request.form['content']
@@ -91,9 +96,9 @@ def new():
             return redirect(url_for('issue', id=issue.id)) 
         else:
             flash('There was an error saving your issue')
-            return render_template('new.html')
+            return render_template('new.html', selected='issues', header=header)
     else:
-        return render_template('new.html', selected='issues')
+        return render_template('new.html', selected='issues', header=header)
 
 @issues.route('/view/<id>', methods=['GET', 'POST'])
 def view(id):

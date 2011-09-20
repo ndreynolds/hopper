@@ -8,6 +8,7 @@ project = Blueprint('project', __name__)
 @project.route('/')
 def home():
     tracker, config = setup()
+    header = 'Documentation for Hopper'
     readme = markdown_to_html(tracker.read('README.md'))
     return render_template('project.html', readme=readme, 
-                           selected='project')
+                           selected='project', header=header)
