@@ -34,6 +34,9 @@ html {
   font-family: Helvetica;
   color: #333;
 }
+p {
+  margin: 1em 0px;
+}
 div#top-header {
   height: 60px;
 }
@@ -50,7 +53,6 @@ div#search {
   float: right;
   position: relative;
   right: 20px;
-  bottom: 10px;
 }
 div#search input {
   width: 250px;
@@ -60,7 +62,7 @@ div#title {
   position: relative;
   width: 300px;
   left: 24px;
-  top: 20px;
+  top: 25px;
   font-family: Nobile;
   font-size: 150%;
   color: #333;
@@ -500,6 +502,7 @@ td.linenos {
   float: left;
   position: relative;
   left: 200px;
+  top: 12px;
 }
 #nav a.nav {
   display: inline;
