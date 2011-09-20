@@ -101,8 +101,10 @@ div.issue-header {
 div.issue-header a {
   float: right;
   position: relative;
-  bottom: 11px;
+  bottom: 7px;
   color: #eee !important;
+  height: 13px;
+  vertical-align: middle;
 }
 div#comment-form {
   margin-left: auto;
