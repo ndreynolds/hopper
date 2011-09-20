@@ -29,6 +29,9 @@
             <div id="title">
                 Hopper
             </div>
+            <div id="search">
+                <input type="text" class="unfocused" value="Search issues...">
+            </div>
             <div id="nav">
                 <a class="{{ 'nav selected' if selected == 'feed' else 'nav' }}"
                     href="{{ url_for('issues.index') }}">Feed</a>
@@ -38,9 +41,6 @@
                     href="{{ url_for('project.home') }}">Docs</a>
                 <a class="{{ 'nav selected' if selected == 'settings' else 'nav' }}"
                     href="{{ url_for('project.home') }}">Settings</a>
-            </div>
-            <div id="search">
-                <input type="text" class="unfocused" value="Search issues...">
             </div>
         </div>
         <div id="mid-header">

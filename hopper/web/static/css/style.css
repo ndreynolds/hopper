@@ -34,24 +34,23 @@ html {
   font-family: Helvetica;
   color: #333;
 }
+div#top-header {
+  height: 60px;
+}
 div#mid-header {
   background-color: #92bd75;
   font-family: Nobile Bold Italic;
   text-shadow: 0 1px 1px #304521;
   color: #fff;
   padding: 10px;
-  margin: 20px;
-  margin-bottom: 0px;
+  margin: 0px 20px 0px 20px;
   border: 1px solid #5f8a42;
-}
-div#top-header {
-  height: 60px;
 }
 div#search {
   float: right;
   position: relative;
   right: 20px;
-  bottom: 15px;
+  bottom: 10px;
 }
 div#search input {
   width: 250px;
@@ -60,8 +59,8 @@ div#search input {
 div#title {
   position: relative;
   width: 300px;
-  top: 45px;
   left: 24px;
+  top: 20px;
   font-family: Nobile;
   font-size: 150%;
   color: #333;
@@ -496,10 +495,9 @@ td.linenos {
   height: 30px;
   max-width: 400px;
   margin: 0px;
+  float: left;
   position: relative;
-  top: 33px;
   left: 200px;
-  width: 100%;
 }
 #nav a.nav {
   display: inline;

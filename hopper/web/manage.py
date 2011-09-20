@@ -1,6 +1,8 @@
-# For development
+# For development, will use the local repo instead of the installed module
 import sys
-sys.path.insert(0, '/Users/ndreynolds/repos/hopper')
+import os
+home = os.getenv('HOME')
+sys.path.insert(0, os.path.join(home, 'repos/hopper'))
 from hopper.web.app import app
 
 def start(path, port=5000, debug=False, external=False):
@@ -10,6 +12,7 @@ def start(path, port=5000, debug=False, external=False):
 
     Running it on port 80 is possible but will usually require being root.
     '''
+
     # Try and get an int out of the port param, set to 5000 if anything
     # goes wrong.
     app.GLOBALS['tracker'] = path
@@ -30,4 +33,4 @@ def start(path, port=5000, debug=False, external=False):
         app.run(port=port)
 
 if __name__ == '__main__':
-    start('/Users/ndreynolds/trackers/hopper', debug=True)
+    start(os.path.join(home, 'trackers/hopper'), debug=True)
