@@ -3,22 +3,14 @@ import hashlib
 import time
 import os
 from flask import Flask
+from hopper.config import Config
 
 # Create the app
 app = Flask(__name__)
 
-# Look for a SECRET_KEY file, or make one.
-path = os.path.split(__file__)[0]
-path = os.path.join(path, 'SECRET_KEY')
-try:
-    with open(path, 'r') as fp:
-        key = fp.read()
-except IOError:
-    key = hashlib.sha1(str(time.time()))
-    with open(path, 'w') as fp:
-        fp.write(key)
-
-app.secret_key = key
+# Get the Secret Key from Config
+c = Config()
+app.secret_key = c.web['secret_key']
 
 # We need to share a few vars between scripts:
 app.GLOBALS = {

@@ -3,6 +3,7 @@ import sys
 from configobj import ConfigObj
 
 from hopper.files import BaseFile, ConfigFile
+from hopper.utils import get_uuid
 
 class Config(ConfigFile):
     '''
@@ -24,6 +25,11 @@ class Config(ConfigFile):
                     'editor': 'vim',
                     'autocommit': True,
                     'color': True
+                    },
+                'web': {
+                    # This generated key is overriden if it exists
+                    # in the config file already.
+                    'secret_key': get_uuid() 
                     }
                 }
         # set field types (so they're parsed correctly)

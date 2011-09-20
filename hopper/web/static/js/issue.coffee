@@ -1,13 +1,16 @@
 $ ->
     keyup_start = false
+
     $('#issue-close').tipTip {
         content: 'Click to close this Issue'
         defaultPosition: 'top'
     }
+
     $('#issue-open').tipTip {
         content: 'Click to reopen this Issue'
         defaultPosition: 'top'
     }
+    
     $('textarea').keyup ->
         if not keyup_start
             $('#preview-toggle').fadeIn()

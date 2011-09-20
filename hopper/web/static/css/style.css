@@ -1,13 +1,19 @@
 @font-face {
   font-family: 'Nobile';
+  font-weight: normal;
+  font-style: normal;
   src: url('../fonts/nobile.ttf');
 }
 @font-face {
   font-family: 'Nobile Bold Italic';
+  font-weight: normal;
+  font-style: normal;
   src: url('../fonts/nobile_bold_italic.ttf');
 }
 @font-face {
   font-family: 'DejaVu';
+  font-weight: normal;
+  font-style: normal;
   src: url('../fonts/DejaVuSansMono.ttf');
 }
 .centered {
@@ -31,7 +37,6 @@ html {
 div#mid-header {
   background-color: #92bd75;
   font-family: Nobile Bold Italic;
-  font-weight: bold;
   text-shadow: 0 1px 1px #304521;
   color: #fff;
   padding: 10px;
@@ -45,22 +50,22 @@ div#top-header {
 div#search {
   float: right;
   position: relative;
-  right: 88px;
-  bottom: 20px;
+  right: 20px;
+  bottom: 15px;
+}
+div#search input {
+  width: 250px;
+  height: 30px;
 }
 div#title {
   position: relative;
-  top: 40px;
+  width: 300px;
+  top: 45px;
   left: 24px;
   font-family: Nobile;
   font-size: 150%;
-  font-weight: bold;
   color: #333;
   text-shadow: 0 1px 1px #fff;
-}
-div#search input {
-  width: 140%;
-  height: 30px;
 }
 div#menu {
   background-image: -webkit-linear-gradient(top, #888888, #666666);
@@ -87,7 +92,7 @@ div.issue-header {
   border-top-right-radius: 5px;
   -webkit-top-left-border-radius: 5px;
   -webkit-top-right-border-radius: 5px;
-  text-shadow: 0 1px 1px #444;
+  text-shadow: 0 1px 1px #333;
   font-size: 105%;
   color: #eee;
   padding: 10px;
@@ -489,9 +494,10 @@ td.linenos {
 }
 #nav {
   height: 30px;
+  max-width: 400px;
   margin: 0px;
   position: relative;
-  top: 20px;
+  top: 33px;
   left: 200px;
   width: 100%;
 }
@@ -517,7 +523,7 @@ td.linenos {
   position: relative;
   height: 31px;
   border: 1px solid #5f8a42;
-  border-bottom: none;
+  border-bottom: 1px solid #92bd75;
   top: 1px;
 }
 pre, code {

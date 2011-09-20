@@ -123,12 +123,13 @@ def view(id):
         issue.created = relative_time(issue.created)
         issue.content = markdown_to_html(issue.content)
         comments = issue.comments()
+        header = 'Viewing Issue <span class="monospace">%s</span>' % issue.id[:6]
         if comments:
             map_attr(comments, 'timestamp', relative_time)
             map_attr(comments, 'content', markdown_to_html)
         return render_template('issue.html', issue=issue,
                                comments=comments, selected='issues',
-                               config=config)
+                               config=config, header=header)
 
 @issues.route('/settings')
 def settings():
