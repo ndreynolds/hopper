@@ -20,6 +20,9 @@
   margin-left: auto;
   margin-right: auto;
 }
+.default-width {
+  width: 800px;
+}
 .auto-height {
   height: auto !important;
   min-height: 0px !important;
@@ -36,6 +39,10 @@ html {
 }
 p {
   margin: 1em 0px;
+}
+li {
+  list-style-type: circle;
+  margin-left: 20px;
 }
 div#top-header {
   height: 60px;
@@ -57,6 +64,9 @@ div#search {
 div#search input {
   width: 250px;
   height: 30px;
+  font-size: 90%;
+  padding: 0px;
+  padding-left: 5px;
 }
 div#title {
   position: relative;
@@ -395,6 +405,23 @@ input[type=submit]:hover {
   padding: 4px;
   color: #444;
   text-shadow: 0 1px 1px #eee;
+}
+.fancy-monospace-header {
+  background-image: -webkit-linear-gradient(top, #dddddd, #cccccc);
+  background-image: -moz-linear-gradient(top, #dddddd, #cccccc);
+  background-image: -ms-linear-gradient(top, #dddddd, #cccccc);
+  background-image: -o-linear-gradient(top, #dddddd, #cccccc);
+  background-image: linear-gradient(top, #dddddd, #cccccc);
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  -webkit-top-left-border-radius: 4px;
+  -webkit-top-right-border-radius: 4px;
+  border: 1px solid #555;
+  padding: 4px;
+  color: #444;
+  text-shadow: 0 1px 1px #eee;
+  margin-left: -11px;
+  line-height: 25px;
 }
 .bold {
   font-weight: bold;
