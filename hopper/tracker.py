@@ -16,7 +16,7 @@ class Tracker(JSONFile):
     '''
     def __init__(self, path):
         self.fields = {
-                'name': None,
+                'name'   : None,
                 'created': None
                 }
         if not os.path.exists(path):
@@ -25,7 +25,7 @@ class Tracker(JSONFile):
                 raise OSError('Supplied path does not exist')
         self.path = path
         self.paths = {
-                'root': self.path,
+                'root'  : self.path,
                 'config': os.path.join(self.path, 'config'),
                 'issues': os.path.join(self.path, 'issues'),
                 'hopper': os.path.join(self.path, '.hopper')
@@ -45,34 +45,34 @@ class Tracker(JSONFile):
                      supplying ``my_tracker`` would create the directory
                      ``./my_tracker``.
         '''
-        root = path
-        # stores issues
-        issues = os.path.join(root, 'issues')
-        # stores administrative stuff 
-        hopper = os.path.join(root, '.hopper')
+        # set the install paths
+        paths = {
+                'root'  : path,
+                'issues': os.path.join(path, 'issues'),
+                'admin' : os.path.join(path, '.hopper')
+                }
 
-        repo = Repo.init(root, mkdir=True)
-        open(os.path.join(root, 'config'), 'w').close()
-        open(os.path.join(root, 'README.md'), 'w').close()
+        # create the repository
+        repo = Repo.init(paths['root'], mkdir=True)
+        open(os.path.join(paths['root'], 'config'), 'w').close()
+        open(os.path.join(paths['root'], 'README.md'), 'w').close()
 
-        readme_notes = '''\
-**This is your Project Overview.**
+        readme = open(os.path.join(os.path.dirname(__file__), 
+                                   'TRACKER_README'), 'r').read()
+        with open(os.path.join(paths['root'], 'README.md'), 'w') as fp:
+            fp.write(readme)
 
-It might contain notes on submitting issues, information about your
-project, or both.
+        os.mkdir(paths['issues'])
+        open(os.path.join(paths['issues'], 'empty'), 'w').close()
+        os.mkdir(paths['admin'])
+        open(os.path.join(paths['admin'], 'empty'), 'w').close()
 
-To replace this default message, edit the file `README.md` under 
-`$TRACKER/README.md`.'''
-
-        with open(os.path.join(root, 'README.md'), 'w') as fp:
-            fp.write(readme_notes)
-        os.mkdir(issues)
-        open(os.path.join(issues, 'empty'), 'w').close()
-        os.mkdir(hopper)
-        open(os.path.join(hopper, 'empty'), 'w').close()
+        # add everything to the repo and commit
         repo.add(all=True)
         repo.commit(committer='Hopper <hopper@hopperhq.com>',
                     message='Initial Commit')
+
+        # instantiate and return our new Tracker.
         return cls(path)
 
     def autocommit(self, msg):

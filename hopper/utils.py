@@ -62,7 +62,13 @@ def markdown_to_html(text):
 
 def match_path(path, get_all=False):
     '''
-    Match a path using glob. Return scenarios:
+    Match a path using glob. 
+
+    :param path: the path to match.
+    :param get_all: if True, return the list of matches, by default it
+                    will return the first match.
+    
+    Return scenarios:
         No matches => None
         One or more matches => first matching path as string 
         No matches and get_all => []
@@ -74,7 +80,7 @@ def match_path(path, get_all=False):
     if get_all:
         return matches
     if matches:
-        return glob.glob(path)[0]
+        return matches[0]
     else:
         return None
 
@@ -82,7 +88,12 @@ def map_attr(obj_list, attr, f):
     '''
     Apply the function, f, to attribute, attr, of each object in obj_list
 
-    Because it's easier than a map...
+    This was implemented for things like humanizing issues' timestamps before
+    sending them out to the template.
+
+    :param obj_list: a list of objects.
+    :param attr: an attribute that each object in **obj_list** should have.
+    :param f: a function to apply to each each object's **attr**.
     ''' 
     for obj in obj_list:
         val = getattr(obj, attr)
@@ -91,6 +102,13 @@ def map_attr(obj_list, attr, f):
     return obj_list # Lists are mutable so using this isn't necessary.
 
 def wrap(text, width=80):
+    '''
+    Intelligently wrap text to a set width.
+
+    :param text: text to wrap.
+    :param width: number of columns to wrap to.
+    '''
+
     return reduce(lambda line, word, width=width: '%s%s%s' %
                   (line,
                    ' \n'[(len(line)-line.rfind('\n')-1

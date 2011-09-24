@@ -32,15 +32,15 @@ class Issue(JSONFile):
 
     def __init__(self, tracker, id=None):
         self.fields = {
-                'title': None,
-                'status': 'open',
-                'labels': [],
+                'title'  : None,
+                'status' : 'open',
+                'labels' : [],
                 'content': None,
                 'created': None,
                 'updated': None,
-                'author': {
-                    'name': None,
-                    'email': None,
+                'author' : {
+                    'name'  : None,
+                    'email' : None,
                     'avatar': None,
                     }
                 }

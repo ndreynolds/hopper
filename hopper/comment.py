@@ -9,16 +9,15 @@ class Comment(JSONFile):
     
     def __init__(self, issue, id=None, **kwargs):
         self.fields = {
-              'author': {
-                  'name': None,
-                  'email': None,
+              'author'   : {
+                  'name'  : None,
+                  'email' : None,
                   'avatar': None
                   },
-              'content': None,
+              'content'  : None,
               'timestamp': None,
-              'id': None,
-              'event': False # use comments for event messages
-                             # e.g. 'Closed issue', 'Added labels'
+              'id'       : None,
+              'event'    : False
               }
         self.issue = issue
         if id is not None:

@@ -4,15 +4,14 @@ import subprocess
 
 from dulwich.repo import Repo as DulwichRepo
 from dulwich.objects import Commit, Blob, Tree
-from dulwich.errors import CommitError
 
 class Repo(object):
     '''
-    A layer of abstraction over Dulwich to provide high-level Git 
-    repository interaction.
+    An abstraction layer that sits on top of Dulwich to provide high-level 
+    Git repository interaction.
 
-    In some places this is purely a wrapper of dulwich.repo, in others
-    it uses low-level dulwich methods to achieve high-level ends such as 
+    In some places this is purely a wrapper of dulwich.Repo, in others
+    it uses low-level dulwich methods to achieve high-level ends emulating
     the common git commands (e.g. add, commit, branch, log).
 
     The underlying dulwich Repo object can always be accessed through
@@ -108,18 +107,29 @@ class Repo(object):
 
         return adds
 
-    def branch(self, name, commit=None):
+    def branch(self, name=None, commit=None):
         '''
-        Create a new branch. Equivalent to `git branch`.
+        Create a new branch or display the current one. Equivalent to 
+        `git branch`.
         
         :param name: the name of the branch
         :param commit: a commit identifier. Same idea as the ``--start-point``
                        option. Will create the branch off of the commit. 
                        Defaults to HEAD.
         '''
-        if commit is None:
-            commit = self.head().id
-        self.repo.refs['refs/heads/%s' % name] = commit
+        # create a branch
+        if name is not None:
+            if commit is None:
+                commit = self.head().id
+            self.repo.refs['refs/heads/%s' % name] = commit
+        # display the current branch
+        else:
+            # couldn't find an easy way to get it out of dulwich, so we'll
+            # just read the HEAD file directly.
+            path = os.path.join(self.repo._controldir, 'HEAD')
+            if os.path.isfile(path):
+                with open(path, 'r') as fp:
+                    return fp.read().strip()
 
     def checkout(self, identifier):
         '''
@@ -162,7 +172,7 @@ class Repo(object):
         # It would be nice to use check_output() here, but it's 2.7+
         return subprocess.Popen(prefix + cmd, stdout=subprocess.PIPE).communicate()[0]
 
-    def commit(self, **kwargs):
+    def commit(self, all=False, **kwargs):
         '''
         Commit the changeset to the repository.  Equivalent to the 
         `git commit` command.
@@ -171,8 +181,16 @@ class Repo(object):
         retrieve one or more commits.
 
         Uses ``dulwich.objects.BaseRepo.do_commit()``, see that for
-        params.
+        params. At minimum, you need to provide **committer** and 
+        **message**. Everything else will be defaulted.
+
+        :param all: commit all modified files that are already being tracked.
+        :param **kwargs: the commit attributes (e.g. committer, message,
+                         etc.). Again, see the underlying dulwich method.
         '''
+        
+        if all:
+            self.add(all=True)
 
         # pass the kwargs to dulwich, get the returned commit id.
         commit_id = self.repo.do_commit(**kwargs)

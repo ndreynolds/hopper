@@ -24,15 +24,15 @@ class UserConfig(ConfigFile):
         # set config file fields
         self.fields = {
                 'user': {
-                    'name': None,
+                    'name' : None,
                     'email': None
                     },
                 'core': {
-                    'editor': 'vim',
+                    'editor'    : 'vim',
                     'autocommit': True,
-                    'color': True
+                    'color'     : True
                     },
-                'web': {
+                'web' : {
                     # This generated key is overridden if it exists
                     # in the config file already. It is required for the
                     # Flask app.
@@ -45,7 +45,7 @@ class UserConfig(ConfigFile):
         self.types = {
                 'core': {
                     'autocommit': bool,
-                    'color': bool
+                    'color'     : bool
                     }
                 }
         if path is None:
