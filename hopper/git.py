@@ -101,6 +101,13 @@ class Repo(object):
             if os.path.isfile(path):
                 adds.append(path)
 
+        # make sure we've got relpaths, otherwise Dulwich will freak.
+        rels = []
+        for p in adds:
+            # get the relpath relative to repo root.
+            rels.append(os.path.relpath(p, self.root))
+        adds = rels
+
         # don't waste time with stage if empty list.
         if adds:
             self.repo.stage(adds)
@@ -135,7 +142,7 @@ class Repo(object):
         '''
         Checkout a branch, commit, or file.
         '''
-        pass
+        raise NotImplementedError
 
     def cmd(self, cmd):
         '''
@@ -249,27 +256,6 @@ class Repo(object):
 
     def tree(self, sha):
         return self.repo.tree(sha)
-
-    def _add_to_tree(self, path, tree=None):
-        '''Create a blob from the given file and add the blob to the tree.'''
-        if os.path.isfile(path):
-            fname = os.path.split(path)[-1]
-            with open(path, 'r') as fp:
-                blob_string = fp.read()
-            blob = Blob.from_string(blob_string)
-            self.blobs.append(blob)
-            self.tree.add(fname, 0100644, blob.id)
-
-    def _store_objects(self):
-        '''Store the objects in the repo's object store.'''
-        if self.blobs:
-            obj_store = self.repo.object_store
-            for blob in self.blobs:
-                obj_store.add_object(blob)
-            obj_store.add_object(self.tree)
-            obj_store.add_object(self.commit)
-            return True
-        return False
 
 class NoHeadSet(Exception):
     '''The repository has no HEAD.'''
