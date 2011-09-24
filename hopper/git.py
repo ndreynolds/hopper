@@ -1,6 +1,5 @@
 from __future__ import with_statement
 import os
-import time
 import subprocess
 
 from dulwich.repo import Repo as DulwichRepo
@@ -9,7 +8,8 @@ from dulwich.errors import CommitError
 
 class Repo(object):
     '''
-    High-level Git repository interactions using Dulwich.
+    A layer of abstraction over Dulwich to provide high-level Git 
+    repository interaction.
 
     In some places this is purely a wrapper of dulwich.repo, in others
     it uses low-level dulwich methods to achieve high-level ends such as 
@@ -18,64 +18,108 @@ class Repo(object):
     The underlying dulwich Repo object can always be accessed through
     Repo.repo (as redundant as that is).
 
-    Batteries not included.
+    This should be considered a work-in-progress, and as such, a lot 
+    of it doesn't work yet.
     '''
 
     def __init__(self, path):
         self.repo = DulwichRepo(path) # The inner Dulwich Repo object.
-        try:
-            self.head = self._get_head()
-        except KeyError:
-            self.head = None
-        try:
-            self.tree = self.head.tree
-            self.blobs = self.head.tree.blobs
-        except AttributeError:
-            self.tree = Tree()
-            self.blobs = []
         self.root = path
-        self.objects = self.repo.object_store
 
     @classmethod
     def init(cls, path, mkdir=False, bare=False):
-        '''Initializes a normal or bare repository.'''
+        '''
+        Initializes a normal or bare repository. This is mostly a
+        handoff to Dulwich.
+        
+        :param path: the path (which must be a directory) to create
+                     the repository within.
+        :param mkdir: if True, make a directory at **path**. Equivalent 
+                      to ``mkdir [path] && cd [path] && git init``.
+        :param bare: if True, create a bare repository at the path.
+
+        :return: a ``Repo`` instance.
+        '''
         if bare:
             DulwichRepo.init_bare(path)
         else:
             DulwichRepo.init(path, mkdir)
         return cls(path)
 
-    def add_all(self, directory=None):
+    def add(self, path=None, all=False):
         '''
-        Mimics the `git add .` command.
-
-        If :directory is supplied, stage all files within that directory 
-        (recursively). :directory defaults to the repo root.  
-        '''
-        if directory is None:
-            directory = self.root
-        if not os.path.isdir(directory):
-            raise OSError('Supplied path is not a directory')
-        for directory, dirnames, filenames in os.walk(directory):
-            if '.git' in dirnames:
-                # don't traverse the .git subdir
-                dirnames.remove('.git')
-            for f in filenames:
-                self._add_to_tree(os.path.join(directory, f))
-
-    def add(self, path):
-        '''
-        Mimics the `git add <file>` command.
+        Add files to the repository or staging area. Equivalent to 
+        the `git add` command. 
 
         :param path: the path to the file to add.
-        '''
-        self._add_to_tree(path)
+        :param all: if True, add all files under the given path. If 
+                    **path** is omitted, the repository's root path 
+                    will be used.
 
-    def branch(self, name, head=None):
-        '''Create a new branch with the given name.'''
-        if head is None:
-            head = self.head.id
-        self.repo.refs['refs/heads/%s' % name] = head
+        :return: list of filepaths that were added.
+                   
+        If **path** is a file and **all** is True, only the single 
+        file will be added.
+        If **path** is a directory and **all** is False, nothing 
+        will be added.
+        Likewise, if both **path** and **all** are omitted, nothing 
+        will be added.        
+        '''
+
+        # the implementation creates a list of paths and stages them using 
+        # dulwich.Repo.stage
+
+        adds = []
+
+        # add all files within given path
+        if path is not None and all:
+            if os.path.isdir(path):
+                # walk the directory
+                for directory, dirnames, filenames in os.walk(directory):
+                    if '.git' in dirnames:
+                        # in case path is root, don't traverse the .git subdir 
+                        dirnames.remove('.git')
+                    for f in filenames:
+                        path = os.path.join(directory, f)
+                        adds.append(path)
+            elif os.path.isfile(path):
+                adds.append(path)
+        
+        # add all files within root path
+        elif path is None and all:
+            # walk the root directory
+            for directory, dirnames, filenames in os.walk(self.root):
+                if '.git' in dirnames:
+                    # don't traverse the .git subdir 
+                    dirnames.remove('.git')
+                for f in filenames:
+                    path = os.path.join(directory, f)
+                    adds.append(path)
+
+        # add file at path
+        elif path is not None:
+            # add only if file
+            if os.path.isfile(path):
+                adds.append(path)
+
+        # don't waste time with stage if empty list.
+        if adds:
+            self.repo.stage(adds)
+
+        return adds
+
+    def branch(self, name, commit=None):
+        '''
+        Create a new branch. Equivalent to `git branch`.
+        
+        :param name: the name of the branch
+        :param commit: a commit identifier. Same idea as the ``--start-point``
+                       option. Will create the branch off of the commit. 
+                       Defaults to HEAD.
+        '''
+        if commit is None:
+            commit = self.head().id
+        self.repo.refs['refs/heads/%s' % name] = commit
 
     def checkout(self, identifier):
         '''
@@ -87,26 +131,30 @@ class Repo(object):
         '''
         Run a raw git command from the shell and return any output. Unlike 
         other methods (which depend on Dulwich's git reimplementation and 
-        not git itself), this is dependant on the git shell command.
+        not git itself), this is dependent on the git shell command. 
 
         The given command and arguments are prefixed with:
-            git --git-dir=[/path/to/tracker/.git] --work-tree=[/path/to/tracker]
+
+        ``git --git-dir=[/path/to/tracker/.git] --work-tree=[/path/to/tracker]``
+
+        and run through the ``subprocess.Popen`` method.
 
         :param cmd: A list of command-line arguments (anything the subprocess 
                     module will take).
+        :return: a string containing the command's output.
 
-        Usage:
+        **Usage** (output has truncated for brevity):
           >>> Repo.cmd(['checkout', '-q', 'master'])
           >>> Repo.cmd(['commit', '-q', '-a', '-m', 'Initial Commit'])
           >>> Repo.cmd(['remote', '-v'])
-          "origin  git@ndreynolds.com:hopper2.git (fetch)\n\n origin ... "
+          "origin  git@ndreynolds.com:hopper.git (fetch)\\n\\n origin ..."
           >>> Repo.cmd(['log'])
-          "commit 68a116eaee458607a3a9cf852df4f358a02bdb92\nAuthor: Ni..."
+          "commit 68a116eaee458607a3a9cf852df4f358a02bdb92\\nAuthor: Ni..."
 
-        As you can see, it doesn't do any parsing of the output. It's best 
-        used for actions with little or no output (e.g. checkouts, add/rm, 
-        remote add/rm, etc.). 
+        As you can see, it doesn't do any parsing of the output. It's available
+        for times when the other methods don't get the job done.
         '''
+
         if not type(cmd) is list:
             raise TypeError('cmd must be a list')
         git_dir = os.path.join(self.root, '.git')
@@ -116,69 +164,21 @@ class Repo(object):
 
     def commit(self, **kwargs):
         '''
-        Mimics the `git commit` command.
+        Commit the changeset to the repository.  Equivalent to the 
+        `git commit` command.
 
-        This method does a commit; use commits() to retrieve one 
-        or more commits.
+        This method does a commit; use the ``commits`` method to 
+        retrieve one or more commits.
 
-        The method will accept any arguments accepted by Dulwich's 
-        Repo.commit(). It merges these arguments with some sensible 
-        defaults. For example, commit_time will be handled automatically
-        unless supplied. 
-
-        Not all arguments are defaultable. At minimum you should 
-        provide:
-
-            :param message: the commit message
-            :param author: the commit author
+        Uses ``dulwich.objects.BaseRepo.do_commit()``, see that for
+        params.
         '''
-        defaults = {
-                'commit_time': int(time.time()),
-                'commit_timezone': 0,
-                'encoding': 'UTF-8',
-                'parents': [],
-                'tree': self.tree.id
-                }
 
-        # merge defaults with kwargs
-        options = dict(defaults.items() + kwargs.items())
+        # pass the kwargs to dulwich, get the returned commit id.
+        commit_id = self.repo.do_commit(**kwargs)
 
-        # make sure we have everything we need:
-        if not options.has_key('author_time'):
-            options['author_time'] = options['commit_time']
-        if not options.has_key('author_timezone'):
-            options['author_timezone'] = options['commit_timezone']
-        if not options.has_key('committer'):
-            options['committer'] = options['author']
-
-        commit = Commit()
-        # Set the commit attributes from the dictionary
-        for key in options.keys():
-            setattr(commit, key, options[key])
-        
-        # Get the ref param if it's there, otherwise HEAD
-        ref = 'HEAD'
-        if kwargs.has_key('ref'):
-            ref = kwargs['ref']
-
-        try:
-            old_head = self.repo.refs[ref]
-            commit.parents = [old_head]
-            self.repo.object_store.add_object(commit)
-            ok = self.repo.refs.set_if_equals(ref, old_head, commit.id)
-        except KeyError:
-            commit.parents = []
-            self.repo.object_store.add_object(commit)
-            ok = self.repo.refs.add_if_new(ref, commit.id)
-            # set the branch.
-            self.branch('master', commit.id)
-        if not ok:
-            raise CommitError("%s changed during commit" % (ref,))
-
-        # set the head attribute
-        self.head = commit
-        # return the Commit object
-        return commit
+        # return the Commit object (instead of the id, which is less useful).
+        return self.commits(commit_id)
 
     def commits(self, identifier=None, n=10):
         '''
@@ -194,17 +194,34 @@ class Repo(object):
 
         # eventually this needs to check if the identifier is a branch
         # or tag first, then look for an identifier.
+
         if identifier is not None:
             return self.repo[identifier]
-        if not hasattr(self, 'head'):
-            raise MissingHead
-        return self.repo.revision_history(self.head.id)[:n]
+        return self.repo.revision_history(self.head().id)[:n]
 
-    def diff(self, a, b):
+    def diff(self, a, b=None, path=None):
         '''
         Return a diff of commits a and b.
+
+        :param a: a commit identifier.
+        :param b: a commit identifier. Defaults to HEAD.
+        :param path: a path to a file or directory to diff. Defaults
+                     to the entire tree.
         '''
         raise NotImplementedError
+
+    def head(self):
+        '''
+        Return the HEAD or raise an error.
+        '''
+
+        # It seems best to make this a function so we don't have to
+        # set and continually update it.
+        try:
+            return self.repo['HEAD']
+        except KeyError:
+            # The HEAD will be missing before the repo is committed to.
+            raise NoHeadSet
 
     def log(self):
         return self.commits()
@@ -215,7 +232,7 @@ class Repo(object):
     def tree(self, sha):
         return self.repo.tree(sha)
 
-    def _add_to_tree(self, path):
+    def _add_to_tree(self, path, tree=None):
         '''Create a blob from the given file and add the blob to the tree.'''
         if os.path.isfile(path):
             fname = os.path.split(path)[-1]
@@ -236,14 +253,5 @@ class Repo(object):
             return True
         return False
 
-    def _get_head(self):
-        '''Get and return the repo's HEAD.'''
-        if 'HEAD' in self.repo.refs.keys():
-            head = self.repo[self.repo.head()]
-            head.tree = self.repo[head.tree]
-            return head
-        else:
-            return None
-
-class MissingHead(Exception):
-    '''The repository has no HEAD'''
+class NoHeadSet(Exception):
+    '''The repository has no HEAD.'''

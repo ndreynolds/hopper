@@ -3,9 +3,10 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/issue.js') }}"></script>
 
 <div class="issue-header">
-    <b>{{ issue.author['name'] }}</b> ({{ issue.author['email'] }}) opened 
-    Issue <span class="fancy-monospace">{{ issue.id[:6] }}</span> 
-    <b>{{ issue.created }}</b>
+    <span id="author">{{ issue.author['name'] }}</span> 
+    <span id="email">({{ issue.author['email'] }})</span> 
+    opened 
+    <span id="time">{{ issue.created }}</span>
     &nbsp; &nbsp; 
     {% if issue.status == 'open' %}
         <a id="issue-close" class="button green"

@@ -123,7 +123,7 @@ def view(id):
         issue.created = relative_time(issue.created)
         issue.content = markdown_to_html(issue.content)
         comments = issue.comments()
-        header = 'Viewing Issue <span class="monospace">%s</span>' % issue.id[:6]
+        header = 'Viewing Issue &nbsp;<span class="fancy-monospace">%s</span>' % issue.id[:6]
         if comments:
             map_attr(comments, 'timestamp', relative_time)
             map_attr(comments, 'content', markdown_to_html)

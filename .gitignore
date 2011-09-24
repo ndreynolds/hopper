@@ -20,6 +20,9 @@ pip-log.txt
 .coverage
 .tox
 
+# Sphinx doc build
+_build
+
 # Vim swaps
 *.swp
 

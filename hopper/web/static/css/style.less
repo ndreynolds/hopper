@@ -79,11 +79,14 @@ html {
 
 p {
     margin: 1em 0px;
+    line-height:115%;
 }
 
 li {
     list-style-type: circle;
+    margin: 0.8em 0px;
     margin-left:20px;
+    line-height:115%;
 }
 
 div#top-header {
@@ -150,7 +153,7 @@ div.issue-header {
 div.issue-header a {
     float:right;
     position:relative;
-    bottom:7px;
+    bottom:9px;
     color:#eee !important;
     height:13px;
     vertical-align:middle;
@@ -373,7 +376,7 @@ textarea#content {
 .gray {
     .rounded-corners(4px);
     .gradient(#ddd, #ccc);
-    border:1px solid #666;
+    border:1px solid #888;
     color:#333;
     text-shadow:1px 1px #fff;
 }
@@ -410,23 +413,25 @@ input[type=submit]:hover {
 }
 
 .monospace {
-    font-family: DejaVu;
+    font-family: DejaVu !important;
     font-size:95%;
 }
 
 .fancy-monospace {
+    .monospace;
     .gradient(#ddd, #ccc);
     .rounded-corners(4px);
-    border:1px solid #555;
+    border:1px solid #777;
     padding:4px;
     color:#444;
     text-shadow:0 1px 1px #eee;
 }
 
 .fancy-monospace-header {
+    .monospace;
     .gradient(#ddd, #ccc);
     .rounded-corners-top(4px);
-    border:1px solid #555;
+    border:1px solid #777;
     padding:4px;
     color:#444;
     text-shadow:0 1px 1px #eee;
@@ -470,6 +475,19 @@ input[type=submit]:hover {
 .comment-header span#time {
     font-weight:bold;
     color:#444;
+}
+
+.issue-header span#author {
+    font-weight:bold;
+    color:#eee;
+}
+
+.issue-header span#email {
+}
+        
+.issue-header span#time {
+    font-weight:bold;
+    color:#ddd;
 }
 
 .comment {
@@ -575,7 +593,7 @@ code {
     .rounded-corners(3px);
     background-color: #ddd;
     border:1px solid #ccc;
-    font-size:90%;
+    font-size:85%;
     padding:1px;
 }
 

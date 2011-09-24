@@ -38,7 +38,13 @@ class Tracker(JSONFile):
 
     @classmethod
     def new(cls, path):
-        '''Create and return tracker at the given path.'''
+        '''
+        Create and return tracker at the given path.
+
+        :param path: path to create the directory at. For example,
+                     supplying ``my_tracker`` would create the directory
+                     ``./my_tracker``.
+        '''
         root = path
         # stores issues
         issues = os.path.join(root, 'issues')
@@ -64,25 +70,30 @@ To replace this default message, edit the file `README.md` under
         open(os.path.join(issues, 'empty'), 'w').close()
         os.mkdir(hopper)
         open(os.path.join(hopper, 'empty'), 'w').close()
-        repo.add_all()
-        repo.commit(author='Hopper <hopper@hopperhq.com>',
+        repo.add(all=True)
+        repo.commit(committer='Hopper <hopper@hopperhq.com>',
                     message='Initial Commit')
         return cls(path)
 
-    def autocommit(self):
-        '''Commit any changes to the repo.'''
+    def autocommit(self, msg):
+        '''
+        Commit any changes to the repo.
+
+        :param msg: the commit message to use.
+        '''
         self.repo.cmd(['add', '.'])
         self.repo.cmd(['commit', '-am', 'Did something'])
 
     def read(self, relpath, mode='r'):
-        '''Read a file relative to the tracker route.'''
+        '''
+        Read a file relative to the tracker root.
+
+        :param relpath: a path relative to the trackers root directory.
+        :param mode: the file mode to use (e.g. 'r' or 'wb').
+        '''
         path = os.path.join(self.paths['root'], relpath)
         with open(path, mode) as fp:
             return fp.read()
-
-    def update(self):
-        '''Update the tracker's properties.'''
-        pass
 
     def issue(self, sha):
         '''Return the Issue object with the given SHA1'''
@@ -144,15 +155,17 @@ To replace this default message, edit the file `README.md` under
         '''
         Return a list of dictionaries containing the action and the actor.
         These are assembled from the Git repository's commit log.
+
+        :param n: the maximum number of history items to return.
         '''
-        return self.repo.commits()
+        return self.repo.commits()[:n]
 
     def get_issue_path(self, sha):
         '''
         Returns the absolute path to the issue. It doesn't check if the issue
         exists; this should be done afterwards if necessary.
 
-        :param sha: the SHA1 that uniquely identifies an issue.
+        :param sha: the issue's unique identifier.
         '''
         return os.path.join(self.paths['issues'], sha, 'issue')
 

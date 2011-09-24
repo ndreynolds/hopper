@@ -36,7 +36,7 @@
             </div>
             <div id="nav">
                 <a class="{{ 'nav selected' if selected == 'feed' else 'nav' }}"
-                    href="{{ url_for('issues.index') }}">Feed</a>
+                    href="{{ url_for('feed.main') }}">Feed</a>
                 <a class="{{ 'nav selected' if selected == 'issues' else 'nav' }}"
                     href="{{ url_for('issues.index') }}">Issues</a>
                 <a class="{{ 'nav selected' if selected == 'project' else 'nav' }}"

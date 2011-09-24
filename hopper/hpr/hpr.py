@@ -6,7 +6,7 @@ import os
 from hopper.tracker import Tracker
 from hopper.issue import Issue
 from hopper.comment import Comment
-from hopper.config import Config
+from hopper.config import UserConfig
 from hopper.web.manage import start
 from hopper.hpr.templates import Template, IssueTemplate
 from hopper.utils import relative_time, wrap
@@ -119,7 +119,7 @@ def main(args=sys.argv[1:]):
 def new(args):
     '''Create a new issue.'''
     i = Issue(args['tracker'])
-    conf = Config()
+    conf = UserConfig()
     # set the author info
     i.author['name'] = conf.user['name']
     i.author['email'] = conf.user['email']
@@ -154,7 +154,7 @@ def comment(args):
         print 'No such issue'
         return
     c = Comment(i)
-    conf = Config()
+    conf = UserConfig()
     # set the author info
     c.author['name'] = conf.user['name']
     c.author['email'] = conf.user['email']
@@ -196,7 +196,7 @@ def show(args):
     '''Show an issue.'''
     t = args['tracker']
     i = t.issue(args['issue'])
-    c = Config()
+    c = UserConfig()
     if not i:
         print 'No such issue'
         return
@@ -217,7 +217,7 @@ def show(args):
 def list_(args):
     '''List the tracker's issues (filtered by criteria)'''
     t = args['tracker']
-    c = Config()
+    c = UserConfig()
     issues = t.issues()
     # short mode
     if args['short']:

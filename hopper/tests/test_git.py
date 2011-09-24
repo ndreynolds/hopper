@@ -4,7 +4,7 @@ import shutil
 import os
 
 from hopper.utils import get_uuid
-from hopper.git import Repo
+from hopper.git import Repo, NoHeadSet
 from dulwich.objects import Commit
 
 class RepoTest(unittest.TestCase):
@@ -25,9 +25,9 @@ class RepoTest(unittest.TestCase):
             with open(os.path.join(r.root, 'spam-%d' % i), 'w') as fp:
                 fp.write(get_uuid())
         # add the changes
-        r.add_all()
+        r.add(all=True)
         # commit the changes
-        r.commit(author='Joe Sixpack', message='Initial commit')
+        r.commit(committer='Joe Sixpack', message='Initial commit')
         return r
 
     def test_init(self):
@@ -47,11 +47,12 @@ class RepoTest(unittest.TestCase):
         r2 = Repo(r1.root)
         # make sure it's a Repo object.
         assert type(r2) is Repo
-        # a new repo should have no HEAD
-        assert r2.head == None
 
-    def test_add_all(self):
-        pass
+        # a new repo should have no HEAD
+        try:
+            r2.head()
+        except NoHeadSet:
+            pass
 
     def test_add(self):
         pass
@@ -61,21 +62,26 @@ class RepoTest(unittest.TestCase):
 
     def test_commit(self):
         r = Repo.init(self.path, mkdir=True)
-        with open('spam', 'w') as fp:
+        with open(os.path.join(r.root, 'spam'), 'w') as fp:
             fp.write('test')
         r.add('spam')
-        c = r.commit(author='GOB Bluth', message='Come on!')
+        c = r.commit(committer='GOB Bluth', message='Come on!')
         # make sure the commit got set right
         assert type(c) is Commit
         assert c.author == 'GOB Bluth'
         assert c.message == 'Come on!'
         # the commit should be the same as the Repo.head
-        assert c == r.head
+        assert c == r.head()
 
     def test_commits(self):
         r = self._make_repo_with_commit()
         # giving it a SHA should return a single Commit object
-        assert type(r.commits(r.head.id)) is Commit
+        assert type(r.commits(r.head().id)) is Commit
+        # no args should garner a list
+        assert type(r.commits()) is list
+        # each list element should be a Commit object
+        for c in r.commits():
+            assert type(c) is Commit
 
     def test_log(self):
         pass
@@ -84,15 +90,6 @@ class RepoTest(unittest.TestCase):
         pass
 
     def test_tree(self):
-        pass
-
-    def test__add_to_tree(self):
-        pass
-
-    def test__store_objects(self):
-        pass
-
-    def test__set_head(self):
         pass
 
 if __name__ == '__main__':

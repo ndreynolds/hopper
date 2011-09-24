@@ -5,7 +5,7 @@ Utility functions for the Hopper Flask app.
 from flask import flash, request, current_app
 
 from hopper.tracker import Tracker
-from hopper.config import Config
+from hopper.config import UserConfig
 
 # Handles json/simplejson import
 from hopper.utils import to_json as json
@@ -16,9 +16,9 @@ def setup():
     
     It also sets the flash to an environment warning to let the user know
     they are running the tracker locally and as <name>. We only do this
-    the first time setup() is called per web server lifetime.
+    the first time setup() is called per web server process.
     '''
-    config = Config()
+    config = UserConfig()
     # Use current_app so we don't have circular imports.
     if current_app.GLOBALS['first_request']:
         flash('Running Hopper locally as %s' % config.user['name'])

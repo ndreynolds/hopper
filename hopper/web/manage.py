@@ -1,4 +1,6 @@
-# For development, will use the local repo instead of the installed module
+# For development, will use the local repo instead of the installed package.
+# It will fallback to the installed package anyway, so it's not a big deal
+# if the path doesn't exist.
 import sys
 import os
 home = os.getenv('HOME')

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block body %}
+<div id="feed">
+    <ul>
+    {% for c in history %}
+        <li>
+        {{ c.author }}
+        {{ c.message }}
+        {{ c.commit_time }}
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}
