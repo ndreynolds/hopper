@@ -17,17 +17,17 @@ class RepoTest(unittest.TestCase):
         if os.path.isdir(self.path):
             shutil.rmtree(self.path)
 
-    def _repo_with_commit(self):
-        '''Returns a repo with a single commit (of some randomly generated files).'''
+    def _repo_with_commits(self, num_commits=1):
+        '''Returns a repo with one or more commits.'''
         r = Repo.init(self.path, mkdir=True)
-        # write some SHAs to a few files
-        for i in range(4):
-            with open(os.path.join(r.root, 'spam-%d' % i), 'w') as fp:
-                fp.write(get_uuid())
-        # add the changes
-        r.add(all=True)
-        # commit the changes
-        r.commit(committer='Joe Sixpack', message='Initial commit')
+        for c in range(num_commits):
+            for i in range(4):
+                with open(os.path.join(r.root, 'spam-%d' % i), 'w') as fp:
+                    fp.write(get_uuid())
+            # add the files/changes
+            r.add(all=True)
+            # commit the changes
+            r.commit(committer='Joe Sixpack', message='Commit %d' % c)
         return r
 
     def test_init(self):
@@ -64,7 +64,7 @@ class RepoTest(unittest.TestCase):
         pass
 
     def test_branch(self):
-        r = self._repo_with_commit()
+        r = self._repo_with_commits()
 
         # test repo should be on master branch.
         assert r.branch() == 'ref: refs/heads/master'
@@ -104,20 +104,21 @@ class RepoTest(unittest.TestCase):
         assert c == r.head()
 
     def test_commits(self):
-        r = self._repo_with_commit()
+        r = self._repo_with_commits(20)
 
-        # giving it a SHA should return a single Commit object
-        assert type(r.commits(r.head().id)) is Commit
-
-        # no args should garner a list
+        # returns list of Commit objects
         assert type(r.commits()) is list
+        assert type(r.commits()[0]) is Commit
 
-        # each list element should be a Commit object
-        for c in r.commits():
-            assert type(c) is Commit
+        # setting n=20 should get us 20 commits
+        assert len(r.commits(n=20)) == 20
 
-    def test_log(self):
-        pass
+        # should accept a SHA
+        assert r.commits(r.head().id)
+        # should accept a branch name
+        assert r.commits('master')
+        # should accept a tag
+        # (stub)
 
     def test_tag(self):
         pass

@@ -62,6 +62,7 @@ def main(args=sys.argv[1:]):
     # `edit` subcommand
     editp = subparsers.add_parser('edit', help='Edit an existing issue')
     editp.add_argument('issue', help='an issue id (the first 4 chars is usually enough)')
+    editp.add_argument('-e', '--editor', action='store', help='use the given editor')
     editp.set_defaults(func=edit)
 
     # `list` subcommand
@@ -87,7 +88,7 @@ def main(args=sys.argv[1:]):
     servep = subparsers.add_parser('serve', help='Serve a web interface \
             to the tracker')
     servep.add_argument('-p', '--port', action='store', 
-                        help='serve on the specified prot, default is 5000')
+                        help='serve on the specified port, default is 5000')
     servep.add_argument('-v', '--verbose', action='store_true', 
                         help='turn on debug mode')
     servep.set_defaults(func=serve)

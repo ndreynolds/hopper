@@ -16,7 +16,10 @@ Documentation
 .. toctree::
    :maxdepth: 2
 
-   tracker
+   hpr/index
+   web/index
+   api
+  
 
 Index
 -----

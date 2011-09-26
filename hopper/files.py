@@ -94,7 +94,7 @@ class ConfigFile(BaseFile):
         value. You can nest dictionaries too.
 
         It should look like this:
-            { 'autocommit': bool, 'user': {'name': str} }
+            ``{ 'autocommit': bool, 'user': {'name': str} }``
 
         If str fields are mapped in types, empty strings remain ''.
         If they're not mapped, empty strings get converted to None.
