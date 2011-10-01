@@ -112,6 +112,7 @@ class Issue(JSONFile):
     def _resolve_id(self, id):
         '''Resolve partial ids and verify the issue exists.'''
         if len(id) == 40:
+            print self.tracker.get_issue_path(id)
             if os.path.exists(self.tracker.get_issue_path(id)):
                 return id
             else:

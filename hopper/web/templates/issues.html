@@ -42,6 +42,7 @@
                 </th>
                 {% endif %} 
                 <th>Labels</th>
+                <th>Author</th>
                 {% if sorted_by == 'updated' and (order == 'asc' or order is none) %}
                 <th>
                     <a href="{{ url_for('issues.index', status=status, s='timestamp', o='desc') }}">Age &darr;</a>
@@ -67,6 +68,7 @@
                         <span class="fancy-monospace">{{ label }}</span>
                     {% endfor %}
                 </td>
+                <td>{{ issue.author['name'] }}</td>
                 <td>{{ issue.updated }}</td>
             </tr>
             {% endfor %}
@@ -96,5 +98,5 @@
     </div>
 {% endif %}
 <br>
-<small>Showing {{ issues_|count }} of {{ n }} issues.</small>
+<span id="issue-count">Showing {{ issues_|count }} of {{ n }} issues.</span>
 {% endblock %}

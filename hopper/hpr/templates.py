@@ -2,6 +2,8 @@ from __future__ import with_statement
 import os
 import tempfile
 
+from hopper.files import lock
+
 class Template(object):
     def __init__(self, template):
         if not os.path.exists(template):
@@ -11,7 +13,8 @@ class Template(object):
                 template = tpath
             else:
                 raise OSError('The template, %s, does not exist' % template)
-        self.template = open(template, 'r').read()
+        with open(template, 'r') as fp:
+            self.template = fp.read()
 
     def open(self, editor):
         '''
@@ -22,6 +25,7 @@ class Template(object):
             raise OSError('%s is not executable. Provide an executable \
                     editor in your .hprconfig' % editor)
         temp = tempfile.mkstemp(suffix='.hpr')[1]
+        # don't need locking here.
         with open(temp, 'w') as fp:
             fp.write(self.template)
         os.system('%s %s' % (editor, temp))

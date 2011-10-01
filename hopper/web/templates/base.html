@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Hopper</title>
+        <title>{{ tracker.config.name }}</title>
         <link rel="stylesheet" 
             type="text/css" href="{{ url_for('static', filename='css/reset.css') }}">
         <link rel="stylesheet" 
@@ -29,7 +29,7 @@
         {% endif %}
         <div id="top-header">
             <div id="title">
-                Hopper
+                {{ tracker.config.name }}
             </div>
             <div id="search">
                 <input type="text" class="unfocused" value="Search issues...">
@@ -58,6 +58,9 @@
         <br>
         <div id="footer">
             Proudly powered by <a href="http://hopperhq.com/hopper">Hopper</a>
+            <div id="git-access">
+                Access this tracker via Git: <span class="fancy-monospace">git@hopperhq.com:{{ tracker.paths['base'] }}.git</span>
+            </div>
         </div>
     </body>
 </html>

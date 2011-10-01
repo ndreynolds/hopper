@@ -1,25 +1,30 @@
 from __future__ import with_statement
 import os
 import subprocess # only used for Repo.cmd()
+import difflib
 
 from dulwich.repo import Repo as DulwichRepo
-from dulwich.objects import Blob, Commit, Tree, Tag
-from dulwich.errors import NotTreeError, NotCommitError
+from dulwich.objects import Blob, Commit, Tree
+from dulwich.errors import NotTreeError, NotBlobError
 
 class Repo(object):
     '''
-    An abstraction layer that sits on top of Dulwich to provide high-level 
-    Git repository interaction.
+    An abstraction layer on top of dulwich.repo.Repo for higher-level
+    git repository actions like:
 
-    In some places this is purely a wrapper of dulwich.Repo, in others
-    it uses low-level dulwich methods to achieve high-level ends emulating
-    the common git commands (e.g. add, commit, branch, log).
+    * adding only modified files
+    * checking out whole trees (or paths within them) from refs
+    * diffs with difflib
+    * branching and tagging (both displaying and creating)
+    * listing commits down from a ref
 
-    The underlying dulwich Repo object can always be accessed through
-    Repo.repo (as redundant as that is).
+    Methods are structured to match git commands when appropriate.
 
-    This should be considered a work-in-progress, and as such, a lot 
-    of it doesn't work yet.
+    It also supports executing arbitrary git commands, if git is installed.
+    Of course, everything else is implemented in pure python, so having git
+    installed is optional.
+
+    Should be considered a work-in-progress.
     '''
 
     def __init__(self, path):
@@ -51,15 +56,14 @@ class Repo(object):
         Add files to the repository or staging area if new or modified. 
         Equivalent to the ``git add`` command. 
 
-        :param path: the path to the file to add.
+        :param path: the path to the file to add, relative to the
+            repository root. 
         :param all: if True, add all files under the given path. If 
-                    **path** is omitted, the repository's root path 
-                    will be used.
+            **path** is omitted, the repository's root path will be used.
         :param add_new_files: if True, this command will also add new
-                              files. Note the default is True--this is 
-                              provided for situations 
-                              (like ``git commit -a``), where adding
-                              new files would be undesirable.
+            files. Note this is the default behavior. The option is 
+            provided for situations (e.g. ``git commit -a``) where adding
+            new files would be undesirable.
 
         :return: list of filepaths that were added.
                    
@@ -78,7 +82,16 @@ class Repo(object):
         # the implementation creates a list of paths and stages them using 
         # dulwich.Repo.stage
 
+        # Paths are a little tricky. To work with repositories independent
+        # of the current working directory, we need absolute paths to files.
+        # At the same time, git trees are relative to the repository root.
+        # So, we have to do a few conversions.
+
         adds = []
+
+        # get an absolute path for doing isfile/isdir checks.
+        if path is not None:
+            path = os.path.join(self.root, path)
 
         # add all files within given path
         if path is not None and all:
@@ -111,7 +124,7 @@ class Repo(object):
             if os.path.isfile(path):
                 adds.append(path)
 
-        # need relpaths, so Git doesn't freak.
+        # back to relative paths, so we can add them to the tree.
         rels = []
         for p in adds:
             # get the path relative to repo root.
@@ -131,28 +144,28 @@ class Repo(object):
 
         return adds
 
-    def branch(self, name=None, commit=None):
+    def branch(self, name=None, ref=None):
         '''
         Create a new branch or display the current one. Equivalent to 
         `git branch`.
         
         :param name: the name of the branch
-        :param commit: a commit SHA. Same idea as the ``--start-point``
-                       option. Will create the branch off of the commit. 
-                       Defaults to HEAD.
+        :param ref: a commit reference (branch, tag, or SHA). Same idea 
+                    as the git-branch ``--start-point`` option. Will 
+                    create the branch off of the commit. Defaults to HEAD.
+        :return: None on create, branch name on display.
         
         When the name param is not given, the current branch will be
-        returned as a string in the format: 
-
-            ``ref: refs/heads/[branch_name]``
-
-        Note that this is just the contents of ``.git/HEAD``.
+        returned as a string using the branch's full name
+        (i.e. ``refs/heads/[branch_name]``).
         '''
         # create a branch
         if name is not None:
-            if commit is None:
-                commit = self.head().id
-            self.repo.refs['refs/heads/%s' % name] = commit
+            if ref is None:
+                ref = self.head().id
+            else:
+                ref = self._resolve(ref)
+            self.repo.refs['refs/heads/%s' % name] = ref
         # display the name of the current branch
         else:
             # couldn't find an easy way to get it out of dulwich, 
@@ -161,7 +174,7 @@ class Repo(object):
             path = os.path.join(self.repo._controldir, 'HEAD')
             if os.path.isfile(path):
                 with open(path, 'r') as fp:
-                    return fp.read().strip()
+                    return fp.read().strip()[5:]
 
     def checkout(self, ref, path=None):
         '''
@@ -185,6 +198,7 @@ class Repo(object):
         :param ref: branch, tag, or commit
         :param path: checkout only file or directory at path, should be
                      relative to the repo's root. 
+        :raises KeyError: if bad reference.
         '''
         sha = self._resolve(ref)
         obj = self.repo[sha]
@@ -240,7 +254,7 @@ class Repo(object):
         # It would be nice to use check_output() here, but it's 2.7+
         return subprocess.Popen(prefix + cmd, stdout=subprocess.PIPE).communicate()[0]
 
-    def commit(self, all=False, force=False, **kwargs):
+    def commit(self, all=False, **kwargs):
         '''
         Commit the changeset to the repository.  Equivalent to the 
         `git commit` command.
@@ -294,7 +308,6 @@ class Repo(object):
         start_point = self.head().id
         if ref is not None:
             start_point = self._resolve(ref)
-
         return self.repo.revision_history(start_point)[:n]
 
     def diff(self, a, b=None, path=None):
@@ -303,10 +316,12 @@ class Repo(object):
 
         :param a: a commit identifier.
         :param b: a commit identifier. Defaults to HEAD.
-        :param path: a path to a file or directory to diff. Defaults
-                     to the entire tree.
+        :param path: a path to a file or directory to diff, relative
+                     to the repo root. Defaults to the entire tree.
         '''
-        raise NotImplementedError
+        if not os.path.isfile(path):
+            raise NotImplementedError('Specify a file path for now')
+        return self._diff_file(path, a, b)
 
     def head(self):
         '''Return the HEAD commit or raise an error.'''
@@ -318,11 +333,6 @@ class Repo(object):
             # The HEAD will be missing before the repo is committed to.
             raise NoHeadSet
 
-    def log(self):
-        # Need to decide if this is necessary.
-        # It should do, more or less, the same thing as commits().
-        return self.commits()
-
     def object(self, sha):
         '''
         Retrieve an object from the repository.
@@ -331,29 +341,38 @@ class Repo(object):
         '''
         return self.repo[sha]
 
-    def tag(self, name, commit=None):
+    def tag(self, name, ref=None):
         '''
         Create a tag.
 
         :param name: name of the new tag (e.g. 'v1.0' or '1.0.6')
-        :param commit: a commit SHA to tag, defaults to HEAD.
+        :param ref: a commit ref to tag, defaults to HEAD.
         '''
-        if commit is None:
-            commit = self.head().id
-        self.repo.refs['refs/tags/%s'] = commit
+        # TODO: display tags attached to HEAD when no args.
+        if ref is None:
+            ref = self.head().id
+        ref = self._resolve(ref)
+        self.repo.refs['refs/tags/%s' % name] = ref
 
-    def tree(self, sha):
+    def tree(self, sha=None):
         '''
-        Return the tree with given SHA. Raise an error if an object
-        matches the SHA, but is not a tree.
+        Return the tree with given SHA, or if no SHA given, return the
+        HEAD commit's tree. Raise an error if an object matches the SHA, 
+        but is not a tree.
 
-        :param sha: tree reference
+        :param sha: tree reference. 
+        
+        Note that a commit reference would not work. To get a commit's 
+        tree, just provide ``c.tree``, which contains the SHA we need.
         '''
-        obj = self.repo[sha]
-        if type(obj) is Tag:
+        if sha is None:
+            obj = self.repo[self.head().tree]
+        else:
+            obj = self.repo[sha]
+        if type(obj) is Tree:
             return obj
         else:
-            raise NotTreeError
+            raise NotTreeError('Object is not a Tree')
 
     def _file_is_modified(self, path):
         '''
@@ -408,9 +427,27 @@ class Repo(object):
             return True
         return False
 
+    def _apply_to_tree(self, tree, f, path=None):
+        '''
+        Walk a tree recursively and apply function, f, to each entry
+
+        :param tree: a dulwich.objects.Tree object
+        :param f: function that will be called with each entry.
+        :param path: if provided, the path relative to the repository
+                     will be included in the function call.
+        '''
+        if type(tree) is not Tree:
+            raise NotTreeError
+        for entry in tree.iteritems():
+            f(entry, path) if path else f(entry)
+            obj = self.repo[entry.sha]
+            if type(obj) is Tree:
+                new_path = os.path.join(path, f) if path else None
+                self._apply_to_tree(obj, f, new_path)
+
     def _tree_grab(self, tree, path):
         '''
-        Walk a Git tree recursively to retrieve and return a blob or 
+        Walk a tree recursively to retrieve and return a blob or 
         sub-tree, or return None if one does not exist.
 
         :param tree: a dulwich.objects.Tree object.
@@ -423,7 +460,7 @@ class Repo(object):
         ``git.py`` blob within the ``hopper`` sub-tree.
         '''
         if type(tree) is not Tree:
-            raise NotTreeError
+            raise NotTreeError('Object is not a tree')
         # remove trailing slashes from path (so basename doesn't return '')
         if path[-1] == os.sep:
             path = path[:-1]
@@ -446,7 +483,7 @@ class Repo(object):
 
     def _tree_write(self, tree, basepath):
         '''
-        Walk a Git tree recursively and write each blob's data to
+        Walk a tree recursively and write each blob's data to
         disk.
 
         :param tree: a dulwich.objects.Tree object.
@@ -456,7 +493,7 @@ class Repo(object):
                          name to the original call.
         '''
         if type(tree) is not Tree:
-            raise NotTreeError
+            raise NotTreeError('Object is not a tree')
         for entry in tree.iteritems():
             obj = self.repo[entry.sha]
             if type(obj) is Blob:
@@ -501,6 +538,41 @@ class Repo(object):
                 return obj.id
             else:
                 raise KeyError('Bad reference: %s' % ref)
+
+    def _diff_file(self, path, a, b=None, html=True):
+        '''
+        Use difflib to compare a file between two commits, or a
+        single commit and the working tree.
+
+        :param a: ref to commit a.
+        :param b: ref to commit b, defaults to the working tree.
+        :param path: path to file, relative to repo root.
+        :param html: format using difflib.HtmlDiff.
+        :raise NotBlobError: if path wasn't present in both trees.
+        '''
+        # resolve commit
+        a = self._resolve(a)
+        # get the trees
+        tree1 = self.repo[self.repo[a].tree]
+        # get the blob
+        blob1 = self._tree_grab(tree1, path)
+        # set data or empty string (meaning no blob at path)
+        data1 = blob1.data if type(blob1) is Blob else ''
+
+        if b is None:
+            with open(os.path.join(self.root, path), 'r') as fp:
+                data2 = fp.read()
+        else:
+            b = self._resolve(b)
+            tree2 = self.repo[self.repo[b].tree]
+            blob2 = self._tree_grab(tree2, path)
+            data2 = blob2.data if type(blob2) is Blob else ''
+            # if both blobs were missing => bad path
+            if type(blob1) is not Blob and type(blob2) is not Blob:
+                raise NotBlobError('Path did not point to a blob in either tree')
+
+        diff = list(difflib.context_diff(data1.splitlines(), data2.splitlines()))
+        return diff.join('\n')
 
 
 def _expand_branch_name(shortname):

@@ -58,7 +58,8 @@ def index(status='open'):
         pages = None
 
     # set the context header
-    header = 'Viewing issues for %s' % 'Hopper'
+    context = 'open' if status == 'open' else 'closed'
+    header = 'Viewing %s issues for %s' % (context, tracker.config.name)
 
     # humanize the timestamps
     map_attr(issues_, 'updated', relative_time)
@@ -79,7 +80,7 @@ def index(status='open'):
                                selected='issues', status=status, 
                                sorted_by=sort_by, page=page, pages=pages,
                                num_pages=num_pages, order=order,
-                               header=header, n=n)
+                               header=header, n=n, tracker=tracker)
 
 @issues.route('/new', methods=['GET', 'POST'])
 def new():
@@ -93,12 +94,16 @@ def new():
         issue.author['name'] = config.user['name']
         issue.author['email'] = config.user['email']
         if issue.save():
-            return redirect(url_for('issue', id=issue.id)) 
+            tracker.autocommit(message='Created a new issue %s' % issue.id[:6], 
+                               author=config.user)
+            return redirect(url_for('issues.view', id=issue.id)) 
         else:
-            flash('There was an error saving your issue')
-            return render_template('new.html', selected='issues', header=header)
+            flash('There was an error saving your issue.')
+            return render_template('new.html', selected='issues', 
+                                   header=header, tracker=tracker)
     else:
-        return render_template('new.html', selected='issues', header=header)
+        return render_template('new.html', selected='issues', 
+                               header=header, tracker=tracker)
 
 @issues.route('/view/<id>', methods=['GET', 'POST'])
 def view(id):
@@ -116,7 +121,11 @@ def view(id):
         comment.author['name'] = config.user['name']
         comment.author['email'] = config.user['email']
         comment.save()
-        issue.save() # ping the issue (updated = now)
+        if issue.save(): # ping the issue (updated = now)
+            tracker.autocommit(message='Commented on issue %s' % issue.id[:6],
+                               author=config.user)
+        else:
+            flash('There was an error saving your comment.')
         return redirect(url_for('issues.view', id=issue.id))
     else:
         issue.updated = relative_time(issue.updated)
@@ -129,7 +138,7 @@ def view(id):
             map_attr(comments, 'content', markdown_to_html)
         return render_template('issue.html', issue=issue,
                                comments=comments, selected='issues',
-                               config=config, header=header)
+                               config=config, header=header, tracker=tracker)
 
 @issues.route('/settings')
 def settings():

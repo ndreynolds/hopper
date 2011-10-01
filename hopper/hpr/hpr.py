@@ -119,24 +119,32 @@ def main(args=sys.argv[1:]):
 # Manage issues
 def new(args):
     '''Create a new issue.'''
-    i = Issue(args['tracker'])
-    conf = UserConfig()
+    t = args['tracker']
+    i = Issue(t)
+    config = UserConfig()
     # set the author info
-    i.author['name'] = conf.user['name']
-    i.author['email'] = conf.user['email']
+    i.author['name'] = config.user['name']
+    i.author['email'] = config.user['email']
+
+    # no editor for inline calls
     if args['message'] is not None:
         i.title = args['message']
         i.content = '.'
-        if i.save():
-            print 'Created issue %s' % i.id
-    editor = args['editor'] if args['editor'] else conf.core['editor']
-    # the Template object opens templates in the editor and parses them.
-    template = IssueTemplate('new.hpr')
-    path = template.open(editor)
-    fields = template.parse(path)
-    i.title = fields['title']
-    i.content = fields['content']
+    else:
+        # get the user's editor
+        editor = args['editor'] if args['editor'] else config.core['editor']
+        # the Template object opens templates in the editor and parses them.
+        template = IssueTemplate('new.hpr')
+        path = template.open(editor)
+        fields = template.parse(path)
+        i.title = fields['title']
+        i.content = fields['content']
+
     if i.save():
+        # commit the changes
+        if config.core['autocommit']:
+            t.autocommit(message='Created a new issue %s' % i.id[:6],
+                         author=config.user)
         print 'Created issue %s' % i.id[:6]
 
 def edit(args):
@@ -155,17 +163,21 @@ def comment(args):
         print 'No such issue'
         return
     c = Comment(i)
-    conf = UserConfig()
+    config = UserConfig()
     # set the author info
-    c.author['name'] = conf.user['name']
-    c.author['email'] = conf.user['email']
-    editor = args['editor'] if args['editor'] else conf.core['editor']
+    c.author['name'] = config.user['name']
+    c.author['email'] = config.user['email']
+    editor = args['editor'] if args['editor'] else config.core['editor']
     template = Template('comment.hpr')
     path = template.open(editor)
     fields = template.parse(path)
     c.content = fields['content']
     if c.save() and i.save():
-        print 'Posted comment %s on issue %s' % (c.id[:6], i.id[:6])
+        # commit the changes
+        if config.core['autocommit']:
+            t.autocommit(message='Commented on issue %s' % i.id[:6],
+                         author=config.user)
+        print 'Posted comment %s on issue %s' % (c.id[:3], i.id[:6])
 
 def reopen(args):
     '''Reopen a closed issue.'''
@@ -228,11 +240,16 @@ def list_(args):
     elif args['verbose']:
         for i in issues:
             print '%s %s' % (c.decorate('red', 'issue'), i.id)
-            print '%s  %s <%s>' % (c.decorate('yellow', 'Author:'), i.author['name'], i.author['email'])
-            print '%s %s' % (c.decorate('yellow', 'Created:'), relative_time(i.created))
+            print '%s  %s <%s>' % (c.decorate('yellow', 'Author:'), 
+                                   i.author['name'], 
+                                   i.author['email'])
+            print '%s %s' % (c.decorate('yellow', 'Created:'), 
+                             relative_time(i.created))
             if i.updated != i.created:
-                print '%s %s' % (c.decorate('yellow', 'Updated:'), relative_time(i.updated))
-            print '%s  %s' % (c.decorate('yellow', 'Status:'), i.status)
+                print '%s %s' % (c.decorate('yellow', 'Updated:'), 
+                                 relative_time(i.updated))
+            print '%s  %s' % (c.decorate('yellow', 'Status:'), 
+                              i.status)
             print
             print '    ' + c.decorate('bold', i.title)
             print
@@ -244,10 +261,14 @@ def list_(args):
     else:
         for i in issues:
             print '%s %s' % (c.decorate('red', 'issue'), i.id)
-            print '%s %s <%s>' % (c.decorate('yellow', 'Author:'), i.author['name'], i.author['email'])
-            print '%s %s' % (c.decorate('yellow', 'Created:'), relative_time(i.created))
+            print '%s %s <%s>' % (c.decorate('yellow', 'Author:'), 
+                                  i.author['name'], 
+                                  i.author['email'])
+            print '%s %s' % (c.decorate('yellow', 'Created:'), 
+                             relative_time(i.created))
             if i.updated != i.created:
-                print '%s %s' % (c.decorate('yellow', 'Updated:'), relative_time(i.updated))
+                print '%s %s' % (c.decorate('yellow', 'Updated:'), 
+                                 relative_time(i.updated))
             print
             print '    ' + i.title
             print

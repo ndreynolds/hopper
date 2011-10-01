@@ -13,7 +13,6 @@ app.secret_key = c.web['secret_key']
 app.GLOBALS = {
         'debug': True,
         'first_request': True, # give the user a env context msg
-        'tracker': None 
         }
 
 # Import blueprints

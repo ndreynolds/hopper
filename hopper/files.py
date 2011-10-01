@@ -1,5 +1,6 @@
 from __future__ import with_statement
 import os
+import time
 from configobj import ConfigObj
 
 from hopper.utils import from_json, to_json
@@ -60,7 +61,8 @@ class JSONFile(BaseFile):
         '''Read self.fields from file.'''
         if not os.path.exists(f):
             raise OSError('File does not exist')
-        with open(f, 'r') as fp:
+        # uses a LockedFile object for file I/O
+        with lock(f, 'r') as fp:
             self.fields = from_json(fp.read())
         return True
 
@@ -68,7 +70,7 @@ class JSONFile(BaseFile):
         '''Save self.fields to file.'''
         if not type(self.fields) is dict:
             raise TypeError('self.fields must be a dict')
-        with open(f, 'w') as fp:
+        with lock(f, 'w') as fp:
             fp.write(to_json(self.fields))
         return True
 
@@ -88,16 +90,24 @@ class ConfigFile(BaseFile):
         '''
         Read self.fields from config file.
         
-        You can pass it a dictionary mapping fields to types and
-        they will be auto-converted. That is, provide each field
-        as a key and a type object (e.g. int, bool, str) as the
-        value. You can nest dictionaries too.
+        :param f: path to file
+        :param types: dictionary that maps fields to data types.
+            By default, all fields will be assumed to be strings.
+            Often, config files contain bools and ints. If you
+            map the field to a type, it can be parsed for you.
+            (i.e. if the string is ``'true'`` and type is bool,
+            you get ``True``)
 
-        It should look like this:
+        The types dictionary should look something like this: 
             ``{ 'autocommit': bool, 'user': {'name': str} }``
 
-        If str fields are mapped in types, empty strings remain ''.
-        If they're not mapped, empty strings get converted to None.
+        Provide the type objects themselves as values to the
+        keys (which should be fields). The dictionary can be
+        nested to your heart's content.
+
+        If str fields are explicitly mapped to types, empty strings 
+        remain ``''``. If the default behavior is being used, empty 
+        strings get converted to None.
         '''
         def config_traverse(config, types):
             '''
@@ -150,3 +160,103 @@ class ConfigFile(BaseFile):
         for k in self.fields.keys():
             config[k] = self.fields[k]
         config.write()
+
+
+class LockedFile(file):
+    '''
+    Provides primitive file-locking. It subclasses the ``file`` object
+    to hook in locking and unlocking. Hopper is single-threaded, but there
+    may be multiple processes acting on a Tracker's files at any time. As
+    such, we need a little insurance.
+
+    Locks are set by creating a file of the same path, but suffixed with
+    ``.lock``. Both reading and writing requires an exclusive lock. 
+
+    Before opening the file, we lock it. After closing it, we unlock it.
+
+    :param persist: if True, keep trying until the file is unlocked or a
+                    timeout is reached. 
+    :param interval: interval in ms at which to poll ``self.locked()``.
+    :param surrender: time in ms, after which the method will give up and
+                      throw an exception. Note that this can only be 
+                      applied approximately.
+    '''
+    # TODO multiple readers, exclusive writer
+
+    def __init__(self, name, mode, persist=True, 
+                 surrender=2000, interval=10):
+
+        # we don't care if the file exists (it may be new)
+        # let the file object worry about that.
+        self.path = name
+        self.lock_path = name + '.lock'
+        self.persist = persist
+        self.surrender = surrender
+        self.interval = interval
+
+        # see if it's locked
+        if self.locked():
+            # if it is, we'll wait around
+            self.wait()
+        self.lock()
+        file.__init__(self, name, mode)
+
+    def __del__(self):
+        '''
+        Last ditch effort to unlock files.
+
+        LockFiles should be closed (and by extension, unlocked) by
+        calling the ``close`` method or using the ``with`` statement. 
+        The ``__del__`` method is in place to remove the lock if these
+        are forgotten, but it's not guaranteed to work (due to the way
+        python calls ``__del__``.
+        '''
+        self.unlock()
+
+    def __exit__(self, type, value, traceback):
+        '''Unlock the file when object falls out of ``with`` scope.'''
+        file.__exit__(self, type, value, traceback)
+        self.unlock()
+
+    def close(self):
+        file.close(self)
+        self.unlock()
+
+    def locked(self):
+        '''Check if the file is locked.'''
+        if os.path.isfile(self.lock_path):
+            return True
+        return False
+
+    def lock(self):
+        '''Lock the file.'''
+        open(self.lock_path, 'w').close()
+
+    def unlock(self):
+        '''Unlock a file.'''
+        if self.locked():
+            os.remove(self.lock_path)
+
+    def wait(self):
+        '''
+        Continually poll the ``locked`` method using the given interval
+        until either the file can be acquired or the timeout is reached.
+
+        :raise RuntimeError: if duration exceeds surrender value.
+        '''
+        t = 0
+        while self.locked():
+            if t > self.surrender:
+                raise RuntimeError('Acquiring lock timed out')
+            time.sleep(float(self.interval) / 1000)
+            t += self.interval
+
+
+def lock(name, mode):
+    '''
+    Returns a LockedFile object with the default timeout.
+
+    :param name: path to the file
+    :param mode: mode to open the file with
+    '''
+    return LockedFile(name, mode)

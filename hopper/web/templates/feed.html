@@ -2,11 +2,22 @@
 {% block body %}
 <div id="feed">
     <ul>
-    {% for c in history %}
+    {% for item in history %}
         <li>
-        {{ c.author }}
-        {{ c.message }}
-        {{ c.commit_time }}
+        <span id="author">{{ item['user']['name'] }}</span>
+        ({{ item['user']['email'] }})
+        <span id="author">{{ item['message'] }}</span>
+        {% if item['link'] %}
+            <a class="fancy-monospace" 
+                href="issues/view/{{ item['link'] }}">{{ item['link'] }}</a>
+        {% endif %}
+        &nbsp;
+        <span id="time">{{ item['time'] }} ↲</span>
+        {% if item['changes'] %}
+        <div class="changes">
+            {{ item['changes'] }}
+        </div>
+        {% endif %}
         </li>
     {% endfor %}
     </ul>

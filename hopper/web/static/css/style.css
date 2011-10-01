@@ -82,11 +82,11 @@ div#title {
   text-shadow: 0 1px 1px #fff;
 }
 div#menu {
-  background-image: -webkit-linear-gradient(top, #888888, #666666);
-  background-image: -moz-linear-gradient(top, #888888, #666666);
-  background-image: -ms-linear-gradient(top, #888888, #666666);
-  background-image: -o-linear-gradient(top, #888888, #666666);
-  background-image: linear-gradient(top, #888888, #666666);
+  background-image: -webkit-linear-gradient(top, #999999, #777777);
+  background-image: -moz-linear-gradient(top, #999999, #777777);
+  background-image: -ms-linear-gradient(top, #999999, #777777);
+  background-image: -o-linear-gradient(top, #999999, #777777);
+  background-image: linear-gradient(top, #999999, #777777);
   margin: -20px;
   margin-bottom: 20px;
   text-shadow: 0 1px 1px #444;
@@ -95,11 +95,11 @@ div#menu {
   padding: 15px;
 }
 div.issue-header {
-  background-image: -webkit-linear-gradient(top, #888888, #666666);
-  background-image: -moz-linear-gradient(top, #888888, #666666);
-  background-image: -ms-linear-gradient(top, #888888, #666666);
-  background-image: -o-linear-gradient(top, #888888, #666666);
-  background-image: linear-gradient(top, #888888, #666666);
+  background-image: -webkit-linear-gradient(top, #999999, #777777);
+  background-image: -moz-linear-gradient(top, #999999, #777777);
+  background-image: -ms-linear-gradient(top, #999999, #777777);
+  background-image: -o-linear-gradient(top, #999999, #777777);
+  background-image: linear-gradient(top, #999999, #777777);
   margin-left: auto;
   margin-right: auto;
   border-top-left-radius: 5px;
@@ -144,10 +144,17 @@ div.page a {
 }
 div#footer {
   margin: 20px;
-  padding-bottom: 10px;
+  display: block;
+  padding: 10px;
+  background-color: #bbb;
+  border: 1px solid #aaa;
+  color: #565656;
+  font-family: Nobile Bold Italic;
+  text-shadow: 0 1px 1px #eee;
+  font-size: 90%;
 }
 div#footer a {
-  color: #333;
+  color: #454545;
 }
 div#content-header,
 div#content-footer,
@@ -189,11 +196,11 @@ div#content-header .monospace {
   text-shadow: 0 1px 1px #eee;
 }
 div#content-footer {
-  background-image: -webkit-linear-gradient(top, #888888, #666666);
-  background-image: -moz-linear-gradient(top, #888888, #666666);
-  background-image: -ms-linear-gradient(top, #888888, #666666);
-  background-image: -o-linear-gradient(top, #888888, #666666);
-  background-image: linear-gradient(top, #888888, #666666);
+  background-image: -webkit-linear-gradient(top, #999999, #777777);
+  background-image: -moz-linear-gradient(top, #999999, #777777);
+  background-image: -ms-linear-gradient(top, #999999, #777777);
+  background-image: -o-linear-gradient(top, #999999, #777777);
+  background-image: linear-gradient(top, #999999, #777777);
   min-height: 0px;
   padding-bottom: 5px;
   padding-top: 5px;
@@ -410,6 +417,10 @@ input[type=submit]:hover {
   padding: 4px;
   color: #444;
   text-shadow: 0 1px 1px #eee;
+}
+a.fancy-monospace {
+  color: #444 !important;
+  text-decoration: none;
 }
 .fancy-monospace-header {
   font-family: DejaVu !important;
@@ -677,4 +688,38 @@ div#paging a {
 }
 div#paging a.cur-page {
   color: #444;
+}
+div#git-access {
+  float: right;
+}
+span#issue-count {
+  font-size: 93%;
+  color: #666;
+}
+div#feed {
+  width: 650px;
+}
+div#feed li {
+  list-style-type: none;
+  margin-left: 0px;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 95%;
+}
+div#feed span#author {
+  font-weight: bold;
+  color: #555;
+}
+div#feed span#time {
+  font-size: 85%;
+  color: #666;
+}
+div#feed div.changes {
+  margin-left: 20px;
+  margin-top: 10px;
+  width: 600px;
+  background-color: #eee;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
 }

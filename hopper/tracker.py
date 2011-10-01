@@ -4,28 +4,29 @@ import os
 from hopper.git import Repo
 from hopper.issue import Issue
 from hopper.utils import match_path
-from hopper.files import BaseFile, JSONFile
+from hopper.config import TrackerConfig
 
-class Tracker(JSONFile):
+class Tracker(object):
     '''
     Defines a Hopper tracker and provides paths to files within a 
-    tracker. It subclasses JSONFile to get methods for reading from
-    and writing to its JSON config file.
+    tracker. 
 
     :param path: the relative or absolute path to the tracker
     '''
     def __init__(self, path):
-        self.fields = {
-                'name'   : None,
-                'created': None
-                }
         if not os.path.exists(path):
             path = match_path(path)
             if path is None:
                 raise OSError('Supplied path does not exist')
+
+        # remove trailing slash
+        if path.endswith('/'):
+            path = path[:-1]
+
         self.path = path
         self.paths = {
                 'root'  : self.path,
+                'base'  : os.path.basename(self.path),
                 'config': os.path.join(self.path, 'config'),
                 'issues': os.path.join(self.path, 'issues'),
                 'hopper': os.path.join(self.path, '.hopper')
@@ -34,7 +35,7 @@ class Tracker(JSONFile):
                 'name': None
                 }
         self.repo = Repo(path)
-        super(BaseFile, self).__init__()
+        self.config = TrackerConfig(self)
 
     @classmethod
     def new(cls, path):
@@ -45,6 +46,10 @@ class Tracker(JSONFile):
                      supplying ``my_tracker`` would create the directory
                      ``./my_tracker``.
         '''
+        # remove trailing slash
+        if path.endswith('/'):
+            path = path[:-1]
+
         # set the install paths
         paths = {
                 'root'  : path,
@@ -67,22 +72,41 @@ class Tracker(JSONFile):
         os.mkdir(paths['admin'])
         open(os.path.join(paths['admin'], 'empty'), 'w').close()
 
+        # set the config
+        config = TrackerConfig(cls(path))
+        config.name = os.path.basename(path).capitalize()
+        config.save()
+
         # add everything to the repo and commit
         repo.add(all=True)
         repo.commit(committer='Hopper <hopper@hopperhq.com>',
-                    message='Initial Commit')
+                    message='Created a new tracker')
 
         # instantiate and return our new Tracker.
         return cls(path)
 
-    def autocommit(self, msg):
+    def autocommit(self, message, author=None):
         '''
-        Commit any changes to the repo.
+        Commit any changes to the repo. In most scenarios, the user
+        responsible for the change(s) would be listed as the commit 
+        author, and Hopper would be the committer.  
 
         :param msg: the commit message to use.
+        :param author: the commit's author in string or dictionary
+            format. For example: ``'Full Name <your.email@domain.tld>'``
+            **or** ``{'name': 'Full Name', 'email': 'your.email@domain.tld'}``
+        :return: the Commit object.
         '''
-        self.repo.cmd(['add', '.'])
-        self.repo.cmd(['commit', '-am', 'Did something'])
+        committer = 'Hopper <hopper@hopperhq.com>'
+
+        if type(author) is dict:
+            author = '%s <%s>' % (author['name'], author['email'])
+        if type(author) is not str:
+            author = committer
+
+        self.repo.add(all=True)
+        return self.repo.commit(message=message, committer=committer,
+                                author=author)
 
     def read(self, relpath, mode='r'):
         '''

@@ -127,7 +127,10 @@ class TrackerConfig(ConfigFile):
                         'github_repo_name': None
                         }
                 }
-        self.path = self.tracker.paths['config']
+        self.path = tracker.paths['config']
+        if self.path is not None and os.path.exists(self.path):
+            self.from_file(self.path)
+        super(BaseFile, self).__init__()
 
     def save(self):
         self.to_file(self.path)

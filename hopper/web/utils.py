@@ -3,6 +3,7 @@ Utility functions for the Hopper Flask app.
 '''
 
 from flask import flash, request, current_app
+import string
 
 from hopper.tracker import Tracker
 from hopper.config import UserConfig
@@ -32,3 +33,15 @@ def to_json(data):
     '''
     json_response = json(data, indent=None if request.is_xhr else 2)
     return current_app.response_class(json_response, mimetype='application/json')
+
+def looks_hashy(text):
+    '''
+    Return True if the string could be (part of) a 40 byte SHA1 hex 
+    digest. This helps us when auto-generating links to issues.  
+    '''
+    if len(text) > 40:
+        return False
+    for ch in text:
+        if ch not in string.hexdigits:
+            return False
+    return True
