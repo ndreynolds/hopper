@@ -2,19 +2,35 @@
 {% block body %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/issue.js') }}"></script>
 
+<div class="issue-sidebar">
+    <div class="issue-sidebar-heading">Status:</div>
+    <div class="issue-sidebar-content">
+        {% if issue.status == 'open' %}
+            <a id="issue-close" class="button green"
+                href="{{ url_for('issues.close', id=issue.id) }}">Open</a>
+        {% else %}
+            <a id="issue-open" class="button red"
+                href="{{ url_for('issues.open', id=issue.id) }}">Closed</a>
+        {% endif %}
+    </div>
+    <div class="issue-sidebar-heading">Labels:</div>
+    <div class="issue-sidebar-content">
+        {% for label in issue.labels %}
+            <span class="fancy-monospace">{{ label }}</span>
+            <br><br>
+        {% endfor %}
+    </div>
+    <div class="issue-sidebar-heading">Assigned to:</div>
+    <div class="issue-sidebar-content">
+        {{ issue.assigned_to }}
+    </div>
+</div>
+
 <div class="issue-header">
     <span id="author">{{ issue.author['name'] }}</span> 
     <span id="email">({{ issue.author['email'] }})</span> 
     opened 
     <span id="time">{{ issue.created }}</span>
-    &nbsp; &nbsp; 
-    {% if issue.status == 'open' %}
-        <a id="issue-close" class="button green"
-            href="{{ url_for('issues.close', id=issue.id) }}">Open</a>
-    {% else %}
-        <a id="issue-open" class="button red"
-            href="{{ url_for('issues.open', id=issue.id) }}">Closed</a>
-    {% endif %}
 </div>
 <div class="issue">
     <span style="font-size:130%; font-weight:bold; text-shadow: 0 0 1px #fff;">{{ issue.title }}</span>
@@ -50,10 +66,6 @@
     <div id="comment-form">
         <form method="post">
         <textarea name="content"></textarea>
-        <br>
-        <span style="font-size:90%">
-            Hopper uses <a href="http://daringfireball.com/projects/markdown">Markdown</a> formatting.
-        </span>
         <br><br>
         <input type="submit" class="button gray" style="font-size:90%" value="Comment">
         </form>

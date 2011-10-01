@@ -112,7 +112,6 @@ class Issue(JSONFile):
     def _resolve_id(self, id):
         '''Resolve partial ids and verify the issue exists.'''
         if len(id) == 40:
-            print self.tracker.get_issue_path(id)
             if os.path.exists(self.tracker.get_issue_path(id)):
                 return id
             else:
@@ -154,4 +153,7 @@ class Issue(JSONFile):
         paths['issue'] = self.tracker.get_issue_path(self.id)
         # path to the issue's comments directory.
         paths['comments'] = os.path.join(tpaths['issues'], self.id, 'comments')
+        # create the comments dir if missing and the root path exists
+        if not os.path.exists(paths['comments']) and os.path.exists(paths['root']):
+            os.mkdir(paths['comments'])
         self.paths = paths

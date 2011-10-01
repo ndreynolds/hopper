@@ -7,10 +7,9 @@ from hopper.tracker import Tracker
 from hopper.issue import Issue
 from hopper.comment import Comment
 from hopper.config import UserConfig
-from hopper.web.manage import start
 from hopper.hpr.templates import Template, IssueTemplate
 from hopper.utils import relative_time, wrap
-
+from hopper.errors import AmbiguousReference, BadReference
 
 ### utilities
 def get_tracker(path=None):
@@ -70,10 +69,6 @@ def main(args=sys.argv[1:]):
             help='List the (filtered) set of issues')
     listp.add_argument('-s', '--short', action='store_true', 
             help='display each issue in one line')
-    listp.add_argument('-v', '--verbose', action='store_true',
-            help="show each issue's content")
-    listp.add_argument('-vv', '--super-verbose', action='store_true',
-            help="show each issue's content and comments")
     listp.set_defaults(func=list_)
 
     # `new` subcommand
@@ -116,7 +111,6 @@ def main(args=sys.argv[1:]):
 
 ### Command functions
 
-# Manage issues
 def new(args):
     '''Create a new issue.'''
     t = args['tracker']
@@ -208,11 +202,17 @@ def close(args):
 def show(args):
     '''Show an issue.'''
     t = args['tracker']
-    i = t.issue(args['issue'])
     c = UserConfig()
-    if not i:
-        print 'No such issue'
+
+    try:
+        i = t.issue(args['issue'])
+    except AmbiguousReference:
+        print c.decorate('yellow', 'Multiple matches. Try adding another character.')
         return
+    except BadReference:
+        print c.decorate('red', 'No issue matched that id.')
+        return
+
     print '%s %s' % (c.decorate('red', 'issue'), i.id)
     print '%s  %s <%s>' % (c.decorate('yellow', 'Author:'), i.author['name'], i.author['email'])
     print '%s %s' % (c.decorate('yellow', 'Created:'), relative_time(i.created))
@@ -236,8 +236,8 @@ def list_(args):
     if args['short']:
         for i in issues:
             print '%s %s' % (c.decorate('red', i.id[:6]), i.title)
-    # verbose mode
-    elif args['verbose']:
+    # normal mode
+    else:
         for i in issues:
             print '%s %s' % (c.decorate('red', 'issue'), i.id)
             print '%s  %s <%s>' % (c.decorate('yellow', 'Author:'), 
@@ -248,8 +248,11 @@ def list_(args):
             if i.updated != i.created:
                 print '%s %s' % (c.decorate('yellow', 'Updated:'), 
                                  relative_time(i.updated))
-            print '%s  %s' % (c.decorate('yellow', 'Status:'), 
-                              i.status)
+            print '%s  %s' % (c.decorate('yellow', 'Status:'), i.status)
+            
+            num_comments = len(i.comments())
+            if num_comments:
+                print '%d Comments' % num_comments
             print
             print '    ' + c.decorate('bold', i.title)
             print
@@ -257,24 +260,12 @@ def list_(args):
             for line in content.splitlines():
                 print '    ' + line
             print
-    # normal mode
-    else:
-        for i in issues:
-            print '%s %s' % (c.decorate('red', 'issue'), i.id)
-            print '%s %s <%s>' % (c.decorate('yellow', 'Author:'), 
-                                  i.author['name'], 
-                                  i.author['email'])
-            print '%s %s' % (c.decorate('yellow', 'Created:'), 
-                             relative_time(i.created))
-            if i.updated != i.created:
-                print '%s %s' % (c.decorate('yellow', 'Updated:'), 
-                                 relative_time(i.updated))
-            print
-            print '    ' + i.title
-            print
 
 # Manage trackers
 def serve(args):
+    # include the webserver stuff here. runtime is significantly faster
+    # when serve() is not called.
+    from hopper.web.manage import start
     t = args['tracker']
     start(t.paths['root'], port=args['port'], debug=args['verbose'])
 

@@ -90,7 +90,11 @@ def new():
         issue = Issue(tracker)
         issue.content = request.form['content']
         issue.title = request.form['title']
-        issue.labels = request.form['labels'].split(',')
+        labels = request.form['labels']
+        if labels:
+            issue.labels = labels.split(',')
+        else:
+            issue.labels = []
         issue.author['name'] = config.user['name']
         issue.author['email'] = config.user['email']
         if issue.save():
