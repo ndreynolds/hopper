@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block body %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/new.js') }}"></script>
-<div class="default-width centered">
+<div id="issue-new">
     <form method="post">
         <input type="text" id="title" name="title" class="unfocused" value="Issue Summary">
         <br><br>

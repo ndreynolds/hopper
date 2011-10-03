@@ -1,8 +1,3 @@
-'''
-Views for issues:
-    index, view, new, action/ACTION
-'''
-
 from flask import Blueprint, request, redirect, url_for, render_template, \
                   flash
 
@@ -17,6 +12,8 @@ issues = Blueprint('issues', __name__)
 @issues.route('/<status>')
 @issues.route('/', methods=['GET', 'POST'])
 def index(status='open'):
+    '''
+    '''
     tracker, config = setup()
 
     # get the url params
@@ -82,6 +79,7 @@ def index(status='open'):
                                num_pages=num_pages, order=order,
                                header=header, n=n, tracker=tracker)
 
+
 @issues.route('/new', methods=['GET', 'POST'])
 def new():
     tracker, config = setup()
@@ -109,6 +107,7 @@ def new():
         return render_template('new.html', selected='issues', 
                                header=header, tracker=tracker)
 
+
 @issues.route('/view/<id>', methods=['GET', 'POST'])
 def view(id):
     '''
@@ -126,7 +125,8 @@ def view(id):
         comment.author['email'] = config.user['email']
         comment.save()
         if issue.save(): # ping the issue (updated = now)
-            tracker.autocommit(message='Commented on issue %s' % issue.id[:6],
+            tracker.autocommit(message='Commented on issue %s/%s' % \
+                                        (issue.id[:6], comment.id[:6]),
                                author=config.user)
         else:
             flash('There was an error saving your comment.')
@@ -144,10 +144,12 @@ def view(id):
                                comments=comments, selected='issues',
                                config=config, header=header, tracker=tracker)
 
+
 @issues.route('/settings')
 def settings():
     tracker, config = setup()
     return render_template('/settings.html')
+
 
 @issues.route('/action/close/<id>')
 def close(id):
@@ -159,6 +161,7 @@ def close(id):
             flash('Could not close the issue')
         return redirect(url_for('issues.view', id=issue.id))
 
+
 @issues.route('/action/open/<id>')
 def open(id):
     tracker, config = setup()
@@ -168,6 +171,7 @@ def open(id):
         if not issue.save():
             flash('Could not reopen the issue')
         return redirect(url_for('issues.view', id=issue.id))
+
 
 def pager(page, num_pages):
     '''

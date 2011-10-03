@@ -139,11 +139,11 @@ div.issue-header {
     .gradient();
     .rounded-corners-top();
     width:@default-width;
-    text-shadow: 0 1px 1px #000;
+    text-shadow: 0 1px 1px #333;
     font-size:105%;
     color:#fff;
     padding:10px;
-    border:1px solid #555;
+    border:1px solid #666;
 }
     
 div#comment-form {
@@ -396,15 +396,16 @@ a.fancy-monospace {
     font-weight: bold;
 }
 
-.issue {
+div.issue {
     .rounded-corners-bottom();
     width:@default-width;
     background-color:#eee;
     border:1px solid #ccc;
+    border-top:none;
     padding:10px;
 }
 
-.comment-header {
+div.comment-header {
     .rounded-corners-top();
     .gradient(#ddd, #ccc);
     width:@default-width;
@@ -414,33 +415,33 @@ a.fancy-monospace {
     text-shadow:0 1px 1px #fff;
 }
 
-.comment-header span#author {
+div.comment-header span#author {
     font-weight:bold;
     color:#444;
 }
 
-.comment-header span#email {
+div.comment-header span#email {
 }
         
-.comment-header span#time {
+div.comment-header span#time {
     font-weight:bold;
     color:#444;
 }
 
-.issue-header span#author {
+div.issue-header span#author {
     font-weight:bold;
     color:#eee;
 }
 
-.issue-header span#email {
+div.issue-header span#email {
 }
         
-.issue-header span#time {
+div.issue-header span#time {
     font-weight:bold;
     color:#eee;
 }
 
-.comment {
+div.comment {
     .rounded-corners-bottom();
     width:@default-width;
     background-color:#eee;
@@ -449,15 +450,15 @@ a.fancy-monospace {
     border-top:none;
 }
 
-.comment p:first-child {
+div.comment p:first-child {
     margin-top:0.5em;
 }
 
-.comment h1, .issue h1, .doc h1, #preview h1 {
+div.comment h1, .issue h1, .doc h1, #preview h1 {
     font-size: 150%;
 }
 
-.comment h2, .issue h2, .doc h2, #preview h2 {
+div.comment h2, .issue h2, .doc h2, #preview h2 {
     font-size: 130%;
 }
 
@@ -467,7 +468,7 @@ div.codehilite {
     font-family: Menlo, Andale Mono, DejaVu, monospace;
 }
 
-.comment > div.codehilite, .issue > div.codehilite {
+div.comment > div.codehilite, div.issue > div.codehilite {
     margin-top:10px;
     margin-bottom:10px;
     padding:7px;
@@ -669,14 +670,18 @@ div#feed span#time {
     color:#666;
 }
 
-div#feed div.changes {
+div#feed div.snippet {
     margin-left:20px;
     margin-top:10px;
-    width:600px;
+    width:auto;
     background-color:#eee;
     border:1px solid #ddd;
     border-radius:5px;
     padding:10px;
+}
+
+div#feed span#title {
+    font-weight:bold;
 }
 
 div.issue-sidebar {
@@ -713,4 +718,9 @@ div.issue-sidebar div:last-child {
 
 div.issue-sidebar div:first-child {
     .rounded-corners-top();
+}
+
+div#issue-new {
+    width:@default-width;
+    .centered;
 }

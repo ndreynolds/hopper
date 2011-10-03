@@ -1,8 +1,10 @@
 import time
 import os
+import glob
 
 from hopper.files import BaseFile, JSONFile
 from hopper.utils import to_json, get_hash
+from hopper.errors import BadReference, AmbiguousReference
 
 class Comment(JSONFile):
     '''Represents an issue's comment.'''
@@ -21,7 +23,8 @@ class Comment(JSONFile):
               }
         self.issue = issue
         if id is not None:
-            self.from_file(issue.get_comment_path(id))
+            self.id = self._resolve_id(id)
+            self.from_file(issue.get_comment_path(self.id))
         super(BaseFile, self).__init__()
 
     def save(self):
@@ -35,3 +38,23 @@ class Comment(JSONFile):
     def delete(self):
         '''Delete the comment's disk representation.'''
         os.remove(self.issue.get_comment_path(self.id))
+
+    def _resolve_id(self, id):
+        '''Resolve partial ids and verify the comment exists.'''
+        if len(id) == 40:
+            if os.path.exists(self.issue.get_comment_path(id)):
+                return id
+            else:
+                raise BadReference('No matching comment on disk: %s' % id)
+        # glob the path returned by the issue helper method
+        matches = glob.glob(self.issue.get_comment_path(id + '*'))
+        # no matches, raise bad ref:
+        if not matches:
+            raise BadReference('No matching comment on disk: %s' % id)
+        # multiple matches, raise ambiguous ref:
+        if len(matches) > 1:
+            raise AmbiguousReference('Multiple comments matched that id fragment')
+        # one match, return the match
+        match_id = os.path.basename(matches[0])
+        print match_id
+        return match_id

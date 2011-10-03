@@ -19,13 +19,16 @@ def to_json(data):
     '''
     return json.dumps(data, indent=4)
 
+
 def from_json(data):
     '''Returns python objects loaded from a JSON string.'''
     return json.loads(data)
 
+
 def get_hash(text):
     '''SHA1 the text and return the hexdigest.'''
     return hashlib.sha1(text).hexdigest()
+
 
 def get_uuid(salt=None):
     '''Return a UUID generated from the UTC ts and a random float.'''
@@ -34,6 +37,7 @@ def get_uuid(salt=None):
         salt = str(random.random())
     # probably overkill to use both random and time
     return get_hash(str(time.time()) + salt)
+
 
 def relative_time(ts):
     '''Return a human-parseable time format from a UTC timestamp.'''
@@ -57,8 +61,10 @@ def relative_time(ts):
         return '%d minutes ago' % minutes
     return 'just now'
 
+
 def markdown_to_html(text):
     return markdown(text, ['codehilite'])
+
 
 def match_path(path, get_all=False):
     '''
@@ -84,6 +90,7 @@ def match_path(path, get_all=False):
     else:
         return None
 
+
 def map_attr(obj_list, attr, f):
     '''
     Apply the function, f, to attribute, attr, of each object in obj_list
@@ -100,6 +107,17 @@ def map_attr(obj_list, attr, f):
         val = f(val)
         setattr(obj, attr, val)
     return obj_list # Lists are mutable so using this isn't necessary.
+
+
+def cut(text, length, add_elipses=True):
+    '''
+    Cut text off after the given length.
+    '''
+    if len(text) <= length:
+        return text
+    elif add_elipses:
+        return text[:length] + '...'
+    return text[:length]
 
 def wrap(text, width=80):
     '''

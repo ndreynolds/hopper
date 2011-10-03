@@ -1,7 +1,3 @@
-'''
-Utility functions for the Hopper Flask app.
-'''
-
 from flask import flash, request, current_app
 import string
 
@@ -26,18 +22,24 @@ def setup():
         current_app.GLOBALS['first_request'] = False
     return Tracker(current_app.GLOBALS['tracker']), config
 
+
 def to_json(data):
     '''
     Same as Flask's jsonify, but allows top-level arrays. There are cited
     security reasons for not doing this, but it makes for an annoying API. 
+
+    :param data: a python dictionary or list.
     '''
     json_response = json(data, indent=None if request.is_xhr else 2)
     return current_app.response_class(json_response, mimetype='application/json')
+
 
 def looks_hashy(text):
     '''
     Return True if the string could be (part of) a 40 byte SHA1 hex 
     digest. This helps us when auto-generating links to issues.  
+
+    :param text: a string
     '''
     if len(text) > 40:
         return False

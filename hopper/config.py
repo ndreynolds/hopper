@@ -108,6 +108,7 @@ class UserConfig(ConfigFile):
         else:
             return text
 
+
 class TrackerConfig(ConfigFile):
     '''
     Reads and writes the $TRACKER/config file.
@@ -134,6 +135,7 @@ class TrackerConfig(ConfigFile):
 
     def save(self):
         self.to_file(self.path)
+
 
 def parse_gitconfig():
     '''Parse the .gitconfig file and return the dictionary.'''

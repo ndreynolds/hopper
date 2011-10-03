@@ -102,11 +102,11 @@ div.issue-header {
   -webkit-top-left-border-radius: 5px;
   -webkit-top-right-border-radius: 5px;
   width: 700px;
-  text-shadow: 0 1px 1px #000;
+  text-shadow: 0 1px 1px #333;
   font-size: 105%;
   color: #fff;
   padding: 10px;
-  border: 1px solid #555;
+  border: 1px solid #666;
 }
 div#comment-form {
   width: 722px;
@@ -375,7 +375,7 @@ a.fancy-monospace {
 .bold {
   font-weight: bold;
 }
-.issue {
+div.issue {
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   -webkit-bottom-left-border-radius: 5px;
@@ -383,9 +383,10 @@ a.fancy-monospace {
   width: 700px;
   background-color: #eee;
   border: 1px solid #ccc;
+  border-top: none;
   padding: 10px;
 }
-.comment-header {
+div.comment-header {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   -webkit-top-left-border-radius: 5px;
@@ -401,23 +402,23 @@ a.fancy-monospace {
   border: 1px solid #bbb;
   text-shadow: 0 1px 1px #fff;
 }
-.comment-header span#author {
+div.comment-header span#author {
   font-weight: bold;
   color: #444;
 }
-.comment-header span#time {
+div.comment-header span#time {
   font-weight: bold;
   color: #444;
 }
-.issue-header span#author {
+div.issue-header span#author {
   font-weight: bold;
   color: #eee;
 }
-.issue-header span#time {
+div.issue-header span#time {
   font-weight: bold;
   color: #eee;
 }
-.comment {
+div.comment {
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   -webkit-bottom-left-border-radius: 5px;
@@ -428,16 +429,16 @@ a.fancy-monospace {
   border: 1px solid #ccc;
   border-top: none;
 }
-.comment p:first-child {
+div.comment p:first-child {
   margin-top: 0.5em;
 }
-.comment h1,
+div.comment h1,
 .issue h1,
 .doc h1,
 #preview h1 {
   font-size: 150%;
 }
-.comment h2,
+div.comment h2,
 .issue h2,
 .doc h2,
 #preview h2 {
@@ -448,7 +449,7 @@ div.codehilite {
   overflow: auto;
   font-family: Menlo, Andale Mono, DejaVu, monospace;
 }
-.comment > div.codehilite, .issue > div.codehilite {
+div.comment > div.codehilite, div.issue > div.codehilite {
   margin-top: 10px;
   margin-bottom: 10px;
   padding: 7px;
@@ -637,14 +638,17 @@ div#feed span#time {
   font-size: 85%;
   color: #666;
 }
-div#feed div.changes {
+div#feed div.snippet {
   margin-left: 20px;
   margin-top: 10px;
-  width: 600px;
+  width: auto;
   background-color: #eee;
   border: 1px solid #ddd;
   border-radius: 5px;
   padding: 10px;
+}
+div#feed span#title {
+  font-weight: bold;
 }
 div.issue-sidebar {
   width: 220px;
@@ -682,4 +686,9 @@ div.issue-sidebar div:first-child {
   border-top-right-radius: 5px;
   -webkit-top-left-border-radius: 5px;
   -webkit-top-right-border-radius: 5px;
+}
+div#issue-new {
+  width: 700px;
+  margin-left: auto;
+  margin-right: auto;
 }

@@ -9,13 +9,17 @@
         <span id="author">{{ item['message'] }}</span>
         {% if item['link'] %}
             <a class="fancy-monospace" 
-                href="issues/view/{{ item['link'] }}">{{ item['link'] }}</a>
+                href="{{ item['link'] }}">{{ item['button'] }}</a>
         {% endif %}
         &nbsp;
         <span id="time">{{ item['time'] }} ↲</span>
-        {% if item['changes'] %}
-        <div class="changes">
-            {{ item['changes'] }}
+        {% if item['snippet'] %}
+        <div class="snippet">
+            {% if item['title'] %}
+            <span id="title">{{ item['title'] }}</span>
+            <br>
+            {% endif %}
+            {{ item['snippet']|safe }}
         </div>
         {% endif %}
         </li>

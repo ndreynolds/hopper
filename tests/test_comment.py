@@ -1,5 +1,5 @@
 import unittest
-from hopper.test_env import TestEnv
+from env import TestEnv
 from hopper.comment import Comment
 from hopper.issue import Issue
 

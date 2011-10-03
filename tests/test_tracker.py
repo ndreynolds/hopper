@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from hopper.test_env import TestEnv
+from env import TestEnv
 from hopper.tracker import Tracker
 from hopper.issue import Issue
 from hopper.utils import get_uuid

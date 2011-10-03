@@ -97,6 +97,34 @@ class Issue(JSONFile):
             raise BadReference('No matching issue on disk')
         shutil.rmtree(self.paths['root'])
 
+    @classmethod
+    def revision(cls, ref=None):
+        '''
+        Return an Issue object, representing the issue as it was in the 
+        commit referenced by the given ref. The implementation will read 
+        the file from its blob in the commit's tree. 
+
+        It would be better to do a checkout, but this could be used to 
+        rollback the issue, just by calling save and committing.
+
+        NOTE that it's not doing anything with the comments. Still working
+        on how that should function. 
+
+        :param ref: a commit ref.
+        :return: an Issue object.
+        '''
+        # TODO
+        raise NotImplementedError
+
+    def revert(self, ref=None):
+        '''
+        Does a checkout of the issue directory at the commit pointed to by
+        the given ref.  After that, it will update its `fields` attribute to
+        reflect any changes. Any Comment objects will need to be reinitialized. 
+        '''
+        # TODO
+        raise NotImplementedError
+
     def get_comment_path(self, sha):
         '''Get the path to the comment with the given SHA.'''
         if not hasattr(self, 'id'):
@@ -133,17 +161,8 @@ class Issue(JSONFile):
         '''
         Set paths inside the issue.
 
-        Issue data and comments are stored in a directory named from the
+        Issue data and comments are stored in a directory named after the
         issue's SHA. 
-
-        | tracker/
-        |   issues/
-        |     <issue-id>/
-        |       issue
-        |         comments/
-        |           <comment1-id>        
-        |           <comment2-id>
-        |           <comment3-id>
         '''
         paths = {}
         tpaths = self.tracker.paths
