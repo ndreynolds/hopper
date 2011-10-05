@@ -1,5 +1,37 @@
 {% extends 'base.html' %}
 {% block body %}
+<div class="issue-sidebar">
+    <div class="issue-sidebar-heading">
+        Stats
+    </div>
+    <div class="issue-sidebar-content">
+        <div class="graph-outer">
+            <div class="graph-open" style="width:89%"></div>
+            <div class="graph-closed" style="width:9%"></div>
+        </div>
+        <br>
+        <a href="/issues/open">25</a> Open, 
+        <a href="/issues/closed" style="color: #B71713">3</a> Closed
+    </div>
+    <div class="issue-sidebar-heading">
+        Docs
+    </div>
+    <div class="issue-sidebar-content">
+        <a href="test" style="color: #555;">Submitting Issues</a><br>
+        <a href="test" style="color: #555;">Getting the code</a><br>
+        <a href="test" style="color: #555;">Test</a><br>
+        <a href="test">see all...</a>
+    </div>
+    <div class="issue-sidebar-heading">
+        Members
+    </div>
+    <div class="issue-sidebar-content">
+    {% for user in users %}
+        {{ user }}<br>
+        <a href="test">see all...</a>
+    {% endfor %}
+    </div>
+</div>
 <div id="feed">
     <ul>
     {% for item in history %}

@@ -135,3 +135,17 @@ def wrap(text, width=80):
                     word),
                    text.split(' ')
                   )
+
+def strip_email(author):
+    '''
+    Strips the email address (i.e. <%s>) from the Git commit author
+    string, or any similar one.
+
+    :param author: string, formatted like 'Nick Reynolds <ndreynolds@gmail.com'
+    '''
+    if '<' in author or '@' in author:
+        first_bracket = author.index('<')
+        # return the string before the first angle bracket
+        return author[:first_bracket - 1]
+    # didn't contain the email address, return untouched.
+    return author

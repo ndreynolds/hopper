@@ -5,6 +5,7 @@ from hopper.git import Repo
 from hopper.issue import Issue
 from hopper.utils import match_path
 from hopper.config import TrackerConfig
+from hopper.document import Document
 
 class Tracker(object):
     '''
@@ -54,23 +55,28 @@ class Tracker(object):
         paths = {
                 'root'  : path,
                 'issues': os.path.join(path, 'issues'),
-                'admin' : os.path.join(path, '.hopper')
+                'admin' : os.path.join(path, '.hopper'),
+                'docs'  : os.path.join(path, 'docs')
                 }
 
         # create the repository
         repo = Repo.init(paths['root'], mkdir=True)
+
+        # build the default structure
         open(os.path.join(paths['root'], 'config'), 'w').close()
-        open(os.path.join(paths['root'], 'README.md'), 'w').close()
-
-        readme = open(os.path.join(os.path.dirname(__file__), 
-                                   'TRACKER_README'), 'r').read()
-        with open(os.path.join(paths['root'], 'README.md'), 'w') as fp:
-            fp.write(readme)
-
         os.mkdir(paths['issues'])
         open(os.path.join(paths['issues'], 'empty'), 'w').close()
         os.mkdir(paths['admin'])
         open(os.path.join(paths['admin'], 'empty'), 'w').close()
+        os.mkdir(paths['docs'])
+
+        # read sample docs from packaged `templates` into `docs`.
+        templates = os.path.join(os.path.dirname(__file__), 'templates')
+        for p in os.listdir(templates):
+            with open(os.path.join(templates, p), 'r') as fp:
+                data = fp.read()
+            with open(os.path.join(paths['docs'], p), 'w') as fp:
+                fp.write(data)
 
         # set the config
         config = TrackerConfig(cls(path))
@@ -108,11 +114,23 @@ class Tracker(object):
         return self.repo.commit(message=message, committer=committer,
                                 author=author)
 
+    def doc(self, path):
+        '''
+        Return the document at the path.
+
+        :param path: a path relative to the tracker's `docs` directory.
+        '''
+        return Document(self, path)
+
+    def docs(self):
+        '''Return a list of Document objects.'''
+        return [Document(self, path) for path in os.listdir(self.paths['docs'])]
+
     def read(self, relpath, mode='r'):
         '''
         Read a file relative to the tracker root.
 
-        :param relpath: a path relative to the trackers root directory.
+        :param relpath: a path relative to the tracker's root directory.
         :param mode: the file mode to use (e.g. 'r' or 'wb').
         '''
         path = os.path.join(self.paths['root'], relpath)
@@ -120,7 +138,11 @@ class Tracker(object):
             return fp.read()
 
     def issue(self, sha):
-        '''Return the Issue object with the given SHA1'''
+        '''
+        Return the Issue object with the given SHA1.
+        
+        :param sha: the issue's SHA1 identifier.
+        '''
         return Issue(self, sha)
 
     def issues(self, n=None, offset=0, sort_by='updated', reverse=True, 
@@ -201,4 +223,5 @@ class Tracker(object):
         conditions.
         '''
         # we'll just return any paths in tracker/issues/ with 40 chars.
+        # since we're not verifying, this may not be 100% accurate.
         return filter(lambda x: len(x) == 40, os.listdir(self.paths['issues']))

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, url_for
 
 from hopper.web.utils import setup, looks_hashy
-from hopper.utils import relative_time, markdown_to_html, cut
+from hopper.utils import relative_time, cut, strip_email
 from hopper.errors import BadReference
 from hopper.comment import Comment
 from hopper.issue import Issue
@@ -13,6 +13,8 @@ def main():
     tracker, config = setup()
     header = 'Recent Activity for %s' % tracker.config.name
     raw_history = tracker.history(20)
+    # get the unique set of authors (in this history segment)
+    users = set(strip_email(c.author) for c in raw_history)
     history = []
     for c in raw_history:
         split = c.author.index('<')
@@ -45,7 +47,7 @@ def main():
 
     return render_template('feed.html', history=history,
                            selected='feed', header=header, 
-                           tracker=tracker)
+                           tracker=tracker, users=users)
 
 
 def interpret(message, tracker):

@@ -7,10 +7,14 @@
             type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
         <link rel="stylesheet" 
             type="text/css" href="{{ url_for('static', filename='css/pygments.css') }}">
+        <link rel="stylesheet" 
+            type="text/css" href="{{ url_for('static', filename='css/jquery-ui.css') }}">
         <link rel="stylesheet" type="text/css" 
             href="{{ url_for('static', filename='js/tiptip/tipTip.css') }}">
         <script type="text/javascript" src="{{ url_for('static', 
-            filename='js/jquery.min.js') }}"></script>
+            filename='js/jquery.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', 
+            filename='js/jquery-ui.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', 
             filename='js/hopper.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', 
@@ -32,7 +36,13 @@
                 {{ tracker.config.name }}
             </div>
             <div id="search">
+                <form action="issues/search">
                 <input type="text" class="unfocused" value="Search issues...">
+                </form>
+            </div>
+            <div id="new">
+                <a href="/issues/new">New Issue</a>
+                &nbsp;or
             </div>
             <div id="nav">
                 <a class="{{ 'nav selected' if selected == 'feed' else 'nav' }}"
@@ -57,9 +67,10 @@
         </div>
         <br>
         <div id="footer">
-            Proudly powered by <a href="http://hopperhq.com/hopper">Hopper</a>
+            Powered by your friendly, neighborhood <a href="http://hopperhq.com/hopper">Hopper</a>
             <div id="git-access">
-                Access this tracker via Git: <span class="fancy-monospace">git@hopperhq.com:{{ tracker.paths['base'] }}.git</span>
+                Access this tracker via Git: 
+                <span class="fancy-monospace">git@hopperhq.com:{{ tracker.paths['base'] }}.git</span>
             </div>
         </div>
     </body>

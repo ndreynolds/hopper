@@ -32,6 +32,10 @@
     margin-right:auto;
 }
 
+.hidden {
+    display:none;
+}
+
 .rounded-corners (@radius: 5px) {
     border-radius: @radius;
     -webkit-border-radius: @radius;
@@ -72,11 +76,20 @@ html {
     margin:0px;
     font-family:Helvetica;
     color:#333;
+    min-width:1024px;
 } 
 
 p {
     margin: 1em 0px;
     line-height:115%;
+}
+
+b {
+    font-weight:bold;
+}
+
+i {
+    font-style:italic;
 }
 
 li {
@@ -112,6 +125,7 @@ div#search input {
     font-size:90%;
     padding:0px;
     padding-left:5px;
+    border:1px solid #aaa;
 }
 
 div#title {
@@ -133,6 +147,26 @@ div#menu {
     font-size:105%;
     color:#eee;
     padding:15px;
+}
+
+div#new {
+    float:right;
+    position:relative;
+    right:30px;
+    top:7px;
+}
+
+div#new a {
+    color:#444;
+    padding:2px;
+    padding-left:5px;
+    padding-right:5px;
+    background-color:#bbb;
+    border:1px solid #aaa;
+    font-size:95%;
+    text-shadow:0 1px 1px #fff;
+    font-family: Nobile Bold Italic;
+    text-decoration:none;
 }
 
 div.issue-header {
@@ -322,7 +356,7 @@ textarea#content {
     .gradient(#ddd, #ccc);
     border:1px solid #888;
     color:#333;
-    text-shadow:1px 1px #fff;
+    text-shadow: 0 1px 1px #fff;
 }
 
 .gray:hover {
@@ -362,6 +396,11 @@ input[type=submit]:hover {
 .monospace {
     font-family: DejaVu !important;
     font-size:95%;
+}
+
+.fancy {
+    text-shadow: 0 1px 1px #fff;
+    color:#555;
 }
 
 .fancy-monospace {
@@ -439,6 +478,12 @@ div.issue-header span#email {
 div.issue-header span#time {
     font-weight:bold;
     color:#eee;
+}
+
+div.issue span#title, div.comment span#title {
+    font-size:120%; 
+    font-weight:bold; 
+    text-shadow: 0 0 1px #fff;
 }
 
 div.comment {
@@ -703,6 +748,8 @@ div.issue-sidebar-content {
     border-right:1px solid #ddd;
     padding:15px;
     background-color:#eee;
+    color:#555;
+    text-shadow:0 1px 1px #fff;
 }
 
 div.issue-sidebar-content .button {
@@ -712,15 +759,37 @@ div.issue-sidebar-content .button {
     color:#fff;
 }
 
-div.issue-sidebar div:last-child {
+div.issue-sidebar > div:last-child {
     border-bottom:1px solid #ddd;
 }
 
-div.issue-sidebar div:first-child {
+div.issue-sidebar > div:first-child {
     .rounded-corners-top();
 }
 
 div#issue-new {
     width:@default-width;
-    .centered;
+}
+
+div.graph-outer {
+    height:40px;
+}
+
+div.graph-open {
+    height:40px;
+    float:left;
+    border:1px solid darken(@hopper-green, 5%);
+    background-color: lighten(@hopper-green, 20%); 
+}
+
+div.graph-closed {
+    height:40px;
+    float:left;
+    background-color:#EE5F5B;
+    border:1px solid darken(#EE5F5B, 25%);
+    border-left:0px;
+}
+
+.ui-dialog-titlebar {
+    display:none !important;
 }

@@ -1,18 +1,52 @@
 {% extends 'base.html' %}
 {% block body %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/new.js') }}"></script>
+<div class="issue-sidebar">
+    <div class="issue-sidebar-heading">
+        Formatting
+    </div>
+    <div class="issue-sidebar-content">
+        Hopper uses <a href="http://daringfireball.com/projects/markdown">Markdown</a>.
+        <p><code>*italic*</code> yields <i>italic</i></p>
+        <p><code>**bold**</code> yields <b>bold</b></p>
+        <p><code>`code`</code> yields <code>code</code></p>
+        <p><code>[link](url)</code> yields <a href="http://hopperhq.com">link</a>
+        <p>Indent <b>4</b> spaces for code blocks.</p>
+        <p>Start them with <code>!!!lang</code> or <code>#!lang</code> (line #ed) for highlighting.</p>
+    </div>
+    <br>
+    <div class="gray button" id="issue-preview-button" style="width:40%; text-align:center;">
+        <span style="font-size:120%;">☕</span> Preview
+    </div>
+    <br>
+</div>
 <div id="issue-new">
     <form method="post">
         <input type="text" id="title" name="title" class="unfocused" value="Issue Summary">
         <br><br>
         <div id="options-wrapper">
-            labels: <input type="text" name="labels" id="labels">
-            assign to: <input type="text" name="assign-to" id="assign-to">
+            labels:&nbsp; <input type="text" name="labels" id="labels">&nbsp;
+            assign to:&nbsp; <input type="text" name="assign-to" id="assign-to">
         </div>
         <br><br>
         <textarea name="content" id="content"></textarea>
         <br><br>
         <input type="submit" class="button green" value="Create Issue" style="font-size:100%">
     </form>
+</div>
+<div id="issue-preview" class="hidden">
+    <br>
+    <div class="comment-header centered">
+        <span id="author">Nick Reynolds</span>
+        <span id="email">(ndreynolds@gmail.com)</span>
+        opened
+        <span id="time">just now</span>
+    </div>
+    <div class="comment centered">
+        <span id="title"></span>
+        <br>
+        <div id="markdown"></div>
+    </div>
+    <br>
 </div>
 {% endblock %}

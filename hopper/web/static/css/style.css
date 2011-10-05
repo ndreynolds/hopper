@@ -20,6 +20,9 @@
   margin-left: auto;
   margin-right: auto;
 }
+.hidden {
+  display: none;
+}
 .auto-height {
   height: auto !important;
   min-height: 0px !important;
@@ -33,10 +36,17 @@ html {
   margin: 0px;
   font-family: Helvetica;
   color: #333;
+  min-width: 1024px;
 }
 p {
   margin: 1em 0px;
   line-height: 115%;
+}
+b {
+  font-weight: bold;
+}
+i {
+  font-style: italic;
 }
 li {
   list-style-type: circle;
@@ -67,6 +77,7 @@ div#search input {
   font-size: 90%;
   padding: 0px;
   padding-left: 5px;
+  border: 1px solid #aaa;
 }
 div#title {
   position: relative;
@@ -90,6 +101,24 @@ div#menu {
   font-size: 105%;
   color: #eee;
   padding: 15px;
+}
+div#new {
+  float: right;
+  position: relative;
+  right: 30px;
+  top: 7px;
+}
+div#new a {
+  color: #444;
+  padding: 2px;
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: #bbb;
+  border: 1px solid #aaa;
+  font-size: 95%;
+  text-shadow: 0 1px 1px #fff;
+  font-family: Nobile Bold Italic;
+  text-decoration: none;
 }
 div.issue-header {
   background-image: -webkit-linear-gradient(top, #999999, #777777);
@@ -277,7 +306,7 @@ textarea#content {
   background-image: linear-gradient(top, #dddddd, #cccccc);
   border: 1px solid #888;
   color: #333;
-  text-shadow: 1px 1px #fff;
+  text-shadow: 0 1px 1px #fff;
 }
 .gray:hover {
   background-image: -webkit-linear-gradient(top, #dddddd, #bbbbbb);
@@ -315,7 +344,7 @@ input[type=submit] {
   background-image: linear-gradient(top, #dddddd, #cccccc);
   border: 1px solid #888;
   color: #333;
-  text-shadow: 1px 1px #fff;
+  text-shadow: 0 1px 1px #fff;
 }
 input[type=submit]:hover {
   background-image: -webkit-linear-gradient(top, #dddddd, #bbbbbb);
@@ -332,6 +361,10 @@ input[type=submit]:hover {
 .monospace {
   font-family: DejaVu !important;
   font-size: 95%;
+}
+.fancy {
+  text-shadow: 0 1px 1px #fff;
+  color: #555;
 }
 .fancy-monospace {
   font-family: DejaVu !important;
@@ -417,6 +450,11 @@ div.issue-header span#author {
 div.issue-header span#time {
   font-weight: bold;
   color: #eee;
+}
+div.issue span#title, div.comment span#title {
+  font-size: 120%;
+  font-weight: bold;
+  text-shadow: 0 0 1px #fff;
 }
 div.comment {
   border-bottom-left-radius: 5px;
@@ -671,6 +709,8 @@ div.issue-sidebar-content {
   border-right: 1px solid #ddd;
   padding: 15px;
   background-color: #eee;
+  color: #555;
+  text-shadow: 0 1px 1px #fff;
 }
 div.issue-sidebar-content .button {
   text-align: center;
@@ -678,10 +718,10 @@ div.issue-sidebar-content .button {
   margin-right: 20px;
   color: #fff;
 }
-div.issue-sidebar div:last-child {
+div.issue-sidebar > div:last-child {
   border-bottom: 1px solid #ddd;
 }
-div.issue-sidebar div:first-child {
+div.issue-sidebar > div:first-child {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   -webkit-top-left-border-radius: 5px;
@@ -689,6 +729,23 @@ div.issue-sidebar div:first-child {
 }
 div#issue-new {
   width: 700px;
-  margin-left: auto;
-  margin-right: auto;
+}
+div.graph-outer {
+  height: 40px;
+}
+div.graph-open {
+  height: 40px;
+  float: left;
+  border: 1px solid #53793a;
+  background-color: #92bd75;
+}
+div.graph-closed {
+  height: 40px;
+  float: left;
+  background-color: #EE5F5B;
+  border: 1px solid #b71713;
+  border-left: 0px;
+}
+.ui-dialog-titlebar {
+  display: none !important;
 }

@@ -3,7 +3,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/issue.js') }}"></script>
 
 <div class="issue-sidebar">
-    <div class="issue-sidebar-heading">Status:</div>
+    <div class="issue-sidebar-heading">Status</div>
     <div class="issue-sidebar-content">
         {% if issue.status == 'open' %}
             <a id="issue-close" class="button green"
@@ -13,14 +13,14 @@
                 href="{{ url_for('issues.open', id=issue.id) }}">Closed</a>
         {% endif %}
     </div>
-    <div class="issue-sidebar-heading">Labels:</div>
+    <div class="issue-sidebar-heading">Labels</div>
     <div class="issue-sidebar-content">
         {% for label in issue.labels %}
             <span class="fancy-monospace">{{ label }}</span>
             <br><br>
         {% endfor %}
     </div>
-    <div class="issue-sidebar-heading">Assigned to:</div>
+    <div class="issue-sidebar-heading">Assigned to</div>
     <div class="issue-sidebar-content">
         {{ issue.assigned_to }}
     </div>
@@ -33,7 +33,7 @@
     <span id="time">{{ issue.created }}</span>
 </div>
 <div class="issue">
-    <span style="font-size:130%; font-weight:bold; text-shadow: 0 0 1px #fff;">{{ issue.title }}</span>
+    <span id="title">{{ issue.title }}</span>
     <br>
     {{ issue.content|safe }}
 </div>
