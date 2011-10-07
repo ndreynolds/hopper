@@ -30,7 +30,8 @@ class Tracker(object):
                 'base'  : os.path.basename(self.path),
                 'config': os.path.join(self.path, 'config'),
                 'issues': os.path.join(self.path, 'issues'),
-                'hopper': os.path.join(self.path, '.hopper')
+                'hopper': os.path.join(self.path, '.hopper'),
+                'docs'  : os.path.join(self.path, 'docs')
                 }
         self.properties = {
                 'name': None

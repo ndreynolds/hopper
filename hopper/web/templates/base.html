@@ -49,10 +49,10 @@
                     href="{{ url_for('feed.main') }}">Feed</a>
                 <a class="{{ 'nav selected' if selected == 'issues' else 'nav' }}"
                     href="{{ url_for('issues.index') }}">Issues</a>
-                <a class="{{ 'nav selected' if selected == 'project' else 'nav' }}"
-                    href="{{ url_for('project.home') }}">Docs</a>
+                <a class="{{ 'nav selected' if selected == 'docs' else 'nav' }}"
+                    href="{{ url_for('docs.main') }}">Docs</a>
                 <a class="{{ 'nav selected' if selected == 'settings' else 'nav' }}"
-                    href="{{ url_for('project.home') }}">Settings</a>
+                    href="{{ url_for('docs.main') }}">Settings</a>
             </div>
         </div>
         <div id="mid-header">

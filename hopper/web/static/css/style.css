@@ -20,6 +20,9 @@
   margin-left: auto;
   margin-right: auto;
 }
+.clear {
+  clear: both;
+}
 .hidden {
   display: none;
 }
@@ -748,4 +751,15 @@ div.graph-closed {
 }
 .ui-dialog-titlebar {
   display: none !important;
+}
+div.doc {
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  background-color: #eee;
+  min-height: 500px;
+  margin-left: 250px;
+  border: 1px solid #ddd;
+  width: 700px;
+  padding: 10px;
 }

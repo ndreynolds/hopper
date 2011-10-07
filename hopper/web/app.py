@@ -17,10 +17,10 @@ app.GLOBALS = {
 
 # Import blueprints
 from hopper.web.views.issues import issues
-from hopper.web.views.project import project
+from hopper.web.views.docs import docs
 from hopper.web.views.feed import feed
 
 # Register blueprints
 app.register_blueprint(issues, url_prefix='/issues')
-app.register_blueprint(project, url_prefix='/docs')
+app.register_blueprint(docs, url_prefix='/docs')
 app.register_blueprint(feed)

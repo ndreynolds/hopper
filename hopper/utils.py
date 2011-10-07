@@ -9,6 +9,8 @@ import time
 import random
 from datetime import datetime
 from markdown import markdown
+from docutils import core
+from docutils.writers.html4css1 import Writer, HTMLTranslator
 
 def to_json(data):
     '''
@@ -65,6 +67,24 @@ def relative_time(ts):
 def markdown_to_html(text):
     return markdown(text, ['codehilite'])
 
+class NoHeaderHTMLTranslator(HTMLTranslator):
+    '''
+    Adapted from: 
+        http://code.activestate.com/recipes/193890-using-rest-
+            restructuredtext-to-create-html-snippet/
+    '''
+    def __init__(self, document):
+        HTMLTranslator.__init__(self, document)
+        self.head_prefix = ['', '', '', '', '']
+        self.body_prefix = []
+        self.body_suffix = []
+        self.stylesheet = []
+
+def rst_to_html(text):
+
+    w = Writer()
+    w.translator_class = NoHeaderHTMLTranslator
+    return core.publish_string(text, writer=w)
 
 def match_path(path, get_all=False):
     '''
@@ -149,3 +169,5 @@ def strip_email(author):
         return author[:first_bracket - 1]
     # didn't contain the email address, return untouched.
     return author
+
+print rst_to_html('test')

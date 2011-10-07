@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="issue-sidebar" style="float:left">
+    <div class="issue-sidebar-heading">
+        Docs
+    </div>
+    <div class="issue-sidebar-content">
+    {% for d in docs %}
+    <a href="/docs/{{ d.link }}">{{ d.name }}</a><br>
+    {% endfor %}
+    </div>
+</div>
+<div class="doc">
+    {{ doc.read() }}
+</div>
+{% endblock %}
