@@ -33,7 +33,7 @@
         {% endif %}
         <div id="top-header">
             <div id="title">
-                {{ tracker.config.name }}
+                <a href="/">{{ tracker.config.name }}</a>
             </div>
             <div id="search">
                 <form action="issues/search">
@@ -67,7 +67,7 @@
         </div>
         <br>
         <div id="footer">
-            Powered by your friendly, neighborhood <a href="http://hopperhq.com/hopper">Hopper</a>
+            Powered by <a href="http://hopperhq.com/hopper">Hopper</a>
             <div id="git-access">
                 Access this tracker via Git: 
                 <span class="fancy-monospace">git@hopperhq.com:{{ tracker.paths['base'] }}.git</span>

@@ -165,33 +165,35 @@ class ConfigFile(BaseFile):
 class LockedFile(file):
     '''
     Provides primitive file-locking. It subclasses the ``file`` object
-    to hook in locking and unlocking. Hopper is single-threaded, but there
-    may be multiple processes acting on a Tracker's files at any time. As
-    such, we need a little insurance.
+    to hook in locking and unlocking. 
+    
+    Although Hopper is single-threaded, the locally-run web app and CLI
+    run independently, and could potentially intersect writing the same 
+    file.
 
     Locks are set by creating a file of the same path, but suffixed with
-    ``.lock``. Both reading and writing requires an exclusive lock. 
+    ``.lock``. Both reading and writing requires acquiring an exclusive 
+    lock. 
 
     Before opening the file, we lock it. After closing it, we unlock it.
 
     :param persist: if True, keep trying until the file is unlocked or a
                     timeout is reached. 
     :param interval: interval in ms at which to poll ``self.locked()``.
-    :param surrender: time in ms, after which the method will give up and
-                      throw an exception. Note that this can only be 
-                      applied approximately.
+    :param timeout: time in ms, after which the lock acquisition should
+                    throw a RuntimeError. 
     '''
     # TODO multiple readers, exclusive writer
 
     def __init__(self, name, mode, persist=True, 
-                 surrender=2000, interval=10):
+                 timeout=2000, interval=10):
 
-        # we don't care if the file exists (it may be new)
+        # don't care if the file exists (it may be new)
         # let the file object worry about that.
         self.path = name
         self.lock_path = name + '.lock'
         self.persist = persist
-        self.surrender = surrender
+        self.timeout = timeout
         self.interval = interval
 
         # see if it's locked
@@ -209,7 +211,7 @@ class LockedFile(file):
         calling the ``close`` method or using the ``with`` statement. 
         The ``__del__`` method is in place to remove the lock if these
         are forgotten, but it's not guaranteed to work (due to the way
-        python calls ``__del__``.
+        python calls ``__del__``. 
         '''
         self.unlock()
 
@@ -219,6 +221,7 @@ class LockedFile(file):
         self.unlock()
 
     def close(self):
+        '''Close the file and then unlock it.'''
         file.close(self)
         self.unlock()
 
@@ -233,7 +236,7 @@ class LockedFile(file):
         open(self.lock_path, 'w').close()
 
     def unlock(self):
-        '''Unlock a file.'''
+        '''Unlock the file.'''
         if self.locked():
             os.remove(self.lock_path)
 
@@ -242,11 +245,13 @@ class LockedFile(file):
         Continually poll the ``locked`` method using the given interval
         until either the file can be acquired or the timeout is reached.
 
-        :raise RuntimeError: if duration exceeds surrender value.
+        :raise RuntimeError: if wait time exceeds timeout.
         '''
         t = 0
         while self.locked():
-            if t > self.surrender:
+            if t > self.timeout:
+                # the actual timeout duration may be slightly longer than 
+                # the given one. best to undershoot if this matters.
                 raise RuntimeError('Acquiring lock timed out')
             time.sleep(float(self.interval) / 1000)
             t += self.interval

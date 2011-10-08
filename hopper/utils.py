@@ -65,7 +65,9 @@ def relative_time(ts):
 
 
 def markdown_to_html(text):
+    '''Convert markdown to html.'''
     return markdown(text, ['codehilite'])
+
 
 class NoHeaderHTMLTranslator(HTMLTranslator):
     '''
@@ -78,13 +80,15 @@ class NoHeaderHTMLTranslator(HTMLTranslator):
         self.head_prefix = ['', '', '', '', '']
         self.body_prefix = []
         self.body_suffix = []
-        self.stylesheet = []
+        self.stylesheet  = []
+
 
 def rst_to_html(text):
-
+    '''Convert reStructured text to html.'''
     w = Writer()
     w.translator_class = NoHeaderHTMLTranslator
     return core.publish_string(text, writer=w)
+
 
 def match_path(path, get_all=False):
     '''
@@ -95,10 +99,10 @@ def match_path(path, get_all=False):
                     will return the first match.
     
     Return scenarios:
-        No matches => None
-        One or more matches => first matching path as string 
+        No matches             => None
+        One or more matches    => first matching path as string 
         No matches and get_all => []
-        Matches and get_all => [path1, path2, path3]
+        Matches and get_all    => [path1, path2, path3]
     '''
     if path.startswith('~'):
         path = os.path.join(os.getenv('HOME'), path[1:])
@@ -139,6 +143,7 @@ def cut(text, length, add_elipses=True):
         return text[:length] + '...'
     return text[:length]
 
+
 def wrap(text, width=80):
     '''
     Intelligently wrap text to a set width.
@@ -156,6 +161,7 @@ def wrap(text, width=80):
                    text.split(' ')
                   )
 
+
 def strip_email(author):
     '''
     Strips the email address (i.e. <%s>) from the Git commit author
@@ -169,5 +175,3 @@ def strip_email(author):
         return author[:first_bracket - 1]
     # didn't contain the email address, return untouched.
     return author
-
-print rst_to_html('test')

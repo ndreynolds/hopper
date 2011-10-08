@@ -1,5 +1,6 @@
 from __future__ import with_statement
 import os
+import glob
 
 from hopper.git import Repo
 from hopper.issue import Issue
@@ -121,7 +122,11 @@ class Tracker(object):
 
         :param path: a path relative to the tracker's `docs` directory.
         '''
-        return Document(self, path)
+        matches = glob.glob(os.path.join(self.paths['docs'], path) + '*')
+        if not matches:
+            raise OSError('Document does not exist')
+        match = os.path.relpath(matches[0], self.paths['docs'])
+        return Document(self, match)
 
     def docs(self):
         '''Return a list of Document objects.'''
@@ -198,13 +203,16 @@ class Tracker(object):
         else:
             return issues
 
-    def history(self, n=10):
+    def history(self, n=10, all=False):
         '''
         Return a list of dictionaries containing the action and the actor.
         These are assembled from the Git repository's commit log.
 
         :param n: the maximum number of history items to return.
+        :param all: ignore n and return everything.
         '''
+        if all:
+            return self.repo.commits()
         return self.repo.commits()[:n]
 
     def get_issue_path(self, sha):

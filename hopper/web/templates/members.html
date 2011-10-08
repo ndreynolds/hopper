@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block body %}
+<div id="feed">
+    <ul>
+    {% for user in users %}
+    <li>{{ user }}</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}

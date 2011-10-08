@@ -10,7 +10,10 @@
     {% endfor %}
     </div>
 </div>
+<div class="doc-header">
+    <span class="monospace">{{ doc.link + doc.ext }}</span>
+</div>
 <div class="doc">
-    {{ doc.read() }}
+    {{ converted|safe }}
 </div>
 {% endblock %}

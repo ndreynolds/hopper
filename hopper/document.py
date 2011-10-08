@@ -2,12 +2,14 @@ from __future__ import with_statement
 import os
 
 from hopper.files import lock
-from hopper.utils import markdown_to_html
+from hopper.utils import markdown_to_html, rst_to_html
 
 class Document(object):
     '''
     The Document object represents a documentation file. It's a fairly 
-    thin wrapper around reading and writing the file. 
+    thin wrapper around reading and writing the file, and converting it
+    to HTMl from Markdown or reST. The LockedFile class is used for file
+    I/O.
 
     :param tracker: the tracker that owns the document.
     :param path: the path relative to the tracker's `docs` directory.
@@ -37,11 +39,12 @@ class Document(object):
         '''
         with lock(self.path, 'r') as fp:
             content = fp.read()
-        if self.ext[1:] in ['md', 'mdown', 'markdown', 'mdwn']:
-            return markdown_to_html(content)
-        elif self.ext[1:] == 'rst':
-            return 
-
+        if convert:
+            if self.ext[1:] in ['md', 'mdown', 'markdown', 'mdwn']:
+                return markdown_to_html(content)
+            elif self.ext[1:] == 'rst':
+                return rst_to_html(content)
+        return content
 
     def write(self, text):
         '''
