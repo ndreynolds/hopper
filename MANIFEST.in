@@ -1,4 +1,4 @@
 recursive-include hopper/web *
 recursive-include hopper/hpr *
-include hopper/TRACKER_README
+recursive-include hopper/templates *
 prune .git

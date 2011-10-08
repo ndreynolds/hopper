@@ -32,6 +32,10 @@
     margin-right:auto;
 }
 
+.clear {
+    clear:both;
+}
+
 .hidden {
     display:none;
 }
@@ -88,7 +92,7 @@ b {
     font-weight:bold;
 }
 
-i {
+em, i {
     font-style:italic;
 }
 
@@ -98,6 +102,11 @@ li {
     margin-left:20px;
     line-height:115%;
 }
+
+hr {
+    border-top:1px solid #bbb;
+    border-bottom:1px solid #fff;
+    }
 
 div#top-header {
     height:60px;
@@ -139,6 +148,11 @@ div#title {
     text-shadow: 0 1px 1px #fff;
 }
 
+div#title a {
+    text-decoration:none;
+    color:#333;
+}
+
 div#menu {
     .gradient();
     margin:-20px;
@@ -164,7 +178,7 @@ div#new a {
     background-color:#bbb;
     border:1px solid #aaa;
     font-size:95%;
-    text-shadow:0 1px 1px #fff;
+    text-shadow:0 1px 1px #eee;
     font-family: Nobile Bold Italic;
     text-decoration:none;
 }
@@ -792,4 +806,23 @@ div.graph-closed {
 
 .ui-dialog-titlebar {
     display:none !important;
+}
+
+div.doc-header {
+    .rounded-corners-top();
+    .gradient(#ddd, #ccc);
+    padding:10px;
+    border:1px solid #bbb;
+    margin-left:250px;
+    text-shadow:0 1px 1px #fff;
+}
+
+div.doc {
+    .rounded-corners-bottom();
+    background-color:#eee;
+    min-height:500px;
+    margin-left:250px;
+    border:1px solid #ddd;
+    border-top:none;
+    padding:10px;
 }

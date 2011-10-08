@@ -15,6 +15,7 @@ def main():
     raw_history = tracker.history(20)
     # get the unique set of authors (in this history segment)
     users = set(strip_email(c.author) for c in raw_history)
+    docs = tracker.docs()
     history = []
     for c in raw_history:
         split = c.author.index('<')
@@ -47,8 +48,18 @@ def main():
 
     return render_template('feed.html', history=history,
                            selected='feed', header=header, 
-                           tracker=tracker, users=users)
+                           tracker=tracker, users=users,
+                           docs=docs)
 
+@feed.route('/members')
+def members():
+    tracker, config = setup()
+    header = "Everyone who's submitted or commented, ever."
+    raw_history = tracker.history(all=True)
+    # get the unique set of authors (in this history segment)
+    users = set(strip_email(c.author) for c in raw_history)
+    return render_template('members.html', header=header, 
+                           tracker=tracker, users=users)
 
 def interpret(message, tracker):
     '''

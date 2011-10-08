@@ -33,7 +33,7 @@
         {% endif %}
         <div id="top-header">
             <div id="title">
-                {{ tracker.config.name }}
+                <a href="/">{{ tracker.config.name }}</a>
             </div>
             <div id="search">
                 <form action="issues/search">
@@ -49,10 +49,10 @@
                     href="{{ url_for('feed.main') }}">Feed</a>
                 <a class="{{ 'nav selected' if selected == 'issues' else 'nav' }}"
                     href="{{ url_for('issues.index') }}">Issues</a>
-                <a class="{{ 'nav selected' if selected == 'project' else 'nav' }}"
-                    href="{{ url_for('project.home') }}">Docs</a>
+                <a class="{{ 'nav selected' if selected == 'docs' else 'nav' }}"
+                    href="{{ url_for('docs.main') }}">Docs</a>
                 <a class="{{ 'nav selected' if selected == 'settings' else 'nav' }}"
-                    href="{{ url_for('project.home') }}">Settings</a>
+                    href="{{ url_for('docs.main') }}">Settings</a>
             </div>
         </div>
         <div id="mid-header">
@@ -67,7 +67,7 @@
         </div>
         <br>
         <div id="footer">
-            Powered by your friendly, neighborhood <a href="http://hopperhq.com/hopper">Hopper</a>
+            Powered by <a href="http://hopperhq.com/hopper">Hopper</a>
             <div id="git-access">
                 Access this tracker via Git: 
                 <span class="fancy-monospace">git@hopperhq.com:{{ tracker.paths['base'] }}.git</span>

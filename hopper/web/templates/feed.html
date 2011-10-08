@@ -17,10 +17,10 @@
         Docs
     </div>
     <div class="issue-sidebar-content">
-        <a href="test" style="color: #555;">Submitting Issues</a><br>
-        <a href="test" style="color: #555;">Getting the code</a><br>
-        <a href="test" style="color: #555;">Test</a><br>
-        <a href="test">see all...</a>
+    {% for doc in docs %}
+        <a href="/docs/{{ doc.link }}" style="color: #555;">{{ doc.name }}</a><br>
+    {% endfor %}
+        <a href="/docs">see all...</a>
     </div>
     <div class="issue-sidebar-heading">
         Members
@@ -28,8 +28,8 @@
     <div class="issue-sidebar-content">
     {% for user in users %}
         {{ user }}<br>
-        <a href="test">see all...</a>
     {% endfor %}
+        <a href="/members">see all...</a>
     </div>
 </div>
 <div id="feed">
@@ -57,5 +57,6 @@
         </li>
     {% endfor %}
     </ul>
+    <div class="clear"></div>
 </div>
 {% endblock %}
