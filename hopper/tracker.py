@@ -184,7 +184,7 @@ class Tracker(object):
         The Filter class has some more advanced methods. They can be used 
         on the return list. 
         '''
-        issues = [Issue(self, sha) for sha in self.get_issues()]
+        issues = self._get_issues()
         # filter first, sort second.
         if type(conditions) is dict:
             for key in conditions.keys():
@@ -224,13 +224,13 @@ class Tracker(object):
         '''
         return os.path.join(self.paths['issues'], sha, 'issue')
 
-    def get_issues(self):
-        '''
-        Return a list of the SHA1s of all issues in the tracker.
+    def _get_issues(self):
+        '''Returns an issue generator.'''
+        for sha in self._get_issue_shas():
+            yield Issue(self, sha)
 
-        Use Tracker.issues() to get them as Issue objects, filtered by various
-        conditions.
-        '''
+    def _get_issue_shas(self):
+        '''Return a list of the SHA1s of all issues in the tracker.'''
         # we'll just return any paths in tracker/issues/ with 40 chars.
         # since we're not verifying, this may not be 100% accurate.
         return filter(lambda x: len(x) == 40, os.listdir(self.paths['issues']))

@@ -43,6 +43,8 @@ def get_uuid(salt=None):
 
 def relative_time(ts):
     '''Return a human-parseable time format from a UTC timestamp.'''
+    if type(ts) is not float:
+        return 'invalid time'
     ts = datetime.fromtimestamp(ts)
     delta = datetime.now() - ts
     days = delta.days

@@ -80,6 +80,12 @@ def index(status='open'):
                                header=header, n=n, tracker=tracker)
 
 
+@issues.route('/search/<query>')
+def search(query):
+    header = "Search results for '%s'" % query
+    pass
+
+
 @issues.route('/new', methods=['GET', 'POST'])
 def new():
     tracker, config = setup()
@@ -171,6 +177,10 @@ def open(id):
         if not issue.save():
             flash('Could not reopen the issue')
         return redirect(url_for('issues.view', id=issue.id))
+
+
+def fetch_issues():
+    pass
 
 
 def pager(page, num_pages):

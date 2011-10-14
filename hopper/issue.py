@@ -176,3 +176,19 @@ class Issue(JSONFile):
         if not os.path.exists(paths['comments']) and os.path.exists(paths['root']):
             os.mkdir(paths['comments'])
         self.paths = paths
+
+
+class IssueQuery(object):
+    '''
+    List, sort, and/or search the given tracker's issues, using the 
+    db or raw JSON files, depending on what is available.
+
+    If tracker.config.db is True, it'll use the SQLite database. In
+    terms of speed, querying the database is much, much faster than
+    the JSON files. This is because each JSON issue is instantiated
+    as an Issue object, then sorted and filtered in python. However,
+    the difference is barely noticeable for <500 issues.
+    '''
+
+    def __init__(self, tracker):
+        pass

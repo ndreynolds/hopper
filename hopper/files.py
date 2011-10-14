@@ -64,6 +64,7 @@ class JSONFile(BaseFile):
         # uses a LockedFile object for file I/O
         with lock(f, 'r') as fp:
             self.fields = from_json(fp.read())
+            print self.fields, f
         return True
 
     def to_file(self, f):
