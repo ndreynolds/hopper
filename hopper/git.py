@@ -286,6 +286,9 @@ class Repo(object):
         Return up to n-commits down from a ref (branch, tag, commit),
         or if no ref given, down from the HEAD.
 
+        If you just want a single commit, it may be cleaner to use the
+        ``object`` method.
+
         :param ref: a branch, tag (not yet), or commit SHA to use 
                           as a start point.
         :param n: the maximum number of commits to return. If fewer 
@@ -341,6 +344,17 @@ class Repo(object):
         '''
         return self.repo[sha]
 
+    def status(self):
+        '''
+        Compare the working directory with HEAD.
+
+        :return: a dictionary with 3 keys: ``new``, ``modified``, and
+                 ``deleted``. Each corresponding value is a list of 
+                 file paths relative to the repository root.
+        '''
+        # TODO: also compare the index and HEAD, or the index and WT 
+
+
     def tag(self, name, ref=None):
         '''
         Create a tag.
@@ -374,12 +388,32 @@ class Repo(object):
         else:
             raise NotTreeError('Object is not a Tree')
 
-    def _file_is_modified(self, path):
+    def _file_status(self, path, ref=None):
         '''
-        Returns True if the current file has been modified from the
-        blob in the HEAD commit's tree, False otherwise.
+        Checks Returns 'new', 'modified', or 'deleted'
+
+        :param path: file path relative to the repo
+        :param ref: optional ref to compare the WT with, default is HEAD.
+        '''
+        full_path = os.path.join(self.root, path)
+        in_work_tree = os.path.exists(full_path)
+        in_tree = self._file_in_tree(path)
+        if not in_tree and in_work_tree:
+            return 'new'
+        elif in_tree and not in_work_tree:
+            return 'deleted'
+        elif in_tree and in_work_tree and self._file_is_modified(path):
+            return 'modified'
+        else:
+            raise KeyError('Path not found in either tree.')
+
+    def _file_is_modified(self, path, ref=None):
+        '''
+        Returns True if the current file (in the WT) has been modified from 
+        the blob in the commit's tree, False otherwise.
 
         :param path: path to the file relative to the repository root.
+        :param ref: optional ref to compare the WT with, default is HEAD.
 
         This returns False for new files (not present in the tree). If this
         is unexpected, just call ``_file_in_tree`` first.
@@ -408,12 +442,13 @@ class Repo(object):
         # calls dulwich.objects.ShaFile.__eq__, which just compares SHAs
         return blob1 != blob2
 
-    def _file_in_tree(self, path):
+    def _file_in_tree(self, path, ref=None):
         '''
         Returns True if the file corresponds to a blob in the HEAD 
         commit's tree, False otherwise.
 
         :param path: path to the file relative to the repository root.
+        :param ref: optional ref to compare the WT with, default is HEAD.
         '''
         # handle no head scenario when this gets called before first commit
         try:
@@ -511,10 +546,6 @@ class Repo(object):
         :param ref: branch, tag, commit reference.
         :return: a commit SHA.
         :raises KeyError: if ref doesn't point to a commit.
-
-        Branches and tags can have the same shortname. When the ref 
-        is ambiguous, Git assumes the branch was meant. This method does
-        the same.
         '''
         # order: branch -> tag -> commit
         # (tag and branch can have same name, git assumes branch)
@@ -574,6 +605,10 @@ class Repo(object):
         diff = list(difflib.context_diff(data1.splitlines(), data2.splitlines()))
         return diff.join('\n')
 
+# Constants
+FILE_IS_NEW = 0
+FILE_IS_MODIFIED = 1
+FILE_IS_DELETED = 2
 
 def _expand_branch_name(shortname):
     '''Expand branch name'''

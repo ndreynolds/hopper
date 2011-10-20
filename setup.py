@@ -17,7 +17,8 @@ setup(name='Hopper',
       install_requires=['markdown', 
                         'pygments', 
                         'dulwich', 
-                        'configobj'],
+                        'configobj',
+                        'docutils'],
       entry_points={
           'console_scripts': [
               'hpr = hopper.hpr.hpr:main'

@@ -31,7 +31,7 @@ class Tracker(object):
                 'base'  : os.path.basename(self.path),
                 'config': os.path.join(self.path, 'config'),
                 'issues': os.path.join(self.path, 'issues'),
-                'hopper': os.path.join(self.path, '.hopper'),
+                'admin': os.path.join(self.path, '.hopper'),
                 'docs'  : os.path.join(self.path, 'docs')
                 }
         self.properties = {
@@ -226,8 +226,7 @@ class Tracker(object):
 
     def _get_issues(self):
         '''Returns an issue generator.'''
-        for sha in self._get_issue_shas():
-            yield Issue(self, sha)
+        return [Issue(self, sha) for sha in self._get_issue_shas()]
 
     def _get_issue_shas(self):
         '''Return a list of the SHA1s of all issues in the tracker.'''

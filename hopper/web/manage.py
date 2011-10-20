@@ -35,4 +35,4 @@ def start(path, port=5000, debug=False, external=False):
         app.run(port=port)
 
 if __name__ == '__main__':
-    start(os.path.join(home, 'trackers/hopper2'), debug=True)
+    start(os.path.join(home, 'trackers/hopper'), debug=True)
