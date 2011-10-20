@@ -162,11 +162,13 @@ class SQLiteIssueDatabase(object):
         Check the database for consistency with the JSON database.
 
         Compares the repo HEAD with the LAST_UPDATE file, and checks the working
-        tree.
+        tree. If the commits differ, we do a full replication. If the commits are
+        the same, we apply any changes in the working tree.
 
         Speed is better than accuracy here, so it doesn't provide guarantees.
         If the database has been manually changed, or the Git repository has been
-        tampered with, there may be inconsistencies.
+        tampered with, there may be inconsistencies. If we need to be certain, it
+        ends up being faster to replicate 
         '''
         pass
 
@@ -175,7 +177,8 @@ class SQLiteIssueDatabase(object):
         shas = self.tracker.get_issue_shas()
         self._insert_many_from_shas(shas)
 
-    def _apply_worktree(self):
+    def _apply_working_tree(self):
+        '''Apply changes from the working to the database.'''
         pass
 
 class IssueQuery(object):
