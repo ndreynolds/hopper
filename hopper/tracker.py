@@ -9,12 +9,12 @@ from hopper.config import TrackerConfig
 from hopper.document import Document
 
 class Tracker(object):
-    '''
+    """
     Defines a Hopper tracker and provides paths to files within a 
     tracker. 
 
     :param path: the relative or absolute path to the tracker
-    '''
+    """
     def __init__(self, path):
         if not os.path.exists(path):
             path = match_path(path)
@@ -42,13 +42,13 @@ class Tracker(object):
 
     @classmethod
     def new(cls, path):
-        '''
+        """
         Create and return tracker at the given path.
 
         :param path: path to create the directory at. For example,
                      supplying ``my_tracker`` would create the directory
                      ``./my_tracker``.
-        '''
+        """
         # remove trailing slash
         if path.endswith('/'):
             path = path[:-1]
@@ -94,7 +94,7 @@ class Tracker(object):
         return cls(path)
 
     def autocommit(self, message, author=None):
-        '''
+        """
         Commit any changes to the repo. In most scenarios, the user
         responsible for the change(s) would be listed as the commit 
         author, and Hopper would be the committer.  
@@ -104,7 +104,7 @@ class Tracker(object):
             format. For example: ``'Full Name <your.email@domain.tld>'``
             **or** ``{'name': 'Full Name', 'email': 'your.email@domain.tld'}``
         :return: the Commit object.
-        '''
+        """
         committer = 'Hopper <hopper@hopperhq.com>'
 
         if type(author) is dict:
@@ -117,11 +117,11 @@ class Tracker(object):
                                 author=author)
 
     def doc(self, path):
-        '''
+        """
         Return the document at the path.
 
         :param path: a path relative to the tracker's `docs` directory.
-        '''
+        """
         matches = glob.glob(os.path.join(self.paths['docs'], path) + '*')
         if not matches:
             raise OSError('Document does not exist')
@@ -129,31 +129,31 @@ class Tracker(object):
         return Document(self, match)
 
     def docs(self):
-        '''Return a list of Document objects.'''
+        """Return a list of Document objects."""
         return [Document(self, path) for path in os.listdir(self.paths['docs'])]
 
     def read(self, relpath, mode='r'):
-        '''
+        """
         Read a file relative to the tracker root.
 
         :param relpath: a path relative to the tracker's root directory.
         :param mode: the file mode to use (e.g. 'r' or 'wb').
-        '''
+        """
         path = os.path.join(self.paths['root'], relpath)
         with open(path, mode) as fp:
             return fp.read()
 
     def issue(self, sha):
-        '''
+        """
         Return the Issue object with the given SHA1.
         
         :param sha: the issue's SHA1 identifier.
-        '''
+        """
         return Issue(self, sha)
 
     def issues(self, n=None, offset=0, sort_by='updated', reverse=True, 
                return_num=False, conditions=None):
-        '''
+        """
         Return a list of n Issue objects filtered by conditions.
 
         :param n: the number of issues to return. (returns all by default)
@@ -183,7 +183,7 @@ class Tracker(object):
         The conditions parameter allows for very basic (x == y) filtering. 
         The Filter class has some more advanced methods. They can be used 
         on the return list. 
-        '''
+        """
         issues = self._get_issues()
         # filter first, sort second.
         if type(conditions) is dict:
@@ -204,32 +204,32 @@ class Tracker(object):
             return issues
 
     def history(self, n=10, all=False):
-        '''
+        """
         Return a list of dictionaries containing the action and the actor.
         These are assembled from the Git repository's commit log.
 
         :param n: the maximum number of history items to return.
         :param all: ignore n and return everything.
-        '''
+        """
         if all:
             return self.repo.commits()
         return self.repo.commits()[:n]
 
     def get_issue_path(self, sha):
-        '''
+        """
         Returns the absolute path to the issue. It doesn't check if the issue
         exists; this should be done afterwards if necessary.
 
         :param sha: the issue's unique identifier.
-        '''
+        """
         return os.path.join(self.paths['issues'], sha, 'issue')
 
     def _get_issues(self):
-        '''Returns an issue generator.'''
+        """Returns an issue generator."""
         return [Issue(self, sha) for sha in self._get_issue_shas()]
 
     def _get_issue_shas(self):
-        '''Return a list of the SHA1s of all issues in the tracker.'''
+        """Return a list of the SHA1s of all issues in the tracker."""
         # we'll just return any paths in tracker/issues/ with 40 chars.
         # since we're not verifying, this may not be 100% accurate.
         return filter(lambda x: len(x) == 40, os.listdir(self.paths['issues']))

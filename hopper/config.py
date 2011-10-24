@@ -1,3 +1,5 @@
+"""Classes for handling configuration settings."""
+
 import os
 import sys
 from configobj import ConfigObj
@@ -6,7 +8,7 @@ from hopper.files import BaseFile, ConfigFile
 from hopper.utils import get_uuid
 
 class UserConfig(ConfigFile):
-    '''
+    """
     Reads and writes the .hprconfig file.
 
     The Config class holds (and intelligently sets) defaults for 
@@ -14,12 +16,11 @@ class UserConfig(ConfigFile):
     to do the actual reading and writing.
 
     :param path: path to the config file, defaults to $HOME/.hprconfig.
-                 If that doesn't exist, it will use the defaults. 
+                 If *that* doesn't exist, it will use the defaults. 
                  
     UserConfig objects will not write to the config file unless save() is 
     explicitly called.
-    '''
-
+    """
     def __init__(self, path=None):
         # set config file fields
         self.fields = {
@@ -75,11 +76,11 @@ class UserConfig(ConfigFile):
                     pass
 
     def save(self):
-        '''Write config to file.'''
+        """Write config to file."""
         self.to_file(self.path)
 
     def decorate(self, color, text, force=False):
-        '''
+        """
         Output coloring using ANSI escape codes.
 
         Returns colored :text using :color if the config setting
@@ -92,7 +93,7 @@ class UserConfig(ConfigFile):
         :param color: a color from the colors dictionary below.
         :param text: str or unicode type value.
         :param force: force the colors, even if STDOUT != STDIN
-        '''
+        """
         colors = {'purple' : '\033[95m',
                   'blue'   : '\033[94m',
                   'green'  : '\033[92m',
@@ -110,15 +111,14 @@ class UserConfig(ConfigFile):
 
 
 class TrackerConfig(ConfigFile):
-    '''
+    """
     Reads and writes the $TRACKER/config file.
 
     The tracker config file contains settings and preferences for
     the tracker.
 
     :param tracker: a Tracker object to glean the config path from.
-    '''
-    
+    """
     def __init__(self, tracker):
         self.fields = {
                 'name': None,
@@ -138,7 +138,7 @@ class TrackerConfig(ConfigFile):
 
 
 def parse_gitconfig():
-    '''Parse the .gitconfig file and return the dictionary.'''
+    """Parse the .gitconfig file and return the dictionary."""
     HOME = os.getenv('HOME')
     path = os.path.join(HOME, '.gitconfig')
     if not os.path.exists(path):

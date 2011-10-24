@@ -7,7 +7,7 @@ from hopper.utils import to_json, get_hash
 from hopper.errors import BadReference, AmbiguousReference
 
 class Comment(JSONFile):
-    '''Represents an issue's comment.'''
+    """Represents an issue's comment."""
     
     def __init__(self, issue, id=None, **kwargs):
         self.fields = {
@@ -28,7 +28,7 @@ class Comment(JSONFile):
         super(BaseFile, self).__init__()
 
     def save(self):
-        '''Save the comment to file.'''
+        """Save the comment to file."""
         self.timestamp = time.time()
         self.id = get_hash(to_json(self.fields))
         if not os.path.isdir(self.issue.paths['comments']):
@@ -36,11 +36,11 @@ class Comment(JSONFile):
         return self.to_file(self.issue.get_comment_path(self.id))
 
     def delete(self):
-        '''Delete the comment's disk representation.'''
+        """Delete the comment's disk representation."""
         os.remove(self.issue.get_comment_path(self.id))
 
     def _resolve_id(self, id):
-        '''Resolve partial ids and verify the comment exists.'''
+        """Resolve partial ids and verify the comment exists."""
         if len(id) == 40:
             if os.path.exists(self.issue.get_comment_path(id)):
                 return id

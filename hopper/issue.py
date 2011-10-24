@@ -10,7 +10,7 @@ from hopper.utils import to_json, get_hash
 from hopper.errors import BadReference, AmbiguousReference
 
 class Issue(JSONFile):
-    '''
+    """
     Defines an issue (or bug, if you prefer that term). Issues are
     stored in flat files using JSON.  The parent class handles the 
     conversion to and from JSON.
@@ -28,7 +28,7 @@ class Issue(JSONFile):
     The Issue class doesn't handle defaults for the 'author' field.
     The creator of the issue is often the web server, so we can't
     really assume anything about the acting user.
-    '''
+    """
 
     def __init__(self, tracker, id=None):
         self.fields = {
@@ -60,7 +60,7 @@ class Issue(JSONFile):
         return Comment(self, sha)
 
     def save(self):
-        '''Save the issue to file.'''
+        """Save the issue to file."""
 
         # We need to set updated, even if it's the same as created,
         # so we have a consistent timestamp to sort issues by.
@@ -85,21 +85,21 @@ class Issue(JSONFile):
         return self.to_file(self.paths['issue'])
 
     def delete(self):
-        '''
+        """
         Delete the disk representation of the issue.
 
         Issues should rarely be deleted. Closed issues get hidden
         from many commands, but should still be available for reference. 
         This is here for the rare times when they need to be deleted
         (such as spam).
-        '''
+        """
         if not hasattr(self, 'id'):
             raise BadReference('No matching issue on disk')
         shutil.rmtree(self.paths['root'])
 
     @classmethod
     def revision(cls, ref=None):
-        '''
+        """
         Return an Issue object, representing the issue as it was in the 
         commit referenced by the given ref. The implementation will read 
         the file from its blob in the commit's tree. 
@@ -112,33 +112,33 @@ class Issue(JSONFile):
 
         :param ref: a commit ref.
         :return: an Issue object.
-        '''
+        """
         # TODO
         raise NotImplementedError
 
     def revert(self, ref=None):
-        '''
+        """
         Does a checkout of the issue directory at the commit pointed to by
         the given ref.  After that, it will update its `fields` attribute to
         reflect any changes. Any Comment objects will need to be reinitialized. 
-        '''
+        """
         # TODO
         raise NotImplementedError
 
     def get_comment_path(self, sha):
-        '''Get the path to the comment with the given SHA.'''
+        """Get the path to the comment with the given SHA."""
         if not hasattr(self, 'id'):
             raise BadReference('No matching issue on disk')
         return os.path.join(self.paths['comments'], sha)
 
     def get_comments(self):
-        '''Get the SHAs of all comments to the issue.'''
+        """Get the SHAs of all comments to the issue."""
         if not hasattr(self, 'id'):
             raise BadReference('No matching issue on disk')
         return filter(lambda x: len(x) == 40, os.listdir(self.paths['comments']))
 
     def _resolve_id(self, id):
-        '''Resolve partial ids and verify the issue exists.'''
+        """Resolve partial ids and verify the issue exists."""
         if len(id) == 40:
             if os.path.exists(self.tracker.get_issue_path(id)):
                 return id
@@ -158,12 +158,12 @@ class Issue(JSONFile):
         return match_id
 
     def _set_paths(self):
-        '''
+        """
         Set paths inside the issue.
 
         Issue data and comments are stored in a directory named after the
         issue's SHA. 
-        '''
+        """
         paths = {}
         tpaths = self.tracker.paths
         # path to the issue directory

@@ -12,8 +12,8 @@ issues = Blueprint('issues', __name__)
 @issues.route('/<status>')
 @issues.route('/', methods=['GET', 'POST'])
 def index(status='open'):
-    '''
-    '''
+    """
+    """
     tracker, config = setup()
 
     # get the url params
@@ -116,12 +116,12 @@ def new():
 
 @issues.route('/view/<id>', methods=['GET', 'POST'])
 def view(id):
-    '''
+    """
     Renders the issues template. Alternatively, it will respond with 
     JSON when the request mimetype is 'json/application'. The JSON
     requests can contain filter objects. Filters are part of the UI
     and we must re-request the issues each time a filter changes.
-    '''
+    """
     tracker, config = setup()
     issue = tracker.issue(id)
     if request.method == 'POST':
@@ -184,13 +184,13 @@ def fetch_issues():
 
 
 def pager(page, num_pages):
-    '''
+    """
     Generates a list of pages to link to based on the current page
     and the total number of pages.
 
     For example, if page=1 and there are at least 8 pages, it will 
     return [1,2,3,4,5,6,7,8].
-    '''
+    """
     if page == 1:
         pages = [p for p in range(1, page + 6) if p in range(1, num_pages + 1)]
     else:

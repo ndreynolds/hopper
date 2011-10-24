@@ -8,12 +8,12 @@ sys.path.insert(0, os.path.join(home, 'repos/hopper'))
 from hopper.web.app import app
 
 def start(path, port=5000, debug=False, external=False):
-    '''
+    """
     Run the Hopper tracker at the given path. Allows for setting the port,
     debug mode, and whether or not it's externally visible. 
 
     Running it on port 80 is possible but will usually require being root.
-    '''
+    """
 
     # Try and get an int out of the port param, set to 5000 if anything
     # goes wrong.

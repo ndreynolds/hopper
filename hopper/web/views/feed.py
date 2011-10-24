@@ -62,10 +62,10 @@ def members():
                            tracker=tracker, users=users)
 
 def interpret(message, tracker):
-    '''
+    """
     Look for an issue and/or comment id in the commit message
     and return the appropriate object.
-    '''
+    """
     message = message[0].lower() + message[1:]
     last13 = message[-13:]
     print last13

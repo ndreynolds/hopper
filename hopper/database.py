@@ -1,6 +1,6 @@
-'''
+"""
 SQLite issue database representation.
-'''
+"""
 
 from __future__ import with_statement
 import os
@@ -9,7 +9,7 @@ from sqlalchemy import create_engine, Table, Column, String, Float
 from sqlalchemy.schema import MetaData
 
 class SQLiteIssueDatabase(object):
-    '''
+    """
     SQLite representation of the tracker's issue database. Handles SQL through
     SQLAlchemy. It also handles syncing with the primary database.
 
@@ -46,7 +46,7 @@ class SQLiteIssueDatabase(object):
     only an issue after the user does something to change the HEAD (e.g. a pull
     or reset). If the commits are indeed the same, we just apply changes. This 
     just means an ``INSERT OR REPLACE`` or ``DELETE`` for each change.
-    '''
+    """
     def __init__(self, tracker):
         parent = os.path.join(tracker.paths['admin'], 'cache')
         path = os.path.join(parent, 'tracker.db')
@@ -78,13 +78,13 @@ class SQLiteIssueDatabase(object):
         return self.issues.select(**kwargs)
 
     def insert(self, issue):
-        '''
+        """
         Insert an Issue object into the database.
 
         NOTE that the actual SQL statement is an ``INSERT OR REPLACE``.
 
         :param issue: a single Issue object
-        '''
+        """
         ins = self.issues.insert().prefix_with('OR REPLACE')
         comments = issue.comments()
         # comments just need to be searchable, we're not going to be 
@@ -104,14 +104,14 @@ class SQLiteIssueDatabase(object):
                     )
 
     def insert_many(self, issues):
-        '''
+        """
         Insert a list of Issue objects.
 
         If the number of issues is substantial, ``insert_many_from_shas``
         will perform better.
 
         :param issues: a list of Issue objects.
-        '''
+        """
         ins = self.issues.insert().prefix_with('OR REPLACE')
         issue_dicts = []
         for i in issues:
@@ -134,7 +134,7 @@ class SQLiteIssueDatabase(object):
             ins.execute(issue_dicts)
 
     def _insert_many_from_shas(self, shas, n=50):
-        '''
+        """
         Insert issues, given a list of SHA identifiers, as efficiently as
         possible.
 
@@ -145,7 +145,7 @@ class SQLiteIssueDatabase(object):
 
         :param shas: a list of SHA identifiers as strings.
         :param n: group size
-        '''
+        """
         # TODO: n should probably be calculated based on len(shas)
         for i in xrange(0, len(shas), n):
             edge = i + n if i + n < len(shas) else len(shas)
@@ -158,7 +158,7 @@ class SQLiteIssueDatabase(object):
             fp.write(self.ref)
 
     def _integrity_check(self):
-        '''
+        """
         Check the database for consistency with the JSON database.
 
         Compares the repo HEAD with the LAST_UPDATE file, and checks the working
@@ -169,16 +169,16 @@ class SQLiteIssueDatabase(object):
         If the database has been manually changed, or the Git repository has been
         tampered with, there may be inconsistencies. If we need to be certain, it
         ends up being faster to replicate 
-        '''
+        """
         pass
 
     def _replicate(self):
-        '''Do a full replication of the JSON database into this one.'''
+        """Do a full replication of the JSON database into this one."""
         shas = self.tracker.get_issue_shas()
         self._insert_many_from_shas(shas)
 
     def _apply_working_tree(self):
-        '''Apply changes from the working to the database.'''
+        """Apply changes from the working to the database."""
         pass
 
 class IssueQuery(object):
@@ -210,7 +210,7 @@ class IssueQuery(object):
         return len(self._get_issue_shas())
 
     def _get_issue_shas(self):
-        '''Return a list of the SHA1s of all issues in the tracker.'''
+        """Return a list of the SHA1s of all issues in the tracker."""
         # we'll just return any paths in tracker/issues/ with 40 chars.
         # since we're not verifying, this may not be 100% accurate.
         return filter(lambda x: len(x) == 40, os.listdir(self.tracker.paths['issues']))
