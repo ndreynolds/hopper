@@ -324,7 +324,7 @@ class Repo(object):
         :param path: a path to a file or directory to diff, relative
                      to the repo root. Defaults to the entire tree.
         """
-        if not os.path.isfile(path):
+        if not os.path.isfile(os.path.join(self.root, path)):
             raise NotImplementedError('Specify a file path for now')
         return self._diff_file(path, a, b)
 
@@ -612,9 +612,13 @@ class Repo(object):
         :param ref: branch, tag, commit reference.
         :return: a commit SHA.
         :raises KeyError: if ref doesn't point to a commit.
+        :raises TypeError: if ref is not a string.
         """
         # order: branch -> tag -> commit
         # (tag and branch can have same name, git assumes branch)
+
+        if type(ref) is not str:
+            raise TypeError('ref must be a string')
 
         # dulwich.Repo.refs keys the full name
         # (i.e. 'refs/heads/master') for branches and tags
@@ -669,7 +673,7 @@ class Repo(object):
                 raise NotBlobError('Path did not point to a blob in either tree')
 
         diff = list(difflib.context_diff(data1.splitlines(), data2.splitlines()))
-        return diff.join('\n')
+        return '\n'.join(diff)
 
 
 ### Constants

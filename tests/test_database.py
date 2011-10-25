@@ -5,6 +5,7 @@ from env import TestEnv
 from hopper.tracker import Tracker
 from hopper.database import SQLiteIssueDatabase, IssueQuery
 from hopper.issue import Issue
+from sqlalchemy.sql import Select
 
 class IssueQueryTest(unittest.TestCase):
     '''Tests the `IssueQuery` class.'''
@@ -86,16 +87,29 @@ class SQLiteIssueDatabaseTest(unittest.TestCase):
         issue1.save()
         db.insert(issue1)
         rows = db.select().execute()
-        issue2 = Issue(rows[0]['id'])
+        issue2 = [Issue(self.env.tracker, r['id']) for r in rows][0]
+        # make sure the issues are equal which triggers the __eq__ method.
         assert issue1 == issue2
 
     def test_insert_many(self):
         '''Tests the `insert_many` method'''
-        pass
+        db = SQLiteIssueDatabase(self.env.tracker)
+        issues = []
+        for i in range(20):
+            issue = Issue(self.env.tracker)
+            issue.save()
+            issues.append(issue)
+        db.insert_many(issues)
+        rows = db.select().execute()
+        db_issues = [Issue(self.env.tracker, r['id']) for r in rows]
+        # quick check to make sure they're all there.
+        assert len(db_issues) == len(issues)
 
     def test_select(self):
         '''Tests the `select` method'''
-        pass
+        db = SQLiteIssueDatabase(self.env.tracker)
+        # should just return an sqlalchemy.sql.Select object.
+        assert type(db.select()) is Select
 
 
 if __name__ == '__main__':
