@@ -27,6 +27,15 @@ class Comment(JSONFile):
             self.from_file(issue.get_comment_path(self.id))
         super(BaseFile, self).__init__()
 
+    def __eq__(self, other):
+        return True if self.id == other.id else False
+
+    def __ne__(self, other):
+        return True if self.id != other.id else False
+
+    def __repr__(self):
+        return '<Comment %s>' % self.id[:6]
+
     def save(self):
         """Save the comment to file."""
         self.timestamp = time.time()

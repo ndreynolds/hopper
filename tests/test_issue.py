@@ -27,6 +27,19 @@ class TestIssue(unittest.TestCase):
         # i.e.: issue.title should return issue.fields['title'] 
         assert issue.fields['title'] == issue.title
 
+    def test_eq(self):
+        issue1 = Issue(self.tracker)
+        issue1.save()
+        issue2 = Issue(self.tracker, issue1.id)
+        assert issue1 == issue2
+
+    def test_ne(self):
+        issue1 = Issue(self.tracker)
+        issue1.save()
+        issue2 = Issue(self.tracker)
+        issue2.save()
+        assert issue1 != issue2
+
     def test_comments(self):
         issue = Issue(self.tracker)
         issue.save()

@@ -51,6 +51,15 @@ class Issue(JSONFile):
             self.from_file(self.paths['issue'])
         super(BaseFile, self).__init__()
 
+    def __eq__(self, other):
+        return True if self.id == other.id else False
+
+    def __ne__(self, other):
+        return True if self.id != other.id else False
+
+    def __repr__(self):
+        return '<Issue %s>' % self.id[:6]
+
     def comments(self, n=None):
         comments = [Comment(self, sha) for sha in self.get_comments()]
         comments.sort(key=lambda x: x.timestamp)

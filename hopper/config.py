@@ -134,6 +134,7 @@ class TrackerConfig(ConfigFile):
         super(BaseFile, self).__init__()
 
     def save(self):
+        """Save the tracker configuration to file."""
         self.to_file(self.path)
 
 

@@ -1,6 +1,4 @@
-"""
-SQLite issue database representation.
-"""
+"""SQLite issue database representation."""
 
 from __future__ import with_statement
 import os
@@ -118,18 +116,18 @@ class SQLiteIssueDatabase(object):
             comments = i.comments()
             comment_data = ''.join(c.content for c in comments)
             issue_dicts.append({
-                'id': i.id,
-                'title': i.title,
-                'status': i.status,
-                'labels': ','.join(i.labels),
-                'content': i.content,
-                'comments': comment_data,
-                'created': i.created,
-                'updated': i.updated,
-                'author_name': i.author['name'],
-                'author_email': i.author['email'],
-                'author_avatar': i.author['avatar']
-                })
+                                'id': i.id,
+                                'title': i.title,
+                                'status': i.status,
+                                'labels': ','.join(i.labels),
+                                'content': i.content,
+                                'comments': comment_data,
+                                'created': i.created,
+                                'updated': i.updated,
+                                'author_name': i.author['name'],
+                                'author_email': i.author['email'],
+                                'author_avatar': i.author['avatar']
+                               })
         if issue_dicts:
             ins.execute(issue_dicts)
 
