@@ -23,6 +23,7 @@ def index(status='open'):
     order = request.args.get('order', 'updated')
     direc = request.args.get('dir', 'asc')
     page = int(request.args.get('page', 1))
+    label = request.args.get('label', None)
 
     # verify the params
     order = order if order in ['id', 'title', 'author'] else 'updated'
@@ -33,7 +34,7 @@ def index(status='open'):
     # run our query
     issues_ = tracker.query().select(limit=per_page, offset=offset, 
                                     status=status, order_by=order, 
-                                    reverse=reverse)
+                                    reverse=reverse, label=label)
     # humanize the timestamps
     map_attr(issues_, 'updated', relative_time)
     map_attr(issues_, 'created', relative_time)
@@ -51,6 +52,9 @@ def index(status='open'):
 
     # set the header
     header = 'Viewing %s issues for %s' % (status, tracker.config.name)
+    if label:
+        header += ' with label &nbsp; <span class="fancy-monospace">'
+        header += '%s</span>' % label
 
     if request.json is not None:
         return to_json(request.json)
@@ -62,11 +66,20 @@ def index(status='open'):
                                header=header, n=n, tracker=tracker)
 
 
+@issues.route('/search')
 @issues.route('/search/<query>')
-def search(query):
+def search(query=None):
+    tracker, config = setup()
+    if query is None:
+        query = request.args.get('query', 'test')
     header = "Search results for '%s'" % query
-    pass
-
+    issues_ = tracker.query().search(query)
+    for i in issues_:
+        i.content = highlight(i.content, query)
+        i.title = highlight(i.title, query)
+    return render_template('search.html', issues_=issues_, 
+                           selected='issues', tracker=tracker,
+                           header=header)
 
 @issues.route('/new', methods=['GET', 'POST'])
 def new():
@@ -194,3 +207,16 @@ def pager(page, num_pages):
     if not 2 in pages: 
         pages = [1, 2, False] + pages
     return pages
+
+def highlight(text, keyword):
+    """
+    Surround instances of keyword in text with the surround tuple.
+    Just replaces all instances with the entire concatenated string.
+
+    :param text: string of text perform highlights within.
+    :param keyword: string to highlight.
+    :param surround: tuple containing the two strings to surround the keyword
+                     with.
+    """
+    return text.replace(keyword, '<span class="highlighted">' + keyword + 
+                        '</span>')

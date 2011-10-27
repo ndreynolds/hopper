@@ -16,7 +16,8 @@
     <div class="issue-sidebar-heading">Labels</div>
     <div class="issue-sidebar-content">
         {% for label in issue.labels %}
-            <span class="fancy-monospace">{{ label }}</span>
+            <a href="{{ url_for('issues.index', label=label) }}" 
+                class="fancy-monospace">{{ label }}</a>
             <br><br>
         {% endfor %}
     </div>

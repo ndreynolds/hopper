@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block body %}
+<div id="feed">
+    <ul>
+    {% for issue in issues_ %}
+        <li>
+            <a href="{{ url_for('issues.view', id=issue.id[:6]) }}" 
+                style="font-size:120%">{{ issue.title|safe }}</a>
+            &nbsp;&nbsp;
+            <a href="{{ url_for('issues.view', id=issue.id[:6]) }}" 
+                class="fancy-monospace">{{ issue.id[:6] }}</a>
+            <div class="snippet">
+                {{ issue.content|safe }}
+            </div>
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}
