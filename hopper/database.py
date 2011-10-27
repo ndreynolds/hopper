@@ -2,11 +2,10 @@
 
 from __future__ import with_statement
 import os
-from hopper.issue import Issue
 from sqlalchemy import create_engine, Table, Column, String, Float
 from sqlalchemy.schema import MetaData
 
-class SQLiteIssueDatabase(object):
+class Database(object):
     """
     SQLite representation of the tracker's issue database. Handles SQL through
     SQLAlchemy. It also handles syncing with the primary database.
@@ -45,7 +44,7 @@ class SQLiteIssueDatabase(object):
     or reset). If the commits are indeed the same, we just apply changes. This 
     just means an ``INSERT OR REPLACE`` or ``DELETE`` for each change.
     """
-    def __init__(self, tracker):
+    def __init__(self, tracker, check=True):
         parent = os.path.join(tracker.paths['admin'], 'cache')
         path = os.path.join(parent, 'tracker.db')
         db = create_engine('sqlite:///%s' % path)
@@ -69,10 +68,13 @@ class SQLiteIssueDatabase(object):
             elif not os.path.isdir(parent):
                 raise OSError('Parent path exists, but is not a directory.')
             issues.create()
+        self.tracker = tracker
         self.issues = issues
         self.conn = db.connect()
+        self.check = check
 
     def select(self, **kwargs):
+        self._integrity_check()
         return self.issues.select(**kwargs)
 
     def insert(self, issue):
@@ -147,13 +149,13 @@ class SQLiteIssueDatabase(object):
         # TODO: n should probably be calculated based on len(shas)
         for i in xrange(0, len(shas), n):
             edge = i + n if i + n < len(shas) else len(shas)
-            issues = [Issue(self.tracker, shas[i]) for j in range(i, edge)]
+            issues = [self.tracker.issue(shas[j]) for j in range(i, edge)]
             self.insert_many(issues)
 
     def _set_update(self):
         path = os.path.join(self.tracker.paths['admin'], 'cache', 'LAST_UPDATE')
         with open(path, 'w') as fp:
-            fp.write(self.ref)
+            fp.write(self.tracker.repo.head().id)
 
     def _integrity_check(self):
         """
@@ -166,49 +168,48 @@ class SQLiteIssueDatabase(object):
         Speed is better than accuracy here, so it doesn't provide guarantees.
         If the database has been manually changed, or the Git repository has been
         tampered with, there may be inconsistencies. If we need to be certain, it
-        ends up being faster to replicate 
+        ends up being faster to just replicate. 
         """
-        pass
+        if not self.check:
+            return
+
+        path = os.path.join(self.tracker.paths['admin'], 'cache', 'LAST_UPDATE')
+        # No marker, must replicate
+        if not os.path.exists(path):
+            self._replicate()
+            return
+
+        # Get some info
+        head = self.tracker.repo.head().id
+        last_update = open(path, 'r').read()
+        dirty = self.tracker.repo.is_dirty()
+
+        # Commits match, but repo is dirty:
+        if last_update == head and dirty:
+            self._apply_working_tree()
+        # (If commits match and repo is clean, nothing happens.)
+
+        # Commits don't match:
+        elif last_update != head:
+            self._replicate()
 
     def _replicate(self):
         """Do a full replication of the JSON database into this one."""
-        shas = self.tracker.get_issue_shas()
+        shas = self.tracker._get_issue_shas()
         self._insert_many_from_shas(shas)
+        self._set_update()
 
     def _apply_working_tree(self):
         """Apply changes from the working to the database."""
-        pass
-
-class IssueQuery(object):
-    def __init__(self, tracker):
-        self.tracker = tracker
-        self.has_db = True
-        if self.has_db:
-            self.db = SQLiteIssueDatabase(self.tracker)
-
-    def select(self, order_by='updated', limit=None, offset=None, reverse=True):
-        if self.has_db:
-            query = self.db.select(order_by=order_by, limit=limit, offset=offset)
-            rows = query.execute()
-            issues = [Issue(r['id']) for r in rows]
-        else:
-            issues = [Issue(self.tracker, sha) for sha in self._get_issue_shas()]
-            issues.sort(key=lambda x: getattr(x, order_by), reverse=reverse)
-            offset = 0 if offset is None else offset
-            if limit is not None:
-                issues = issues[offset:(offset + limit)]
-            else:
-                issues = issues[offset:]
-        return issues
-
-    def search(self):
-        return None
-
-    def count(self):
-        return len(self._get_issue_shas())
-
-    def _get_issue_shas(self):
-        """Return a list of the SHA1s of all issues in the tracker."""
-        # we'll just return any paths in tracker/issues/ with 40 chars.
-        # since we're not verifying, this may not be 100% accurate.
-        return filter(lambda x: len(x) == 40, os.listdir(self.tracker.paths['issues']))
+        # get modified files within issues
+        new, modified, deleted = self.tracker.repo.status('issues')
+        for path in new + modified:
+            # insert or replace row
+            sha = path.split(os.sep)[1]
+            issue = self.tracker.issue(sha)
+            self.insert(issue)
+        for path in deleted:
+            # delete row
+            sha = path.split(os.sep)[1:]
+            query = self.issues.delete().where(id=sha)
+            query.execute()

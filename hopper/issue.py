@@ -61,7 +61,7 @@ class Issue(JSONFile):
         return '<Issue %s>' % self.id[:6]
 
     def comments(self, n=None):
-        comments = [Comment(self, sha) for sha in self.get_comments()]
+        comments = [Comment(self, sha) for sha in self._get_comments()]
         comments.sort(key=lambda x: x.timestamp)
         return comments[:n]
 
@@ -90,6 +90,8 @@ class Issue(JSONFile):
         # Make the comments dir if it doesn't exist.
         if not os.path.isdir(self.paths['comments']):
             os.mkdir(self.paths['comments'])
+        # Save it in the db.
+        self.tracker.db.insert(self)
         # Save it.
         return self.to_file(self.paths['issue'])
 
@@ -140,7 +142,7 @@ class Issue(JSONFile):
             raise BadReference('No matching issue on disk')
         return os.path.join(self.paths['comments'], sha)
 
-    def get_comments(self):
+    def _get_comments(self):
         """Get the SHAs of all comments to the issue."""
         if not hasattr(self, 'id'):
             raise BadReference('No matching issue on disk')

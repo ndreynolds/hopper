@@ -42,6 +42,8 @@ class Comment(JSONFile):
         self.id = get_hash(to_json(self.fields))
         if not os.path.isdir(self.issue.paths['comments']):
             os.mkdir(self.issue.paths['comments'])
+        # replace the issue in the db
+        self.issue.tracker.db.insert(self.issue)
         return self.to_file(self.issue.get_comment_path(self.id))
 
     def delete(self):

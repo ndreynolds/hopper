@@ -7,6 +7,8 @@ from hopper.issue import Issue
 from hopper.utils import match_path
 from hopper.config import TrackerConfig
 from hopper.document import Document
+from hopper.query import Query
+from hopper.database import Database
 
 class Tracker(object):
     """
@@ -39,6 +41,7 @@ class Tracker(object):
                 }
         self.repo = Repo(path)
         self.config = TrackerConfig(self)
+        self.db = Database(self)
 
     @classmethod
     def new(cls, path):
@@ -88,7 +91,7 @@ class Tracker(object):
         # add everything to the repo and commit
         repo.add(all=True)
         repo.commit(committer='Hopper <hopper@hopperhq.com>',
-                    message='Created a new tracker')
+                    message='Created the %s tracker' % config.name)
 
         # instantiate and return our new Tracker.
         return cls(path)
@@ -184,24 +187,8 @@ class Tracker(object):
         The Filter class has some more advanced methods. They can be used 
         on the return list. 
         """
-        issues = self._get_issues()
-        # filter first, sort second.
-        if type(conditions) is dict:
-            for key in conditions.keys():
-                issues = filter(lambda x: getattr(x, key) == conditions[key],
-                                issues)
-        issues.sort(key=lambda x: getattr(x, sort_by), reverse=reverse)
-        num_issues = len(issues)
-
-        if type(n) is int:
-            issues = issues[offset:(offset + n)]
-        else:
-            issues = issues[offset:]
-
-        if return_num:
-            return issues, num_issues
-        else:
-            return issues
+        query = Query(self)
+        return query.select(limit=20, offset=None)
 
     def history(self, n=10, all=False):
         """
@@ -224,8 +211,15 @@ class Tracker(object):
         """
         return os.path.join(self.paths['issues'], sha, 'issue')
 
+    def query(self):
+        """
+        Returns a hopper.query.Query object for querying the issue 
+        database.
+        """
+        return Query(self)
+
     def _get_issues(self):
-        """Returns an issue generator."""
+        """Returns a list of all issue objects."""
         return [Issue(self, sha) for sha in self._get_issue_shas()]
 
     def _get_issue_shas(self):
