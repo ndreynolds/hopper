@@ -19,7 +19,8 @@ class Query(object):
             self.db = Database(self.tracker, check=False)
             self.table = self.db.issues
 
-    def select(self, order_by='updated', status='open', limit=None, offset=None, reverse=True):
+    def select(self, order_by='updated', status='open', label=None, limit=None, 
+               offset=None, reverse=True):
         """
         Return issues, with options to limit, offset, sort, and filter the result set.
 
@@ -34,6 +35,8 @@ class Query(object):
             order = asc if reverse else desc
             query = self.db.select(order_by=order(order_by), limit=limit, offset=offset)
             query = query.where(self.table.c.status == status)
+            if label:
+                query = query.where(self.table.c.labels.like('%' + label + '%'))
             rows = query.execute()
             issues = [Issue(self.tracker, r['id']) for r in rows]
         else:
