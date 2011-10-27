@@ -6,12 +6,12 @@
     </div>
     <div class="issue-sidebar-content">
         <div class="graph-outer">
-            <div class="graph-open" style="width:89%"></div>
-            <div class="graph-closed" style="width:9%"></div>
+            <div class="graph-open" style="width:{{ g_open }}%"></div>
+            <div class="graph-closed" style="width:{{ g_closed }}%"></div>
         </div>
         <br>
-        <a href="/issues/open">25</a> Open, 
-        <a href="/issues/closed" style="color: #B71713">3</a> Closed
+        <a href="/issues/open">{{ n_open }}</a> Open, 
+        <a href="/issues/closed" style="color: #B71713">{{ n_closed }}</a> Closed
     </div>
     <div class="issue-sidebar-heading">
         Docs
