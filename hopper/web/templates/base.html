@@ -36,8 +36,9 @@
                 <a href="/">{{ tracker.config.name }}</a>
             </div>
             <div id="search">
-                <form action="issues/search">
-                <input type="text" class="unfocused" value="Search issues...">
+                <form action="{{ url_for('issues.search') }}" method="GET">
+                    <input name="query" type="text" class="unfocused" 
+                        value="Search issues...">
                 </form>
             </div>
             <div id="new">

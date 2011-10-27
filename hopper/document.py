@@ -5,7 +5,7 @@ from hopper.files import lock
 from hopper.utils import markdown_to_html, rst_to_html
 
 class Document(object):
-    '''
+    """
     The Document object represents a documentation file. It's a fairly 
     thin wrapper around reading and writing the file, and converting it
     to HTMl from Markdown or reST. The LockedFile class is used for file
@@ -15,7 +15,7 @@ class Document(object):
     :param path: the path relative to the tracker's `docs` directory.
                  This will usually just be the basename (unless the docs
                  are nested into subdirectories).
-    '''
+    """
 
     def __init__(self, tracker, path):
         self.path = os.path.join(tracker.paths['docs'], path)
@@ -29,14 +29,14 @@ class Document(object):
             raise OSError('Document does not exist.')
     
     def read(self, convert=False):
-        '''
+        """
         Read the file (after acquiring a lock).
 
         :param convert: if the content is Markdown or reST (based
                         on the file extension) attempt to convert it
                         first.
         :return: string containing file contents.
-        '''
+        """
         with lock(self.path, 'r') as fp:
             content = fp.read()
         if convert:
@@ -47,10 +47,10 @@ class Document(object):
         return content
 
     def write(self, text):
-        '''
+        """
         Write the file (after acquiring a lock).
 
         :param text: string to write to the file.
-        '''
+        """
         with lock(self.path, 'w') as fp:
             fp.write(text)

@@ -13,27 +13,40 @@ from docutils import core
 from docutils.writers.html4css1 import Writer, HTMLTranslator
 
 def to_json(data):
-    '''
+    """
     Returns sorted & indented JSON from the best json module available.
 
-    By defining json helpers here, we don't have to play the try-except 
-    import game in every file.
-    '''
+    :param data: a python structure that can be converted to JSON (i.e.
+                 a list or dictionary).
+    """
+    # Main purpose here is to avoid doing the json module conditional
+    # logic in every script that uses it.
     return json.dumps(data, indent=4)
 
 
 def from_json(data):
-    '''Returns python objects loaded from a JSON string.'''
+    """
+    Returns python objects loaded from a JSON string.
+
+    :param data: a valid JSON-encoded string.
+    """
     return json.loads(data)
 
 
 def get_hash(text):
-    '''SHA1 the text and return the hexdigest.'''
+    """
+    SHA1 the text and return the hexdigest.
+    """
     return hashlib.sha1(text).hexdigest()
 
 
 def get_uuid(salt=None):
-    '''Return a UUID generated from the UTC ts and a random float.'''
+    """
+    Return a UUID generated from the UTC ts and a random float.
+
+    :param salt: if given, this will be used instead of the call to
+                 ``random.random()``.
+    """
     if salt is None:
         # user can provide a salt to use instead of the random float. 
         salt = str(random.random())
@@ -42,9 +55,18 @@ def get_uuid(salt=None):
 
 
 def relative_time(ts):
-    '''Return a human-parseable time format from a UTC timestamp.'''
+    """
+    Return a human-parseable time format from a UTC timestamp.
+
+    :param ts: a timestamp, given as a float (or something that can
+               be converted to one).
+    """
     if type(ts) is not float:
-        return 'invalid time'
+        try:
+            ts = float(ts)
+        except TypeError:
+            return 'invalid time'
+
     ts = datetime.fromtimestamp(ts)
     delta = datetime.now() - ts
     days = delta.days
@@ -67,16 +89,16 @@ def relative_time(ts):
 
 
 def markdown_to_html(text):
-    '''Convert markdown to html.'''
+    """Convert markdown to html."""
     return markdown(text, ['codehilite'])
 
 
 class NoHeaderHTMLTranslator(HTMLTranslator):
-    '''
+    """
     Adapted from: 
         http://code.activestate.com/recipes/193890-using-rest-
             restructuredtext-to-create-html-snippet/
-    '''
+    """
     def __init__(self, document):
         HTMLTranslator.__init__(self, document)
         self.head_prefix = ['', '', '', '', '']
@@ -86,14 +108,14 @@ class NoHeaderHTMLTranslator(HTMLTranslator):
 
 
 def rst_to_html(text):
-    '''Convert reStructured text to html.'''
+    """Convert reStructured text to html."""
     w = Writer()
     w.translator_class = NoHeaderHTMLTranslator
     return core.publish_string(text, writer=w)
 
 
 def match_path(path, get_all=False):
-    '''
+    """
     Match a path using glob. 
 
     :param path: the path to match.
@@ -105,7 +127,7 @@ def match_path(path, get_all=False):
         One or more matches    => first matching path as string 
         No matches and get_all => []
         Matches and get_all    => [path1, path2, path3]
-    '''
+    """
     if path.startswith('~'):
         path = os.path.join(os.getenv('HOME'), path[1:])
     matches = glob.glob(path)
@@ -118,7 +140,7 @@ def match_path(path, get_all=False):
 
 
 def map_attr(obj_list, attr, f):
-    '''
+    """
     Apply the function, f, to attribute, attr, of each object in obj_list
 
     This was implemented for things like humanizing issues' timestamps before
@@ -127,7 +149,7 @@ def map_attr(obj_list, attr, f):
     :param obj_list: a list of objects.
     :param attr: an attribute that each object in **obj_list** should have.
     :param f: a function to apply to each each object's **attr**.
-    ''' 
+    """ 
     for obj in obj_list:
         val = getattr(obj, attr)
         val = f(val)
@@ -136,9 +158,15 @@ def map_attr(obj_list, attr, f):
 
 
 def cut(text, length, add_elipses=True):
-    '''
-    Cut text off after the given length.
-    '''
+    """
+    Cut text off after the given length, optionally adding elipses to 
+    the end.
+
+    :param text: string to cut
+    :param length: slice off chars after this int.
+    :param add_elipses: if True, append ``...`` to the end, if the 
+                        number of chars in text exceeded length.
+    """
     if len(text) <= length:
         return text
     elif add_elipses:
@@ -147,13 +175,12 @@ def cut(text, length, add_elipses=True):
 
 
 def wrap(text, width=80):
-    '''
+    """
     Intelligently wrap text to a set width.
 
     :param text: text to wrap.
     :param width: number of columns to wrap to.
-    '''
-
+    """
     return reduce(lambda line, word, width=width: '%s%s%s' %
                   (line,
                    ' \n'[(len(line)-line.rfind('\n')-1
@@ -165,12 +192,12 @@ def wrap(text, width=80):
 
 
 def strip_email(author):
-    '''
+    """
     Strips the email address (i.e. <%s>) from the Git commit author
     string, or any similar one.
 
     :param author: string, formatted like 'Nick Reynolds <ndreynolds@gmail.com'
-    '''
+    """
     if '<' in author or '@' in author:
         first_bracket = author.index('<')
         # return the string before the first angle bracket

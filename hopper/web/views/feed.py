@@ -45,16 +45,28 @@ def main():
                         'snippet': snippet
                         }
                        )
+    # Issue counts
+    n_open = tracker.query().count('open')
+    n_closed = tracker.query().count('closed')
+    n_total = n_open + n_closed
+    # Graph percentages
+    # the subtraction is spacing for the CSS.
+    g_open = (float(n_open) / n_total) * 100 - 2 if n_total > 0 else 0
+    g_closed = (float(n_closed) / n_total) * 100 - 2 if n_total > 0 else 0
+    g_open = 1 if g_open < 1 else g_open
+    g_closed = 1 if g_closed < 1 else g_closed
 
     return render_template('feed.html', history=history,
                            selected='feed', header=header, 
                            tracker=tracker, users=users,
-                           docs=docs)
+                           docs=docs, n_open=n_open, 
+                           n_closed=n_closed, n_total=n_total,
+                           g_open=g_open, g_closed=g_closed)
 
 @feed.route('/members')
 def members():
     tracker, config = setup()
-    header = "Everyone who's submitted or commented, ever."
+    header = "Everyone who's altered the %s time continuum." % tracker.config.name
     raw_history = tracker.history(all=True)
     # get the unique set of authors (in this history segment)
     users = set(strip_email(c.author) for c in raw_history)
@@ -62,13 +74,12 @@ def members():
                            tracker=tracker, users=users)
 
 def interpret(message, tracker):
-    '''
+    """
     Look for an issue and/or comment id in the commit message
     and return the appropriate object.
-    '''
+    """
     message = message[0].lower() + message[1:]
     last13 = message[-13:]
-    print last13
     last6 = message[-6:]
     if looks_hashy(last13[:6]) and looks_hashy(last13[7:]):
         issue_id = last13[:6]

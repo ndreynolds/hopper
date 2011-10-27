@@ -2,24 +2,34 @@ from __future__ import with_statement
 import unittest
 import os
 import shutil
+import inspect
 
 from hopper.utils import get_uuid
-from hopper.git import Repo, NoHeadSet
-from dulwich.objects import Commit, Tree
+from hopper.git import Repo, \
+                       NoHeadSet, \
+                       NothingToCommit, \
+                       FILE_IS_UNCHANGED, \
+                       FILE_IS_NEW, \
+                       FILE_IS_MODIFIED, \
+                       FILE_IS_DELETED
+from dulwich.objects import Commit, Tree, Blob
 from dulwich.errors import NotTreeError
 
 class NoHeadSetTest(unittest.TestCase):
-    '''Tests the `NoHeadSet` class.'''
-    pass
+    """Tests the `NoHeadSet` class."""
+    def test(self):
+        # just make sure it's an exception.
+        assert Exception in inspect.getmro(NoHeadSet)
 
 
 class NothingToCommitTest(unittest.TestCase):
-    '''Tests the `NothingToCommit` class.'''
-    pass
+    """Tests the `NothingToCommit` class."""
+    def test(self):
+        assert Exception in inspect.getmro(NothingToCommit)
 
 
 class RepoTest(unittest.TestCase):
-    '''Tests the `Repo` class.'''
+    """Tests the `Repo` class."""
 
     def setUp(self):
         # a path to create each test case's repo at.
@@ -30,37 +40,60 @@ class RepoTest(unittest.TestCase):
         if os.path.isdir(self.path):
             shutil.rmtree(self.path)
 
+    def test__file_status(self):
+        """Tests the `_file_status` method"""
+        r = self._repo_with_commits()
+        basepath = os.path.join(r.root, 'spam-')
+        # remove the first one
+        os.remove(basepath + '0')
+        # edit the second one
+        with open(basepath + '1', 'w') as fp:
+            fp.write('something else\n\n')
+        # new file
+        with open(basepath + 'x', 'w') as fp:
+            fp.write('new file')
+
+        assert r._file_status('spam-0') == FILE_IS_DELETED
+        assert r._file_status('spam-1') == FILE_IS_MODIFIED
+        assert r._file_status('spam-2') == FILE_IS_UNCHANGED
+        assert r._file_status('spam-x') == FILE_IS_NEW
+
+    def test__file_is_modified(self):
+        """Tests the `_file_is_modified` method"""
+        pass
+
     def test__apply_to_tree(self):
-        '''Tests the `_apply_to_tree` method'''
+        """Tests the `_apply_to_tree` method"""
         pass
 
     def test__diff_file(self):
-        '''Tests the `_diff_file` method'''
+        """Tests the `_diff_file` method"""
         pass
 
     def test__file_in_tree(self):
-        '''Tests the `_file_in_tree` method'''
+        """Tests the `_file_in_tree` method"""
+        r = self._repo_with_commits(4)
+        # the spam-0 file is created by the _repo_with_commits method
+        assert r._file_in_tree('spam-0')
+
+    def test__resolve_ref(self):
+        """Tests the `_resolve_ref` method"""
         pass
 
-    def test__file_is_modified(self):
-        '''Tests the `_file_is_modified` method'''
-        pass
+    def test__obj_from_tree(self):
+        """Tests the `_obj_from_tree` method"""
+        r = self._repo_with_commits(4)
+        tree = r.object(r.head().tree)
+        assert type(r._obj_from_tree(tree, 'spam-0')) is Blob
+        # TODO: test subtree retrieval
 
-    def test__resolve(self):
-        '''Tests the `_resolve` method'''
-        pass
-
-    def test__tree_grab(self):
-        '''Tests the `_tree_grab` method'''
-        pass
-
-    def test__tree_write(self):
-        '''Tests the `_tree_write` method'''
+    def test__write_tree_to_wt(self):
+        """Tests the `_write_tree_to_wt` method"""
         pass
 
     def test_add(self):
-        '''Tests the `add` method'''
-        # TODO - a lot more tests here.
+        """Tests the `add` method"""
+        # TODO: a lot more tests here.
         #
         # Need to verify:
         #   * add path or all
@@ -106,7 +139,7 @@ class RepoTest(unittest.TestCase):
         assert r._file_in_tree('spam-5')
 
     def test_branch(self):
-        '''Tests the `branch` method'''
+        """Tests the `branch` method"""
         r = self._repo_with_commits()
 
         # test repo should be on master branch.
@@ -132,7 +165,7 @@ class RepoTest(unittest.TestCase):
         assert r.branch() == 'refs/heads/master'
 
     def test_checkout(self):
-        '''Tests the `checkout` method'''
+        """Tests the `checkout` method"""
         r = self._repo_with_commits(3)
 
         # we'll checkout the parent of HEAD.
@@ -140,11 +173,14 @@ class RepoTest(unittest.TestCase):
         assert type(parent) is Commit
 
     def test_cmd(self):
-        '''Tests the `cmd` method'''
-        pass
+        """Tests the `cmd` method"""
+        r = self._repo_with_commits()
+        # just try a few commands
+        assert r.cmd(['status'])
+        assert r.cmd(['log', '--pretty=oneline'])
 
     def test_commit(self):
-        '''Tests the `commit` method'''
+        """Tests the `commit` method"""
         r = Repo.init(self.path, mkdir=True)
         self._rand_file('spam')
         r.add('spam')
@@ -160,7 +196,7 @@ class RepoTest(unittest.TestCase):
         assert c == r.head()
 
     def test_commits(self):
-        '''Tests the `commits` method'''
+        """Tests the `commits` method"""
         r = self._repo_with_commits(20)
 
         # returns list of Commit objects
@@ -196,11 +232,39 @@ class RepoTest(unittest.TestCase):
             pass
 
     def test_diff(self):
-        '''Tests the `diff` method'''
-        pass
+        """Tests the `diff` method"""
+        r = Repo.init(self.path, mkdir=True)
+
+        with open(os.path.join(r.root, 'test'), 'w') as fp:
+            fp.write('hello world')
+        r.add(all=True)
+        c1 = r.commit(committer='Test McGee', message='testing diff 1')
+
+        with open(os.path.join(r.root, 'test'), 'w') as fp:
+            fp.write('hello world!')
+        r.add(all=True)
+        c2 = r.commit(committer='Test McGee', message='testing diff 2')
+
+        expected = \
+"""*** 
+
+--- 
+
+***************
+
+*** 1 ****
+
+! hello world!
+--- 1 ----
+
+! hello world"""
+
+        result = r.diff(c2.id, c1.id, 'test')
+
+        assert result == expected
 
     def test_head(self):
-        '''Tests the `head` method'''
+        """Tests the `head` method"""
         r = self._repo_with_commits(3)
         head = r.head()
         # make sure it returns a commit
@@ -209,7 +273,7 @@ class RepoTest(unittest.TestCase):
         assert head.message == 'Commit 2'
 
     def test_init(self):
-        '''Tests the `init` method'''
+        """Tests the `init` method"""
         # NOTE init refers not to __init__, but the classmethod for creating 
         # repositories. See test_constructor() for __init__.
 
@@ -225,18 +289,22 @@ class RepoTest(unittest.TestCase):
         assert type(r) is Repo
 
     def test_object(self):
-        '''Tests the `object` method'''
-        pass
+        """Tests the `object` method"""
+        r = self._repo_with_commits()
+        tree = r.head().tree
+        commit = r.head().id
+        assert type(r.object(tree)) is Tree
+        assert type(r.object(commit)) is Commit
 
     def test_tag(self):
-        '''Tests the `tag` method'''
+        """Tests the `tag` method"""
         r = self._repo_with_commits()
         r.tag('test')
         tags_dir = os.path.join(self.path, '.git', 'refs', 'tags')
         assert 'test' in os.listdir(tags_dir)
 
     def test_tree(self):
-        '''Tests the `tree` method'''
+        """Tests the `tree` method"""
         r = self._repo_with_commits()
         # grab the tree from HEAD commit
         t = r.tree(r.head().tree)
@@ -252,15 +320,15 @@ class RepoTest(unittest.TestCase):
             pass
 
     def _rand_file(self, path):
-        '''Write a SHA1 to a file.'''
+        """Write a SHA1 to a file."""
         with open(os.path.join(self.path, path), 'w') as fp:
             fp.write(get_uuid())
 
     def _repo_with_commits(self, num_commits=1):
-        '''
+        """
         Returns a repo with one or more commits, on master branch, with
         a tag 'v1.0' that points to the last commit.
-        '''
+        """
         r = Repo.init(self.path, mkdir=True)
         for c in range(num_commits):
             for i in range(4):
@@ -274,17 +342,17 @@ class RepoTest(unittest.TestCase):
 
 
 def test__expand_branch_name():
-    '''Tests the `_expand_branch_name` function.'''
+    """Tests the `_expand_branch_name` function."""
     pass
 
 
 def test__expand_ref():
-    '''Tests the `_expand_ref` function.'''
+    """Tests the `_expand_ref` function."""
     pass
 
 
 def test__expand_tag_name():
-    '''Tests the `_expand_tag_name` function.'''
+    """Tests the `_expand_tag_name` function."""
     pass
 
 
