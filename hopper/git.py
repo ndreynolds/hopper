@@ -338,6 +338,13 @@ class Repo(object):
             # The HEAD will be missing before the repo is committed to.
             raise NoHeadSet
 
+    def is_dirty(self):
+        """Return True if there are uncommitted changes to the repository."""
+        new, modified, deleted = self.status()
+        if new or modified or deleted:
+            return True
+        return False
+
     def object(self, sha):
         """
         Retrieve an object from the repository.
