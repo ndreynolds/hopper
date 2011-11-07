@@ -1,23 +1,22 @@
 {% extends 'base.html' %}
 {% block body %}
 <div id="feed">
-    <ul>
-        <li>
-            <a id="open-issues" class="open-closed">On</a>
-            <a id="closed-issues" class="open-closed active">Off</a>
-        </li>
-        <li>
-            <a id="open-issues" class="open-closed">On</a>
-            <a id="closed-issues" class="open-closed active">Off</a>
-        </li>
-        <li>
-            <a id="open-issues" class="open-closed">On</a>
-            <a id="closed-issues" class="open-closed active">Off</a>
-        </li>
-        <li>
-            <a id="open-issues" class="open-closed">On</a>
-            <a id="closed-issues" class="open-closed active">Off</a>
-        </li>
-    </ul>
+    <form>
+        <table>
+            <tr>
+                <td>Tracker Name</td>
+                <td><input type="text" name="tracker_name" /></td>
+            </tr>
+            <tr>
+                <td>Notifications</td>
+                <td>
+                    <a id="open-issues" class="open-closed">On</a>
+                    <a id="closed-issues" class="open-closed active">Off</a>
+                </td>
+            </tr>
+        </table>
+        <br><br>
+        <input type="submit" class="button" value="Save changes"/>
+    </form>
 </div>
 {% endblock %}

@@ -90,6 +90,8 @@ def relative_time(ts):
 
 def markdown_to_html(text):
     """Convert markdown to html."""
+    if type(text) is not str:
+        return '<p></p>'
     return markdown(text, ['codehilite'])
 
 
@@ -167,6 +169,8 @@ def cut(text, length, add_elipses=True):
     :param add_elipses: if True, append ``...`` to the end, if the 
                         number of chars in text exceeded length.
     """
+    if type(text) is not str:
+        return ''
     if len(text) <= length:
         return text
     elif add_elipses:

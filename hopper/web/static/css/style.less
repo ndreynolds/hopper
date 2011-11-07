@@ -196,14 +196,13 @@ div#new a {
 }
 
 div.issue-header {
-    .gradient();
     .rounded-corners-top();
+    .gradient(#ddd, #ccc);
     width:@default-width;
-    text-shadow: 0 1px 1px #333;
-    font-size:105%;
-    color:#fff;
+    height:20px;
     padding:10px;
-    border:1px solid #666;
+    border:1px solid #bbb;
+    text-shadow:0 1px 1px #fff;
 }
     
 div#comment-form {
@@ -374,9 +373,10 @@ textarea#content {
 }
 
 .green {
-    .gradient(#62C462, #57A957);
+    border:1px solid darken(@hopper-green, 5%);
+    background-color: lighten(@hopper-green, 20%); 
     border:1px solid #5F8A42;
-    text-shadow:0 -1px 0 rgba(0, 0, 0, 0.25);
+    text-shadow:0 1px 1px #555;
 }
 
 .gray {
@@ -393,11 +393,9 @@ textarea#content {
 }
 
 .red {
-    .gradient(#EE5F5B, #C43C35);
-    border:1px solid #850003;
-    border-color:rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-    color:#fff;
-    text-shadow:0 -1px 0 rgba(0, 0, 0, 0.25);
+    background-color:#EE5F5B;
+    border:1px solid darken(#EE5F5B, 25%);
+    text-shadow:0 1px 1px #555;
 }
 
 div#options-wrapper {
@@ -471,6 +469,26 @@ div.issue {
     padding:10px;
 }
 
+div.comment-event {
+    .rounded-corners-bottom();
+}
+
+div.comment-event span#closed {
+    background-color:#EE5F5B;
+    color:white;
+    text-shadow:0 1px 1px #666;
+    .rounded-corners(3px);
+    padding:3px;
+}
+
+div.comment-event span#opened, div.issue-header span#opened {
+    background-color:lighten(@hopper-green, 20%); 
+    color:white;
+    text-shadow:0 1px 1px #666;
+    .rounded-corners(3px);
+    padding:3px;
+}
+
 div.comment-header {
     .rounded-corners-top();
     .gradient(#ddd, #ccc);
@@ -481,30 +499,17 @@ div.comment-header {
     text-shadow:0 1px 1px #fff;
 }
 
-div.comment-header span#author {
+div.comment-header span#author, div.issue-header span#author {
     font-weight:bold;
     color:#444;
 }
 
-div.comment-header span#email {
+div.comment-header span#email, div.issue-header span#email {
 }
         
-div.comment-header span#time {
+div.comment-header span#time, div.issue-header span#time {
     font-weight:bold;
     color:#444;
-}
-
-div.issue-header span#author {
-    font-weight:bold;
-    color:#eee;
-}
-
-div.issue-header span#email {
-}
-        
-div.issue-header span#time {
-    font-weight:bold;
-    color:#eee;
 }
 
 div.issue span#title, div.comment span#title {

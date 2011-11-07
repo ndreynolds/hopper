@@ -165,8 +165,14 @@ def close(id):
     issue = tracker.issue(id)
     if issue:
         issue.status = 'closed'
-        if not issue.save():
-            flash('Could not close the issue')
+        comment = Comment(issue)
+        comment.event = True
+        comment.event_data = 'closed'
+        comment.author = config.user
+        comment.save()
+        issue.save()
+        tracker.autocommit('Closed issue %s/%s' % (issue.id[:6], comment.id[:6]),
+                           config.user)
         return redirect(url_for('issues.view', id=issue.id))
 
 
@@ -181,8 +187,14 @@ def open(id):
     issue = tracker.issue(id)
     if issue:
         issue.status = 'open'
-        if not issue.save():
-            flash('Could not reopen the issue')
+        comment = Comment(issue)
+        comment.event = True
+        comment.event_data = 'opened'
+        comment.author = config.user
+        comment.save()
+        issue.save()
+        tracker.autocommit('Re-opened issue %s/%s' % (issue.id[:6], comment.id[:6]),
+                           config.user)
         return redirect(url_for('issues.view', id=issue.id))
 
 

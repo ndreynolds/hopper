@@ -142,21 +142,20 @@ div#new a {
   text-decoration: none;
 }
 div.issue-header {
-  background-image: -webkit-linear-gradient(top, #999999, #777777);
-  background-image: -moz-linear-gradient(top, #999999, #777777);
-  background-image: -ms-linear-gradient(top, #999999, #777777);
-  background-image: -o-linear-gradient(top, #999999, #777777);
-  background-image: linear-gradient(top, #999999, #777777);
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   -webkit-top-left-border-radius: 5px;
   -webkit-top-right-border-radius: 5px;
+  background-image: -webkit-linear-gradient(top, #dddddd, #cccccc);
+  background-image: -moz-linear-gradient(top, #dddddd, #cccccc);
+  background-image: -ms-linear-gradient(top, #dddddd, #cccccc);
+  background-image: -o-linear-gradient(top, #dddddd, #cccccc);
+  background-image: linear-gradient(top, #dddddd, #cccccc);
   width: 700px;
-  text-shadow: 0 1px 1px #333;
-  font-size: 105%;
-  color: #fff;
+  height: 20px;
   padding: 10px;
-  border: 1px solid #666;
+  border: 1px solid #bbb;
+  text-shadow: 0 1px 1px #fff;
 }
 div#comment-form {
   width: 722px;
@@ -310,13 +309,10 @@ textarea#content {
   cursor: pointer;
 }
 .green {
-  background-image: -webkit-linear-gradient(top, #62c462, #57a957);
-  background-image: -moz-linear-gradient(top, #62c462, #57a957);
-  background-image: -ms-linear-gradient(top, #62c462, #57a957);
-  background-image: -o-linear-gradient(top, #62c462, #57a957);
-  background-image: linear-gradient(top, #62c462, #57a957);
+  border: 1px solid #53793a;
+  background-color: #92bd75;
   border: 1px solid #5F8A42;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  text-shadow: 0 1px 1px #555;
 }
 .gray {
   border-radius: 4px;
@@ -340,15 +336,9 @@ textarea#content {
   cursor: pointer;
 }
 .red {
-  background-image: -webkit-linear-gradient(top, #ee5f5b, #c43c35);
-  background-image: -moz-linear-gradient(top, #ee5f5b, #c43c35);
-  background-image: -ms-linear-gradient(top, #ee5f5b, #c43c35);
-  background-image: -o-linear-gradient(top, #ee5f5b, #c43c35);
-  background-image: linear-gradient(top, #ee5f5b, #c43c35);
-  border: 1px solid #850003;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-  color: #fff;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #EE5F5B;
+  border: 1px solid #b71713;
+  text-shadow: 0 1px 1px #555;
 }
 div#options-wrapper {
   padding: 10px;
@@ -441,6 +431,30 @@ div.issue {
   border-top: none;
   padding: 10px;
 }
+div.comment-event {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  -webkit-bottom-left-border-radius: 5px;
+  -webkit-bottom-right-border-radius: 5px;
+}
+div.comment-event span#closed {
+  background-color: #EE5F5B;
+  color: white;
+  text-shadow: 0 1px 1px #666;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  padding: 3px;
+}
+div.comment-event span#opened, div.issue-header span#opened {
+  background-color: #92bd75;
+  color: white;
+  text-shadow: 0 1px 1px #666;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  padding: 3px;
+}
 div.comment-header {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
@@ -457,21 +471,13 @@ div.comment-header {
   border: 1px solid #bbb;
   text-shadow: 0 1px 1px #fff;
 }
-div.comment-header span#author {
+div.comment-header span#author, div.issue-header span#author {
   font-weight: bold;
   color: #444;
 }
-div.comment-header span#time {
+div.comment-header span#time, div.issue-header span#time {
   font-weight: bold;
   color: #444;
-}
-div.issue-header span#author {
-  font-weight: bold;
-  color: #eee;
-}
-div.issue-header span#time {
-  font-weight: bold;
-  color: #eee;
 }
 div.issue span#title, div.comment span#title {
   font-size: 120%;

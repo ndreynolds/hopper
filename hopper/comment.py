@@ -16,10 +16,11 @@ class Comment(JSONFile):
                   'email' : None,
                   'avatar': None
                   },
-              'content'  : None,
-              'timestamp': None,
-              'id'       : None,
-              'event'    : False
+              'content'   : None,
+              'timestamp' : None,
+              'id'        : None,
+              'event'     : False,
+              'event_data': None,
               }
         self.issue = issue
         if id is not None:

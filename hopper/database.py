@@ -89,7 +89,8 @@ class Database(object):
         comments = issue.comments()
         # comments just need to be searchable, we're not going to be 
         # retrieving them from this table.
-        comment_data = ''.join(c.content for c in comments)
+        comment_data = ''.join(c.content for c in comments if c.content 
+                               is not None)
         ins.execute(id=issue.id,
                     title=issue.title,
                     status=issue.status,
@@ -116,7 +117,8 @@ class Database(object):
         issue_dicts = []
         for i in issues:
             comments = i.comments()
-            comment_data = ''.join(c.content for c in comments)
+            comment_data = ''.join(c.content for c in comments if c.content
+                                   is not None)
             issue_dicts.append({
                                 'id': i.id,
                                 'title': i.title,
