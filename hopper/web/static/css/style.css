@@ -156,6 +156,7 @@ div.issue-header {
   padding: 10px;
   border: 1px solid #bbb;
   text-shadow: 0 1px 1px #fff;
+  line-height: 23px;
 }
 div#comment-form {
   width: 722px;
@@ -439,6 +440,7 @@ div.comment-event {
 }
 div.comment-event span#closed {
   background-color: #EE5F5B;
+  border: 1px solid #b71713;
   color: white;
   text-shadow: 0 1px 1px #666;
   border-radius: 3px;
@@ -446,8 +448,9 @@ div.comment-event span#closed {
   -moz-border-radius: 3px;
   padding: 3px;
 }
-div.comment-event span#opened, div.issue-header span#opened {
+span#opened {
   background-color: #92bd75;
+  border: 1px solid #53793a;
   color: white;
   text-shadow: 0 1px 1px #666;
   border-radius: 3px;
@@ -470,6 +473,7 @@ div.comment-header {
   padding: 10px;
   border: 1px solid #bbb;
   text-shadow: 0 1px 1px #fff;
+  line-height: 23px;
 }
 div.comment-header span#author, div.issue-header span#author {
   font-weight: bold;

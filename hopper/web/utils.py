@@ -1,3 +1,9 @@
+"""
+  hopper.web.utils
+  ================
+  Utility functions for web views.
+"""
+
 from flask import flash, request, current_app
 import string
 
@@ -44,3 +50,42 @@ def looks_hashy(text):
     :param text: a string
     """
     return all(ch in string.hexdigits for ch in text) and len(text) < 40
+
+
+def pager(page, num_pages):
+    """
+    Generates a list of pages to link to based on the current page
+    and the total number of pages.
+
+    :param page: current page number
+    :param num_pages: number of pages
+
+    For example, if page=1 and there are at least 8 pages, it will 
+    return [1,2,3,4,5,6,7,8].
+    """
+    print num_pages
+    if page == 1:
+        pages = [p for p in range(1, page + 6) if p in 
+                 range(1, num_pages + 1)]
+    else:
+        pages = [p for p in range(page - 3, page + 4) if p in 
+                 range(1, num_pages + 1)]
+    if not num_pages - 1 in pages:
+        pages += [False, num_pages - 1, num_pages]
+    if not 2 in pages: 
+        pages = [1, 2, False] + pages
+    return pages
+
+
+def highlight(text, keyword):
+    """
+    Surround instances of keyword in text with the surround tuple.
+    Just replaces all instances with the entire concatenated string.
+
+    :param text: string of text perform highlights within.
+    :param keyword: string to highlight.
+    :param surround: tuple containing the two strings to surround the 
+                     keyword with.
+    """
+    return text.replace(keyword, '<span class="highlighted">' + keyword + 
+                        '</span>')
