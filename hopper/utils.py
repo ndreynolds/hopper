@@ -21,7 +21,7 @@ def to_json(data, indent=4):
     """
     # Main purpose here is to avoid doing the json module conditional
     # logic in every script that uses it.
-    return json.dumps(data, indent)
+    return json.dumps(data, indent=indent)
 
 
 def from_json(data):
@@ -90,7 +90,7 @@ def relative_time(ts):
 
 def markdown_to_html(text):
     """Convert markdown to html."""
-    if type(text) is not str:
+    if type(text) not in [str, unicode]:
         return '<p></p>'
     return markdown(text, ['codehilite'])
 
@@ -169,7 +169,7 @@ def cut(text, length, add_elipses=True):
     :param add_elipses: if True, append ``...`` to the end, if the 
                         number of chars in text exceeded length.
     """
-    if type(text) is not str:
+    if type(text) not in [str, unicode]:
         return ''
     if len(text) <= length:
         return text

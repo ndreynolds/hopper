@@ -71,7 +71,7 @@ class JSONFile(BaseFile):
         if not type(self.fields) is dict:
             raise TypeError('self.fields must be a dict')
         with lock(f, 'w') as fp:
-            fp.write(to_json(self.fields))
+            fp.write(to_json(self.fields, indent=4))
         return True
 
 
