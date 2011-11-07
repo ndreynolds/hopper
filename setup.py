@@ -18,7 +18,8 @@ setup(name='Hopper',
                         'pygments', 
                         'dulwich', 
                         'configobj',
-                        'docutils'],
+                        'docutils',
+                        'sqlalchemy'],
       entry_points={
           'console_scripts': [
               'hpr = hopper.hpr.hpr:main'
