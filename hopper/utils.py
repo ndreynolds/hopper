@@ -12,7 +12,7 @@ from markdown import markdown
 from docutils import core
 from docutils.writers.html4css1 import Writer, HTMLTranslator
 
-def to_json(data):
+def to_json(data, indent=4):
     """
     Returns sorted & indented JSON from the best json module available.
 
@@ -21,7 +21,7 @@ def to_json(data):
     """
     # Main purpose here is to avoid doing the json module conditional
     # logic in every script that uses it.
-    return json.dumps(data, indent=4)
+    return json.dumps(data, indent)
 
 
 def from_json(data):

@@ -83,8 +83,11 @@ class Tracker(object):
             with open(os.path.join(paths['docs'], p), 'w') as fp:
                 fp.write(data)
 
+        # init the class
+        tracker = cls(path)
+
         # set the config
-        config = TrackerConfig(cls(path))
+        config = TrackerConfig(tracker)
         config.name = os.path.basename(path).capitalize()
         config.save()
 
@@ -94,13 +97,13 @@ class Tracker(object):
                     message='Created the %s tracker' % config.name)
 
         # instantiate and return our new Tracker.
-        return cls(path)
+        return tracker
 
     def autocommit(self, message, author=None):
         """
         Commit any changes to the repo. In most scenarios, the user
         responsible for the change(s) would be listed as the commit 
-        author, and Hopper would be the committer.  
+        author, and Hopper would be the committer.
 
         :param msg: the commit message to use.
         :param author: the commit's author in string or dictionary
@@ -190,7 +193,7 @@ class Tracker(object):
         query = Query(self)
         return query.select(limit=20, offset=None)
 
-    def history(self, n=10, all=False):
+    def history(self, n=10, offset=0, all=False):
         """
         Return a list of dictionaries containing the action and the actor.
         These are assembled from the Git repository's commit log.
@@ -199,8 +202,13 @@ class Tracker(object):
         :param all: ignore n and return everything.
         """
         if all:
-            return self.repo.commits()
-        return self.repo.commits()[:n]
+            commits = self.repo.commits(n=1000)
+        else:
+            commits = self.repo.commits(n=n)
+        if len(commits) > offset:
+            return commits[offset:]
+        else:
+            return []
 
     def get_issue_path(self, sha):
         """

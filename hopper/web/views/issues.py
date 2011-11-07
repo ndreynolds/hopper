@@ -33,8 +33,8 @@ def index(status='open'):
 
     # run our query
     issues_ = tracker.query().select(limit=per_page, offset=offset, 
-                                    status=status, order_by=order, 
-                                    reverse=reverse, label=label)
+                                     status=status, order_by=order, 
+                                     reverse=reverse, label=label)
     # humanize the timestamps
     map_attr(issues_, 'updated', relative_time)
     map_attr(issues_, 'created', relative_time)

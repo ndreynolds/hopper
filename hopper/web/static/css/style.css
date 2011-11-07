@@ -20,10 +20,12 @@
   margin-left: auto;
   margin-right: auto;
 }
+.centered-text {
+  text-align: center;
+}
 .highlighted {
   background-color: #FFFAA8;
   border: 1px solid #FFF778;
-  padding: 1px;
 }
 .clear {
   clear: both;
@@ -111,7 +113,10 @@ div#menu {
   background-image: -ms-linear-gradient(top, #999999, #777777);
   background-image: -o-linear-gradient(top, #999999, #777777);
   background-image: linear-gradient(top, #999999, #777777);
-  margin: -20px;
+  margin: -21px;
+  margin-top: -20px;
+  border: 1px solid #666;
+  border-top: none;
   margin-bottom: 20px;
   text-shadow: 0 1px 1px #444;
   font-size: 105%;
@@ -168,6 +173,8 @@ div.page {
   margin-top: 0px;
   background-color: white;
   padding: 20px;
+  border: 1px solid #999;
+  border-top: none;
 }
 div.page a {
   color: #5F8A42;
@@ -254,7 +261,7 @@ th a {
   text-decoration: none;
 }
 tr.content:nth-child(even) {
-  background-color: #eee;
+  background-color: #f3f3f3;
 }
 textarea {
   padding: 5px;
@@ -346,8 +353,7 @@ textarea#content {
 div#options-wrapper {
   padding: 10px;
   background-color: #eee;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 input[type=submit] {
   border-radius: 4px;
@@ -657,6 +663,9 @@ span.hq {
   vertical-align: super;
   font-weight: bold;
 }
+div#paging {
+  float: right;
+}
 div#paging a {
   text-decoration: none;
   color: #5f8a42;
@@ -791,4 +800,13 @@ div.doc {
   border: 1px solid #ddd;
   border-top: none;
   padding: 10px;
+}
+a.action-link {
+  font-weight: bold;
+  text-decoration: none;
+  color: #444 !important;
+}
+a.action-link:hover {
+  text-decoration: underline;
+  cursor: pointer;
 }

@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% block body %}
+<script type="text/javascript" 
+    src="{{ url_for('static', filename='js/feed.js') }}"></script>
 <div class="issue-sidebar">
     <div class="issue-sidebar-heading">
         Stats
@@ -38,10 +40,13 @@
         <li>
         <span id="author">{{ item['user']['name'] }}</span>
         ({{ item['user']['email'] }})
-        <span id="author">{{ item['message'] }}</span>
         {% if item['link'] %}
+            <a class="action-link"
+                href="{{ item['link'] }}">{{ item['message'] }}</a>&nbsp;
             <a class="fancy-monospace" 
                 href="{{ item['link'] }}">{{ item['button'] }}</a>
+        {% else %}
+        <span id="author">{{ item['message'] }}</span>
         {% endif %}
         &nbsp;
         <span id="time">{{ item['time'] }} ↲</span>
@@ -57,6 +62,9 @@
         </li>
     {% endfor %}
     </ul>
+    {% if more_history %}
+    <div id="load-stories" class="button gray centered-text">Load more stories</div>
+    {% endif %}
     <div class="clear"></div>
 </div>
 {% endblock %}

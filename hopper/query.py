@@ -31,6 +31,9 @@ class Query(object):
         :param reverse: results are returned in ascending order if True, 
                         descending if False.
         """ 
+        if order_by == 'updated' or order_by == 'created':
+            # Time is stored as float, so they sort in reverse of what we want.
+            reverse = not reverse
         if self.has_db:
             order = asc if reverse else desc
             query = self.db.select(order_by=order(order_by), limit=limit, offset=offset)
@@ -39,6 +42,7 @@ class Query(object):
                 query = query.where(self.table.c.labels.like('%' + label + '%'))
             rows = query.execute()
             issues = [Issue(self.tracker, r['id']) for r in rows]
+            print query
         else:
             issues = [Issue(self.tracker, sha) for sha in self.tracker._get_issue_shas()]
             issues.sort(key=lambda x: getattr(x, order_by), reverse=reverse)
@@ -60,11 +64,10 @@ class Query(object):
         """
         if self.has_db:
             sstr = '%' + sstr + '%'
-            rows = self.db.conn.execute("""
-                                        SELECT * FROM issues WHERE
-                                           title    LIKE ? OR
-                                           content  LIKE ? OR
-                                           comments LIKE ?
+            rows = self.db.conn.execute("""SELECT * FROM issues WHERE
+                                               title    LIKE ? OR
+                                               content  LIKE ? OR
+                                               comments LIKE ?
                                         """, (sstr, sstr, sstr))
             rows = rows.fetchmany(n)
             return [Issue(self.tracker, r['id']) for r in rows]

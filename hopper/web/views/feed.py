@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, url_for
+from flask import Blueprint, render_template, url_for, request
 
-from hopper.web.utils import setup, looks_hashy
+from hopper.web.utils import setup, looks_hashy, to_json
 from hopper.utils import relative_time, cut, strip_email
 from hopper.errors import BadReference
 from hopper.comment import Comment
@@ -11,8 +11,18 @@ feed = Blueprint('feed', __name__)
 @feed.route('/')
 def main():
     tracker, config = setup()
-    header = 'Recent Activity for %s' % tracker.config.name
-    raw_history = tracker.history(20)
+
+    # get the offset param (intended for javascript requests)
+    offset = int(request.args.get('offset', 0))
+
+    # Get up to 20 commits starting at whatever offset.
+    raw_history = tracker.history(n=offset+20, offset=offset)
+
+    # Don't want the performance hit of checking how many commits there are.
+    # Instead, we're guessing that there's more if we get a full 20 in the 
+    # first batch. 
+    more_history = False if len(raw_history) < 20 else True
+
     # get the unique set of authors (in this history segment)
     users = set(strip_email(c.author) for c in raw_history)
     docs = tracker.docs()
@@ -37,7 +47,7 @@ def main():
             button = obj.id[:6]
 
         history.append({'user': {'name': name, 'email': email},
-                        'message': message,
+                        'message': message.strip(),
                         'time': time,
                         'link': link,
                         'button': button,
@@ -45,6 +55,13 @@ def main():
                         'snippet': snippet
                         }
                        )
+    # If the request is async, we're all set.
+    if request.is_xhr:
+        return to_json(history)
+
+    # Otherwise, we have to get some more info.
+
+    header = 'Recent Activity for %s' % tracker.config.name
     # Issue counts
     n_open = tracker.query().count('open')
     n_closed = tracker.query().count('closed')
@@ -61,7 +78,8 @@ def main():
                            tracker=tracker, users=users,
                            docs=docs, n_open=n_open, 
                            n_closed=n_closed, n_total=n_total,
-                           g_open=g_open, g_closed=g_closed)
+                           g_open=g_open, g_closed=g_closed,
+                           more_history=more_history)
 
 @feed.route('/members')
 def members():
@@ -84,11 +102,15 @@ def interpret(message, tracker):
     if looks_hashy(last13[:6]) and looks_hashy(last13[7:]):
         issue_id = last13[:6]
         comment_id = last13[7:]
-        issue = Issue(tracker, issue_id)
-        redacted = message[:-13]
-        return redacted, Comment(issue, comment_id)
+        try:
+            issue = Issue(tracker, issue_id)
+            redacted = message[:-13]
+            return redacted, Comment(issue, comment_id)
+        except BadReference:
+            pass
     elif looks_hashy(last6):
         try:
+            issue = Issue(tracker, last6)
             redacted = message[:-6]
             return redacted, Issue(tracker, last6)
         except BadReference:

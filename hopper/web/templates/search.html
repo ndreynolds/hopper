@@ -14,6 +14,9 @@
             </div>
         </li>
     {% endfor %}
+    {% if not issues_|length %}
+        <li>Sorry, no issues matched your query.</li>
+    {% endif %}
     </ul>
 </div>
 {% endblock %}
