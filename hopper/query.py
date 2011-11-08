@@ -42,7 +42,6 @@ class Query(object):
                 query = query.where(self.table.c.labels.like('%' + label + '%'))
             rows = query.execute()
             issues = [Issue(self.tracker, r['id']) for r in rows]
-            print query
         else:
             issues = [Issue(self.tracker, sha) for sha in self.tracker._get_issue_shas()]
             issues.sort(key=lambda x: getattr(x, order_by), reverse=reverse)

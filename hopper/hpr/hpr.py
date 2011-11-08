@@ -9,6 +9,7 @@ from hopper.config import UserConfig
 from hopper.hpr.templates import Template, IssueTemplate
 from hopper.utils import relative_time, wrap
 from hopper.errors import AmbiguousReference, BadReference
+from hopper.query import Query
 
 
 ### Utilities
@@ -70,6 +71,8 @@ def main(args=sys.argv[1:]):
             help='List the (filtered) set of issues')
     listp.add_argument('-s', '--short', action='store_true', 
             help='display each issue in one line')
+    listp.add_argument('-o', '--order', action='store', 
+            help='order by the given attribute')
     listp.set_defaults(func=list_)
 
     # `new` subcommand
@@ -237,7 +240,10 @@ def list_(args):
     """List the tracker's issues (filtered by criteria)"""
     t = args['tracker']
     c = UserConfig()
-    issues = t.issues()
+    query = Query(t)
+    args.setdefault('order', 'updated')
+    args.setdefault('status', 'open')
+    issues = query.select(order_by=args['order'], status=args['status'])
     # short mode
     if args['short']:
         for i in issues:
