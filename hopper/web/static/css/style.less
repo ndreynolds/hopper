@@ -322,6 +322,7 @@ th a {
 
 tr.content:nth-child(even) {
     background-color:#f3f3f3;
+    border:1px solid #eeeeee;
 }
 
 textarea {
@@ -547,6 +548,7 @@ div.codehilite {
     background-color:#002b36;
     overflow:auto;
     font-family: Menlo, Andale Mono, DejaVu, monospace;
+    .rounded-corners(3px);
 }
 
 div.comment > div.codehilite, div.issue > div.codehilite {
@@ -863,3 +865,23 @@ a.action-link:hover {
     text-decoration:underline;
     cursor:pointer;
 }
+
+a.doc-item {
+    display:inline-block;
+    margin-left:-15px;
+    margin-right:-15px;
+    text-decoration:none;
+    padding:10px;
+    padding-left:15px;
+    width:194px;
+}
+
+a.doc-item.selected {
+    background-color: #dcdcdc;
+    border:1px solid #ccc;
+    color:#444;
+    border-left:none;
+    border-right:none;
+    text-shadow: 0 1px 1px #fff;
+}
+    
