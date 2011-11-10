@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% block body %}
+<script type="text/javascript" 
+    src="{{ url_for('static', filename='js/docs.js') }}"></script>
 <div class="issue-sidebar" style="float:left">
     <div class="issue-sidebar-heading">
         Docs
@@ -18,8 +20,13 @@
 </div>
 <div class="doc-header">
     <span class="monospace">{{ doc.link + doc.ext }}</span>
+    <div class="button small-button gray" id="edit-button"
+        style="float:right; position:relative; bottom:6px;">Edit</div>
 </div>
 <div class="doc">
     {{ converted|safe }}
+</div>
+<div class="markdown" style="display:none">
+    {{ markdown }}
 </div>
 {% endblock %}

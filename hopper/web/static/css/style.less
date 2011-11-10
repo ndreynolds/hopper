@@ -375,9 +375,14 @@ textarea#content {
 }
 
 .green {
-    border:1px solid darken(@hopper-green, 5%);
     background-color: lighten(@hopper-green, 20%); 
     border:1px solid #5F8A42;
+    text-shadow:0 1px 1px #555;
+}
+
+.blue {
+    border:1px solid darken(#073642, 5%);
+    background-color: #073642;
     text-shadow:0 1px 1px #555;
 }
 
@@ -398,6 +403,10 @@ textarea#content {
     background-color:#EE5F5B;
     border:1px solid darken(#EE5F5B, 25%);
     text-shadow:0 1px 1px #555;
+}
+
+.red:hover {
+    background-color:darken(#EE5F5B, 5%);
 }
 
 div#options-wrapper {
@@ -884,4 +893,7 @@ a.doc-item.selected {
     border-right:none;
     text-shadow: 0 1px 1px #fff;
 }
-    
+
+.doc #edit-field {
+    height:50%;
+}

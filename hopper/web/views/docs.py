@@ -14,11 +14,13 @@ def main(name=None):
         try:
             doc = tracker.doc(name)
             converted = doc.read(convert=True)
+            markdown = doc.read()
         except OSError:
             abort(404)
     else:
         doc = docs[0]
         converted = doc.read(convert=True)
+        markdown = doc.read()
     return render_template('docs.html', tracker=tracker, docs=docs,
-                           doc=doc, converted=converted, selected='docs', 
-                           header=header)
+                           doc=doc, markdown=markdown, converted=converted, 
+                           selected='docs', header=header)

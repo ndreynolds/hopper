@@ -58,6 +58,10 @@
             {% endif %}
             {{ item['snippet']|safe }}
         </div>
+        {% elif item['title'] %}
+        <div class="snippet">
+            <span id="title">{{ item['title'] }}</span>
+        </div>
         {% endif %}
         </li>
     {% endfor %}
