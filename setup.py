@@ -19,6 +19,7 @@ setup(name='Hopper',
                         'dulwich', 
                         'configobj',
                         'docutils',
+                        'flask',
                         'sqlalchemy'],
       entry_points={
           'console_scripts': [
