@@ -49,8 +49,9 @@
         <span id="author">{{ item['message'] }}</span>
         {% endif %}
         &nbsp;
-        <span id="time">{{ item['time'] }} ↲</span>
+        <span id="time">{{ item['time'] }}</span>
         {% if item['snippet'] %}
+        ↴
         <div class="snippet">
             {% if item['title'] %}
             <span id="title">{{ item['title'] }}</span>
