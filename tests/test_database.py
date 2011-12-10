@@ -2,38 +2,11 @@ import unittest
 import os
 
 from env import TestEnv
-from hopper.tracker import Tracker
-from hopper.database import SQLiteIssueDatabase, IssueQuery
+from hopper.database import Database
 from hopper.issue import Issue
 from sqlalchemy.sql import Select
 
-class IssueQueryTest(unittest.TestCase):
-    '''Tests the `IssueQuery` class.'''
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    def test__get_issue_shas(self):
-        '''Tests the `_get_issue_shas` method'''
-        pass
-
-    def test_count(self):
-        '''Tests the `count` method'''
-        pass
-
-    def test_search(self):
-        '''Tests the `search` method'''
-        pass
-
-    def test_select(self):
-        '''Tests the `select` method'''
-        pass
-
-
-class SQLiteIssueDatabaseTest(unittest.TestCase):
+class DatabaseTest(unittest.TestCase):
     '''Tests the `SQLiteIssueDatabase` class.'''
 
     def setUp(self):
@@ -48,12 +21,12 @@ class SQLiteIssueDatabaseTest(unittest.TestCase):
                             'cache', 'tracker.db')
 
         # Init a database when one does not exist:
-        db1 = SQLiteIssueDatabase(self.env.tracker)
+        db1 = Database(self.env.tracker)
         assert os.path.exists(path)
         assert db1.conn
 
         # Init a database when one already exists:
-        db2 = SQLiteIssueDatabase(self.env.tracker)
+        db2 = Database(self.env.tracker)
         assert os.path.exists(path)
         assert db2.conn
 
@@ -79,7 +52,7 @@ class SQLiteIssueDatabaseTest(unittest.TestCase):
 
     def test_insert(self):
         '''Tests the `insert` method'''
-        db = SQLiteIssueDatabase(self.env.tracker)
+        db = Database(self.env.tracker)
         # make and insert the issue
         issue1 = Issue(self.env.tracker)
         issue1.content = 'test'
@@ -93,7 +66,7 @@ class SQLiteIssueDatabaseTest(unittest.TestCase):
 
     def test_insert_many(self):
         '''Tests the `insert_many` method'''
-        db = SQLiteIssueDatabase(self.env.tracker)
+        db = Database(self.env.tracker)
         issues = []
         for i in range(20):
             issue = Issue(self.env.tracker)
@@ -107,7 +80,7 @@ class SQLiteIssueDatabaseTest(unittest.TestCase):
 
     def test_select(self):
         '''Tests the `select` method'''
-        db = SQLiteIssueDatabase(self.env.tracker)
+        db = Database(self.env.tracker)
         # should just return an sqlalchemy.sql.Select object.
         assert type(db.select()) is Select
 

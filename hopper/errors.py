@@ -5,3 +5,7 @@ class BadReference(Exception):
 class AmbiguousReference(Exception):
     """Multiple objects match the identifier."""
     pass
+
+class MailConfigError(Exception):
+    """Not configured to send email."""
+    pass

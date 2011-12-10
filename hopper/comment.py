@@ -10,6 +10,12 @@ class Comment(JSONFile):
     """Represents an issue's comment."""
     
     def __init__(self, issue, id=None, **kwargs):
+        """
+        Constructor
+
+        :param issue: Issue being commented on.
+        :param id: id of an existing comment. 
+        """
         self.fields = {
               'author'   : {
                   'name'  : None,
@@ -68,5 +74,4 @@ class Comment(JSONFile):
             raise AmbiguousReference('Multiple comments matched that id fragment')
         # one match, return the match
         match_id = os.path.basename(matches[0])
-        print match_id
         return match_id
