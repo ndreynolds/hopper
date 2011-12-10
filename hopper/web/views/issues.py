@@ -3,8 +3,8 @@ from flask import Blueprint, request, redirect, url_for, render_template, \
 from hopper.issue import Issue
 from hopper.comment import Comment
 from hopper.utils import relative_time, markdown_to_html, map_attr
-
 from hopper.web.utils import setup, to_json, pager, highlight
+
 
 issues = Blueprint('issues', __name__)
 
@@ -155,11 +155,13 @@ def settings():
 
 
 @issues.route('/action/close/<id>')
-def close(id):
+def close(id, redirect_after=True):
     """
     Close an issue.
 
-    :param id:
+    :param id: issue id
+    :param redirect_after: return a redirect. This happens by default, but turning
+                           it off may be desirable for async requests.
     """
     tracker, config = setup()
     issue = tracker.issue(id)
@@ -173,15 +175,21 @@ def close(id):
         issue.save()
         tracker.autocommit('Closed issue %s/%s' % (issue.id[:6], comment.id[:6]),
                            config.user)
-        return redirect(url_for('issues.view', id=issue.id))
+        if redirect_after:
+            return redirect(url_for('issues.view', id=issue.id))
+        else:
+            return True
+    return False
 
 
 @issues.route('/action/open/<id>')
-def open(id):
+def open(id, redirect_after=True):
     """
     Open an issue.
 
-    :param id:
+    :param id: issue id
+    :param redirect_after: return a redirect. This happens by default, but turning
+                           it off may be desirable for async requests.
     """
     tracker, config = setup()
     issue = tracker.issue(id)
@@ -195,4 +203,8 @@ def open(id):
         issue.save()
         tracker.autocommit('Re-opened issue %s/%s' % (issue.id[:6], comment.id[:6]),
                            config.user)
-        return redirect(url_for('issues.view', id=issue.id))
+        if redirect_after:
+            return redirect(url_for('issues.view', id=issue.id))
+        else:
+            return True
+    return False

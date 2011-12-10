@@ -11,6 +11,7 @@ $(function() {
     return $('.markdown').html(mdown);
   });
   return $('#save-button').live('click', function() {
-    return alert('you clicked save');
+    var edited;
+    return edited = $('.doc').html();
   });
 });

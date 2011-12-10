@@ -157,41 +157,22 @@ class Tracker(object):
         """
         return Issue(self, sha)
 
-    def issues(self, n=None, offset=0, sort_by='updated', reverse=True, 
-               return_num=False, conditions=None):
+    def issues(self, **kwargs):
         """
-        Return a list of n Issue objects filtered by conditions.
+        Return issues, with options to limit, offset, sort, and filter the result set.
 
-        :param n: the number of issues to return. (returns all by default)
-        :param offset: apply an offset to the return. If n=20 and offset=40,
-                       issues 40-59 would be returned, assuming they exist.
-                       (The first issue is 0, that's why we're not getting 41-60.)
-                       This parameter was added with paging in mind.
-        :param sort_by: an attribute to sort the issues by (e.g. title). By
-                        default it will sort by 'updated', which will contain
-                        the last-modified (or created) timestamp.
-        :param reverse: return the sorted issues in reverse order.
-        :param return_num: instead of only the list, return a tuple containing 
-                           the list of issues and the total number of issues 
-                           after filtering.
-        :param conditions: a dictionary of keys that correspond to Issue
-                           attributes and their required values. 
-        Example:
-        
-        Retrieve the last 12 (or fewer) issues.
-          >>> issues = tracker.issues(n=12)
-          [<issue.Issue object>, ...]
-          >>> len(issues) <= 12
-          True
-          >>> issues[0].title
-          'Some Issue' 
+        This method is a handoff to Query.select(), here for convenience. Both methods
+        take the same paramters.
 
-        The conditions parameter allows for very basic (x == y) filtering. 
-        The Filter class has some more advanced methods. They can be used 
-        on the return list. 
+        :param order_by: order the results by this column.
+        :param status: return results with this status.
+        :param limit: maximum number of results to return.
+        :param offset: skip the first n-results. 
+        :param reverse: results are returned in ascending order if True, 
+                        descending if False.
         """
         query = Query(self)
-        return query.select(limit=20, offset=None)
+        return query.select(**kwargs)
 
     def history(self, n=10, offset=0, all=False):
         """

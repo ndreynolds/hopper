@@ -17,4 +17,4 @@ $ ->
         $('.markdown').html(mdown)
 
     $('#save-button').live 'click', ->
-        alert 'you clicked save'
+        edited = $('.doc').html()
