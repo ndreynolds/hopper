@@ -17,4 +17,22 @@ $ ->
         $('.markdown').html(mdown)
 
     $('#save-button').live 'click', ->
-        edited = $('.doc').html()
+        $doc = $('.doc')
+        $markdown = $('.markdown')
+        edited = $('#edit-field').val()
+        name = $doc.attr('name')
+        converter = new Showdown.converter()
+        $.ajax 
+            type: 'POST'
+            url: "/api/docs/#{name}/edit"
+            data: 
+                edited: edited
+            dataType: 'json'
+            success: (data) ->
+                if data.success
+                    $markdown.html edited
+                    $doc.html converter.makeHtml edited
+                else
+                    alert 'An error occurred, please try again.'
+                    $doc.html $markdown.html
+                    $markdown.html edited

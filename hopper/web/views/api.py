@@ -1,12 +1,14 @@
 """Handles all the API calls. Each function returns JSON."""
 
-from flask import Blueprint
+from flask import Blueprint, request
 from hopper.web.utils import setup, to_json
 import hopper.web.views.issues as issue_view
 
 
 api = Blueprint('api', __name__)
 
+
+### /issues/*
 
 @api.route('/issues/open')
 def open_issues():
@@ -90,5 +92,49 @@ def open_issue(id):
     """
     success = False
     if issue_view.open(id, redirect_after=False):
+        success = True
+    return to_json({'success': success})
+
+
+### /docs/* 
+
+@api.route('/docs/<doc>')
+def doc(doc):
+    """
+    Returns the given doc as html.
+
+    :param doc: name of the doc.
+    """
+    tracker, config = setup()
+    doc = tracker.doc(doc)
+    return to_json({'content': doc.read(convert=True)})
+
+
+@api.route('/docs/<doc>/raw')
+def doc_raw(doc):
+    """
+    Returns the given doc in raw form.
+
+    :param doc: name of the doc.
+    """
+    tracker, config = setup()
+    doc = tracker.doc(doc)
+    return to_json({'content': doc.read()})
+
+
+@api.route('/docs/<doc>/edit', methods=['POST'])
+def doc_edit(doc):
+    """
+    Given a POST request that contains an 'edited' field, the given
+    doc's raw content is replaced.
+
+    :param doc: name of the doc to edit.
+    :returns: {'success': True} if there were no errors.
+    """
+    tracker, config = setup()
+    success = False
+    if request.form:
+        doc = tracker.doc(doc)
+        doc.write(request.form['edited'])
         success = True
     return to_json({'success': success})

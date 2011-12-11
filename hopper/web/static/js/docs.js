@@ -11,7 +11,29 @@ $(function() {
     return $('.markdown').html(mdown);
   });
   return $('#save-button').live('click', function() {
-    var edited;
-    return edited = $('.doc').html();
+    var $doc, $markdown, converter, edited, name;
+    $doc = $('.doc');
+    $markdown = $('.markdown');
+    edited = $('#edit-field').val();
+    name = $doc.attr('name');
+    converter = new Showdown.converter();
+    return $.ajax({
+      type: 'POST',
+      url: "/api/docs/" + name + "/edit",
+      data: {
+        edited: edited
+      },
+      dataType: 'json',
+      success: function(data) {
+        if (data.success) {
+          $markdown.html(edited);
+          return $doc.html(converter.makeHtml(edited));
+        } else {
+          alert('An error occurred, please try again.');
+          $doc.html($markdown.html);
+          return $markdown.html(edited);
+        }
+      }
+    });
   });
 });
