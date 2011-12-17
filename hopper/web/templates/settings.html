@@ -1,22 +1,17 @@
 {% extends 'base.html' %}
 {% block body %}
 <div id="feed">
-    <form>
+    <form method="POST">
         <table>
             <tr>
                 <td>Tracker Name</td>
-                <td><input type="text" name="tracker_name" /></td>
-            </tr>
-            <tr>
-                <td>Notifications</td>
                 <td>
-                    <a id="open-issues" class="open-closed">On</a>
-                    <a id="closed-issues" class="open-closed active">Off</a>
+                    <input type="text" name="name" value="{{ name }}" />
                 </td>
             </tr>
         </table>
         <br><br>
-        <input type="submit" class="button" value="Save changes"/>
+        <input type="submit" class="button" style="font-size:100%" value="Save changes"/>
     </form>
 </div>
 {% endblock %}
