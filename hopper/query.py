@@ -70,7 +70,7 @@ class Query(object):
                                                comments LIKE ?
                                         """, (sstr, sstr, sstr))
             rows = rows.fetchmany(n)
-            return [Issue(self.tracker, r['id']) for r in rows]
+            return [Issue(self.tracker, r['id']) for r in rows][::1]
         else:
             raise NotImplementedError
 

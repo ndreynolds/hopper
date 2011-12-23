@@ -74,8 +74,13 @@ def search(query=None):
     header = "Search results for '%s'" % query
     issues_ = tracker.query().search(query)
     for i in issues_:
-        i.content = highlight(i.content, query)
-        i.title = highlight(i.title, query)
+        blurb = i.content
+        if i.comments():
+            blurb += ' ... ' + ' ... '.join(c.content for c in i.comments() if 
+                                            type(c.content) is str)
+        blurb = highlight(blurb, query)
+        i.content = blurb
+        i.title = highlight(i.title, query, False)
     return render_template('search.html', issues_=issues_, 
                            selected='issues', tracker=tracker,
                            header=header)

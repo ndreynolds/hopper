@@ -6,6 +6,7 @@
 
 from flask import flash, request, current_app
 import string
+import re
 
 from hopper.tracker import Tracker
 from hopper.config import UserConfig
@@ -77,15 +78,41 @@ def pager(page, num_pages):
     return pages
 
 
-def highlight(text, keyword):
+def highlight(text, keyword, condense=True):
     """
     Surround instances of keyword in text with the surround tuple.
     Just replaces all instances with the entire concatenated string.
 
-    :param text: string of text perform highlights within.
+    :param text: string of text to perform highlights within.
     :param keyword: string to highlight.
-    :param surround: tuple containing the two strings to surround the 
-                     keyword with.
+    :param condense: if True, condense the highlighted text to a reasonable
+                     size. A maximum of 500 characters will be displayed, 
+                     starting with the first match and ending 500 characters 
+                     afterward.
     """
-    return text.replace(keyword, '<span class="highlighted">' + keyword + 
-                        '</span>')
+
+    # We're passing this func to re.sub to highlight each match
+    # Can't just sub the keyword b/c we need to retain case.
+    def hilite(m):
+        return "<span class='highlighted'>%s</span>" % m.group()
+
+    # Compile the pattern--it's case-insensitive
+    pattern = re.compile(re.escape(keyword), re.IGNORECASE)
+
+    # Substitute the pattern with the return value of hilite for each match in
+    # text:
+    subd = re.sub(pattern, hilite, text)
+
+    # Condense to (first_match or 0) to (last_match or end)
+    if condense:
+        try:
+            start = subd.index("<span class='highlighted'>") - 30
+            end = subd.rindex("<span class='highlighted'>") + len(keyword) + 37 
+            if start < 0:
+                start = 0
+            if end - start > 500:
+                end = start + 500
+            return subd[start:end]
+        except ValueError:
+            return subd[:200]
+    return subd
