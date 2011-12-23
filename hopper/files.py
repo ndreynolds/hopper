@@ -1,3 +1,8 @@
+"""
+Classes for persistent storage of dictionaries; object access to dictionary 
+keys.
+"""
+
 from __future__ import with_statement
 import os
 import time
@@ -6,7 +11,7 @@ from configobj import ConfigObj
 from hopper.utils import from_json, to_json
 
 class BaseFile(object):
-    '''
+    """
     BaseFile subclasses have the 'fields' attribute, a dictionary that 
     specifies properties that will be saved to persistent memory.
     (Issues have 'content', 'timestamp', etc.)
@@ -14,7 +19,12 @@ class BaseFile(object):
     To make life easier, the class provides attribute access and
     assignment to these keys, provided they don't clash with any existing
     attributes.
-    '''
+    """
+
+    # For later versions, I think it'd be cleaner to abandon the fields 
+    # attribute and store everything in __dict__. Things that aren't supposed
+    # to be written to disk can be '_'-prefixed. Mostly, I want to get rid of 
+    # the super constructor calls in subclasses.
 
     def __init__(self):
         self._set_fields()
@@ -26,13 +36,13 @@ class BaseFile(object):
             self.fields[name] = value
 
     def __getattribute__(self, name):
-        '''
+        """
         We want the attributes to contain the same value as
         the fields[name] value. Assuming the fields dictionary was
         modified directly, the corresponding attribute would not be 
         in sync. To counter this, we get attributes directly from the
         dictionary.
-        '''
+        """
         # we don't want to mess with any special attributes.
         if not name.startswith('__'):
             # use the base class's method so we avoid infinite recursion.
@@ -42,42 +52,43 @@ class BaseFile(object):
         return object.__getattribute__(self, name)
 
     def _set_fields(self):
-        '''
+        """
         Sets the keys in self.fields as attributes, provided they don't
         already exist. This needs to be called manually inside __init__.
-        '''
+        """
         for key in self.fields.iterkeys():
             if not hasattr(self, key):
                 setattr(self, key, self.fields[key])
 
 
 class JSONFile(BaseFile):
-    '''
+    """
     JSONFile subclasses the BaseFile class to provide methods
     for reading and writing JSON to file.
-    '''
+    """
 
     def from_file(self, f):
-        '''Read self.fields from file.'''
+        """Read self.fields from file."""
         if not os.path.exists(f):
             raise OSError('File does not exist')
-        # uses a LockedFile object for file I/O
+        # Uses a LockedFile object for file I/O
         with lock(f, 'r') as fp:
-            self.fields = from_json(fp.read())
-            print self.fields, f
+            # Merge the current dictionary with the new one.
+            self.fields = dict(self.fields.items() + 
+                               from_json(fp.read()).items())
         return True
 
     def to_file(self, f):
-        '''Save self.fields to file.'''
+        """Save self.fields to file."""
         if not type(self.fields) is dict:
             raise TypeError('self.fields must be a dict')
         with lock(f, 'w') as fp:
-            fp.write(to_json(self.fields))
+            fp.write(to_json(self.fields, indent=4))
         return True
 
 
 class ConfigFile(BaseFile):
-    '''
+    """
     ConfigFile subclasses BaseFile to provide methods for
     writing to and reading from configuration files, using
     the ConfigObj module.
@@ -85,10 +96,10 @@ class ConfigFile(BaseFile):
     ConfigFile subclasses still use the self.fields attribute
     to store their configuration. This class takes care of
     turning that into a configuration file.
-    '''
+    """
 
     def from_file(self, f, types=None):
-        '''
+        """
         Read self.fields from config file.
         
         :param f: path to file
@@ -109,15 +120,14 @@ class ConfigFile(BaseFile):
         If str fields are explicitly mapped to types, empty strings 
         remain ``''``. If the default behavior is being used, empty 
         strings get converted to None.
-        '''
+        """
         def config_traverse(config, types):
-            '''
+            """
             Recursively set types, config is mutable so no need for
             a return.
-            '''
+            """
             # iterate through the types
             for k in types.keys():
-                print k
                 # if it has a matching key from the config:
                 if k in config.keys():
                     if type(types[k]) is dict and type(config[k]) is dict:
@@ -153,7 +163,7 @@ class ConfigFile(BaseFile):
         self.fields = dict(self.fields.items() + config.items())
 
     def to_file(self, f):
-        '''Save self.fields to file using ConfigObj.'''
+        """Save self.fields to file using ConfigObj."""
         if not os.path.exists(f):
             raise OSError('File does not exist')
         config = ConfigObj(indent_type='    ')
@@ -164,7 +174,7 @@ class ConfigFile(BaseFile):
 
 
 class LockedFile(file):
-    '''
+    """
     Provides primitive file-locking. It subclasses the ``file`` object
     to hook in locking and unlocking. 
     
@@ -183,7 +193,7 @@ class LockedFile(file):
     :param interval: interval in ms at which to poll ``self.locked()``.
     :param timeout: time in ms, after which the lock acquisition should
                     throw a RuntimeError. 
-    '''
+    """
     # TODO multiple readers, exclusive writer
 
     def __init__(self, name, mode, persist=True, 
@@ -205,7 +215,7 @@ class LockedFile(file):
         file.__init__(self, name, mode)
 
     def __del__(self):
-        '''
+        """
         Last ditch effort to unlock files.
 
         LockFiles should be closed (and by extension, unlocked) by
@@ -213,41 +223,41 @@ class LockedFile(file):
         The ``__del__`` method is in place to remove the lock if these
         are forgotten, but it's not guaranteed to work (due to the way
         python calls ``__del__``. 
-        '''
+        """
         self.unlock()
 
     def __exit__(self, type, value, traceback):
-        '''Unlock the file when object falls out of ``with`` scope.'''
+        """Unlock the file when object falls out of ``with`` scope."""
         file.__exit__(self, type, value, traceback)
         self.unlock()
 
     def close(self):
-        '''Close the file and then unlock it.'''
+        """Close the file and then unlock it."""
         file.close(self)
         self.unlock()
 
     def locked(self):
-        '''Check if the file is locked.'''
+        """Check if the file is locked."""
         if os.path.isfile(self.lock_path):
             return True
         return False
 
     def lock(self):
-        '''Lock the file.'''
+        """Lock the file."""
         open(self.lock_path, 'w').close()
 
     def unlock(self):
-        '''Unlock the file.'''
+        """Unlock the file."""
         if self.locked():
             os.remove(self.lock_path)
 
     def wait(self):
-        '''
+        """
         Continually poll the ``locked`` method using the given interval
         until either the file can be acquired or the timeout is reached.
 
         :raise RuntimeError: if wait time exceeds timeout.
-        '''
+        """
         t = 0
         while self.locked():
             if t > self.timeout:
@@ -259,10 +269,10 @@ class LockedFile(file):
 
 
 def lock(name, mode):
-    '''
+    """
     Returns a LockedFile object with the default timeout.
 
     :param name: path to the file
     :param mode: mode to open the file with
-    '''
+    """
     return LockedFile(name, mode)

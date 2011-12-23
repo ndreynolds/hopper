@@ -2,7 +2,6 @@ from argparse import ArgumentParser
 import sys
 import os
 
-# hopper imports
 from hopper.tracker import Tracker
 from hopper.issue import Issue
 from hopper.comment import Comment
@@ -10,10 +9,13 @@ from hopper.config import UserConfig
 from hopper.hpr.templates import Template, IssueTemplate
 from hopper.utils import relative_time, wrap
 from hopper.errors import AmbiguousReference, BadReference
+from hopper.query import Query
+from hopper.version import VERSION
 
-### utilities
+
+### Utilities
 def get_tracker(path=None):
-    '''Get the tracker or raise an error.'''
+    """Get the tracker or raise an error."""
     if path is None:
         cwd = os.getcwd()
         if is_tracker(cwd):
@@ -24,27 +26,28 @@ def get_tracker(path=None):
         return Tracker(path)
     raise OSError('The supplied path is not a Hopper tracker')
 
+
 def is_tracker(path):
-    '''Check if the given path is a Hopper tracker'''
+    """Check if the given path is a Hopper tracker"""
     # This is only a good guess. Corrupt trackers will fail to init.
     dirlist = os.listdir(path)
     return '.hopper' in dirlist and '.git' in dirlist
 
 
-### main script (arg parser)
+### Main Script (arg parser)
 def main(args=sys.argv[1:]):
-    ''' 
+    """ 
     Parse the sys args using argparse and call the appropriate function.
 
     :param args: arguments to use. This defaults to sys.argv[1:] (the sys
                  arguments after the command itself). Supplying a list for
                  args lets you call hpr commands from within python, for
                  whatever reason.
-    ''' 
+    """ 
     parser = ArgumentParser(description='Manage Hopper trackers and their issues', 
                             epilog='See `hpr COMMAND -h` for command-specific help',
                             prog='hpr')
-    parser.add_argument('-v', '--version', action='version', version='1.0',
+    parser.add_argument('-v', '--version', action='version', version=VERSION,
             help='display version number')
     parser.add_argument('--tracker', action='store', metavar='PATH',
             help='set the path to the tracker, defaults to cwd')
@@ -69,6 +72,8 @@ def main(args=sys.argv[1:]):
             help='List the (filtered) set of issues')
     listp.add_argument('-s', '--short', action='store_true', 
             help='display each issue in one line')
+    listp.add_argument('-o', '--order', action='store', 
+            help='order by the given attribute')
     listp.set_defaults(func=list_)
 
     # `new` subcommand
@@ -88,31 +93,35 @@ def main(args=sys.argv[1:]):
                         help='turn on debug mode')
     servep.set_defaults(func=serve)
 
+    # `setup` subcommand
+    setupp = subparsers.add_parser('setup', help='Setup Hopper to track issues')
+    setupp.set_defaults(func=setup)
+
     # `show` subcommand
     showp = subparsers.add_parser('show', help='Show a particular issue')
     showp.add_argument('issue', help='an issue id (the first 4 chars is usually enough)')
     showp.set_defaults(func=show)
 
     # `tracker` subcommand
-    trackerp = subparsers.add_parser('tracker', help='Create a new hopper tracker')
+    trackerp = subparsers.add_parser('create-tracker', 
+                                     help='Create a new hopper tracker')
     trackerp.add_argument('path', action='store', 
-                        help='path that the tracker will be created at')
-    trackerp.set_defaults(func=tracker)
+                          help='path that the tracker will be created at')
+    trackerp.set_defaults(func=create_tracker)
 
     # parse the args
     args = parser.parse_args(args)
     argsd = vars(args)
 
     # replace argsd['tracker'] with a Tracker instance.
-    if args.func != tracker:
+    if args.func not in [create_tracker, setup]:
         argsd['tracker'] = get_tracker(argsd['tracker'])
     args.func(argsd)
 
 
 ### Command functions
-
 def new(args):
-    '''Create a new issue.'''
+    """Create a new issue."""
     t = args['tracker']
     i = Issue(t)
     config = UserConfig()
@@ -141,16 +150,18 @@ def new(args):
                          author=config.user)
         print 'Created issue %s' % i.id[:6]
 
+
 def edit(args):
-    '''Edit an existing issue'''
+    """Edit an existing issue"""
     t = args['tracker']
     i = t.issue(args['issue'])
     if not i:
         print 'No such issue'
         return
 
+
 def comment(args):
-    '''Comment on an issue.'''
+    """Comment on an issue."""
     t = args['tracker']
     i = t.issue(args['issue'])
     if not i:
@@ -173,8 +184,9 @@ def comment(args):
                          author=config.user)
         print 'Posted comment %s on issue %s' % (c.id[:3], i.id[:6])
 
+
 def reopen(args):
-    '''Reopen a closed issue.'''
+    """Reopen a closed issue."""
     t = args['tracker']
     i = t.issue(args['issue'])
     if not i:
@@ -186,8 +198,9 @@ def reopen(args):
     else:
         print 'Already open'
 
+
 def close(args):
-    '''Close an open issue.'''
+    """Close an open issue."""
     t = args['tracker']
     i = t.issue(args['issue'])
     if not i:
@@ -199,8 +212,9 @@ def close(args):
     else:
         print 'Already closed'
 
+
 def show(args):
-    '''Show an issue.'''
+    """Show an issue."""
     t = args['tracker']
     c = UserConfig()
 
@@ -227,11 +241,15 @@ def show(args):
         print '    ' + line
     print
 
+
 def list_(args):
-    '''List the tracker's issues (filtered by criteria)'''
+    """List the tracker's issues (filtered by criteria)"""
     t = args['tracker']
     c = UserConfig()
-    issues = t.issues()
+    query = Query(t)
+    args.setdefault('order', 'updated')
+    args.setdefault('status', 'open')
+    issues = query.select(order_by=args['order'], status=args['status'])
     # short mode
     if args['short']:
         for i in issues:
@@ -261,7 +279,7 @@ def list_(args):
                 print '    ' + line
             print
 
-# Manage trackers
+
 def serve(args):
     # include the webserver stuff here. runtime is significantly faster
     # when serve() is not called.
@@ -269,7 +287,12 @@ def serve(args):
     t = args['tracker']
     start(t.paths['root'], port=args['port'], debug=args['verbose'])
 
-def tracker(args):
+
+def setup(args):
+    raise NotImplementedError
+
+
+def create_tracker(args):
     Tracker.new(args['path'])
     print 'New tracker initialized. Edit %s to configure.' % \
             os.path.join(args['path'], 'config') 

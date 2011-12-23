@@ -1,93 +1,94 @@
 from flask import Blueprint, request, redirect, url_for, render_template, \
                   flash
-
 from hopper.issue import Issue
 from hopper.comment import Comment
 from hopper.utils import relative_time, markdown_to_html, map_attr
+from hopper.web.utils import setup, to_json, pager, highlight
 
-from hopper.web.utils import setup, to_json
 
 issues = Blueprint('issues', __name__)
 
 @issues.route('/<status>')
 @issues.route('/', methods=['GET', 'POST'])
 def index(status='open'):
-    '''
-    '''
+    """
+    Render the issue index view.
+
+    :param status: 'open' or 'closed'
+    """
     tracker, config = setup()
 
     # get the url params
-    sort = request.args.get('sort')
-    order = request.args.get('order')
-    try:
-        page = int(request.args.get('page'))
-    except TypeError:
-        page = 1
-    except ValueError:
-        page = 1
+    order = request.args.get('order', 'updated')
+    direc = request.args.get('dir', 'asc')
+    page = int(request.args.get('page', 1))
+    label = request.args.get('label', None)
 
-    reverse = True 
-    sort_by = 'updated'
-    issues_per_page = 15 
+    # verify the params
+    order = order if order in ['id', 'title', 'author'] else 'updated'
+    reverse = True if direc == 'asc' else False
+    per_page = 15 
+    offset = (page - 1) * per_page if page > 1 else 0
 
-    if order == 'asc':
-        reverse = False
-    if sort in ['id', 'title', 'updated']:
-        sort_by = sort
-    if page > 1: 
-        # If we're on page 3, the offset should be 50.
-        offset = (page - 1) * issues_per_page
-        issues_, n = tracker.issues(n=issues_per_page, offset=offset, 
-                                    sort_by=sort_by, reverse=reverse, 
-                                    return_num=True, conditions={'status': status})
-    else:
-        issues_, n = tracker.issues(n=issues_per_page, sort_by=sort_by, 
-                                    reverse=reverse, return_num=True, 
-                                    conditions={'status': status})
-
-    # get the number of pages
-    num_pages = n / issues_per_page
-
-    # get pages to link to
-    if num_pages > 1:
-        pages = pager(page, num_pages)
-    else:
-        pages = None
-
-    # set the context header
-    context = 'open' if status == 'open' else 'closed'
-    header = 'Viewing %s issues for %s' % (context, tracker.config.name)
-
+    # run our query
+    issues_ = tracker.query().select(limit=per_page, offset=offset, 
+                                     status=status, order_by=order, 
+                                     reverse=reverse, label=label)
     # humanize the timestamps
     map_attr(issues_, 'updated', relative_time)
     map_attr(issues_, 'created', relative_time)
 
-    # Currently, some labels are CSV-formatted while the others are
-    # JSON arrays. To support the prototypes that used CSV we have
-    # to do the conversion. This should be taken out before 1.0.
-    for issue in issues_:
-        if type(issue.labels) is str or type(issue.labels) is unicode:
-            # Filter anything that doesn't return True (i.e. '')
-            issue.labels = filter(lambda x: x, issue.labels.split(','))
+    # get the number of issues by status
+    n = tracker.query().count(status)
+
+    # get the number of pages
+    n_pages = n / per_page
+    if n % per_page > 1:
+        n_pages += 1
+
+    # get pages to link to
+    pages = pager(page, n_pages) if n > per_page else None
+
+    # set the header
+    header = 'Viewing %s issues for %s' % (status, tracker.config.name)
+    if label:
+        header += ' with label &nbsp; <span class="fancy-monospace">'
+        header += '%s</span>' % label
 
     if request.json is not None:
         return to_json(request.json)
     else:
         return render_template('issues.html', issues_=issues_, 
                                selected='issues', status=status, 
-                               sorted_by=sort_by, page=page, pages=pages,
-                               num_pages=num_pages, order=order,
+                               order=order, page=page, pages=pages,
+                               num_pages=n_pages, asc=reverse,
                                header=header, n=n, tracker=tracker)
 
 
+@issues.route('/search')
 @issues.route('/search/<query>')
-def search(query):
+def search(query=None):
+    tracker, config = setup()
+    if query is None:
+        query = request.args.get('query', 'test')
     header = "Search results for '%s'" % query
-    pass
+    issues_ = tracker.query().search(query)
+    for i in issues_:
+        blurb = i.content
+        if i.comments():
+            blurb += ' ... ' + ' ... '.join(c.content for c in i.comments() if 
+                                            type(c.content) is str)
+        blurb = highlight(blurb, query)
+        i.content = blurb
+        i.title = highlight(i.title, query, False)
+    return render_template('search.html', issues_=issues_, 
+                           selected='issues', tracker=tracker,
+                           header=header)
 
 
 @issues.route('/new', methods=['GET', 'POST'])
 def new():
+    """Render the new issue view."""
     tracker, config = setup()
     header = 'Create a new issue'
     if request.method == 'POST':
@@ -116,12 +117,11 @@ def new():
 
 @issues.route('/view/<id>', methods=['GET', 'POST'])
 def view(id):
-    '''
-    Renders the issues template. Alternatively, it will respond with 
-    JSON when the request mimetype is 'json/application'. The JSON
-    requests can contain filter objects. Filters are part of the UI
-    and we must re-request the issues each time a filter changes.
-    '''
+    """
+    Render the issue view to display information about a single issue.
+
+    :param id: id of the issue to view.
+    """
     tracker, config = setup()
     issue = tracker.issue(id)
     if request.method == 'POST':
@@ -142,7 +142,8 @@ def view(id):
         issue.created = relative_time(issue.created)
         issue.content = markdown_to_html(issue.content)
         comments = issue.comments()
-        header = 'Viewing Issue &nbsp;<span class="fancy-monospace">%s</span>' % issue.id[:6]
+        header = 'Viewing Issue &nbsp;<span class="fancy-monospace">%s</span>' \
+                % issue.id[:6]
         if comments:
             map_attr(comments, 'timestamp', relative_time)
             map_attr(comments, 'content', markdown_to_html)
@@ -153,51 +154,62 @@ def view(id):
 
 @issues.route('/settings')
 def settings():
+    """Settings"""
     tracker, config = setup()
     return render_template('/settings.html')
 
 
 @issues.route('/action/close/<id>')
-def close(id):
+def close(id, redirect_after=True):
+    """
+    Close an issue.
+
+    :param id: issue id
+    :param redirect_after: return a redirect. This happens by default, but turning
+                           it off may be desirable for async requests.
+    """
     tracker, config = setup()
     issue = tracker.issue(id)
     if issue:
         issue.status = 'closed'
-        if not issue.save():
-            flash('Could not close the issue')
-        return redirect(url_for('issues.view', id=issue.id))
+        comment = Comment(issue)
+        comment.event = True
+        comment.event_data = 'closed'
+        comment.author = config.user
+        comment.save()
+        issue.save()
+        tracker.autocommit('Closed issue %s/%s' % (issue.id[:6], comment.id[:6]),
+                           config.user)
+        if redirect_after:
+            return redirect(url_for('issues.view', id=issue.id))
+        else:
+            return True
+    return False
 
 
 @issues.route('/action/open/<id>')
-def open(id):
+def open(id, redirect_after=True):
+    """
+    Open an issue.
+
+    :param id: issue id
+    :param redirect_after: return a redirect. This happens by default, but turning
+                           it off may be desirable for async requests.
+    """
     tracker, config = setup()
     issue = tracker.issue(id)
     if issue:
         issue.status = 'open'
-        if not issue.save():
-            flash('Could not reopen the issue')
-        return redirect(url_for('issues.view', id=issue.id))
-
-
-def fetch_issues():
-    pass
-
-
-def pager(page, num_pages):
-    '''
-    Generates a list of pages to link to based on the current page
-    and the total number of pages.
-
-    For example, if page=1 and there are at least 8 pages, it will 
-    return [1,2,3,4,5,6,7,8].
-    '''
-    if page == 1:
-        pages = [p for p in range(1, page + 6) if p in range(1, num_pages + 1)]
-    else:
-        pages = [p for p in range(page - 3, page + 4) if p in range(1, num_pages + 1)]
-    if not num_pages - 1 in pages:
-        pages += [False, num_pages - 1, num_pages]
-    if not 2 in pages: 
-        pages = [1, 2, False] + pages
-    print pages
-    return pages
+        comment = Comment(issue)
+        comment.event = True
+        comment.event_data = 'opened'
+        comment.author = config.user
+        comment.save()
+        issue.save()
+        tracker.autocommit('Re-opened issue %s/%s' % (issue.id[:6], comment.id[:6]),
+                           config.user)
+        if redirect_after:
+            return redirect(url_for('issues.view', id=issue.id))
+        else:
+            return True
+    return False

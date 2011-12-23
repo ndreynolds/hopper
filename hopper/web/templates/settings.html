@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block body %}
+<div id="feed">
+    <form method="POST">
+        <table>
+            <tr>
+                <td>Tracker Name</td>
+                <td>
+                    <input type="text" name="name" value="{{ name }}" />
+                </td>
+            </tr>
+        </table>
+        <br><br>
+        <input type="submit" class="button" style="font-size:100%" value="Save changes"/>
+    </form>
+</div>
+{% endblock %}

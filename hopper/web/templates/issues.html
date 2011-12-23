@@ -1,59 +1,74 @@
 {% extends 'base.html' %}
 {% block body %}
 
-<script type="text/javascript" src="{{ url_for('static', filename='js/issues.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/filter.js') }}"></script>
+<script type="text/javascript" 
+    src="{{ url_for('static', filename='js/issues.js') }}"></script>
+<script type="text/javascript" 
+    src="{{ url_for('static', filename='js/filter.js') }}"></script>
 <div id="menu">
     {% if status == 'open' %}
-        <a href="{{ url_for('issues.index', status='open') }}" id="open-issues" class="open-closed">Open</a>
-        <a href="{{ url_for('issues.index', status='closed') }}" id="closed-issues" class="open-closed active">Closed</a>
+        <a href="{{ url_for('issues.index', status='open') }}" 
+            id="open-issues" class="open-closed">Open</a>
+        <a href="{{ url_for('issues.index', status='closed') }}" 
+            id="closed-issues" class="open-closed active">Closed</a>
     {% else %}
-        <a href="{{ url_for('issues.index', status='open') }}" id="open-issues" class="open-closed active">Open</a>
-        <a href="{{ url_for('issues.index', status='closed') }}" id="closed-issues" class="open-closed">Closed</a>
+        <a href="{{ url_for('issues.index', status='open') }}" 
+            id="open-issues" class="open-closed active">Open</a>
+        <a href="{{ url_for('issues.index', status='closed') }}" 
+            id="closed-issues" class="open-closed">Closed</a>
     {% endif %}
 </div>
     <table>
         {% if issues_ is not none %}
             <tr>
-                {% if sorted_by == 'id' and order == 'asc' %}
+                {% if order == 'id' and asc %}
                 <th>
-                    <a href="{{ url_for('issues.index', status=status, s='id', o='desc') }}">Identifier &darr;</a>
+                    <a href="{{ url_for('issues.index', status=status, 
+                        order='id', dir='desc') }}">Identifier &darr;</a>
                 </th>
-                {% elif sorted_by == 'id' and order == 'desc' %}
+                {% elif order == 'id' and not asc %}
                 <th>
-                    <a href="{{ url_for('issues.index', status=status, s='id', o='asc') }}">Identifier &uarr;</a>
+                    <a href="{{ url_for('issues.index', status=status, 
+                        order='id', dir='asc') }}">Identifier &uarr;</a>
                 </th>
                 {% else %}
                 <th>
-                    <a href="{{ url_for('issues.index', status=status, s='id', o='asc') }}">Identifier</a>
+                    <a href="{{ url_for('issues.index', status=status, 
+                        order='id', dir='asc') }}">Identifier</a>
                 </th>
                 {% endif %} 
-                {% if sorted_by == 'title' and order == 'asc' %}
+                {% if order == 'title' and asc %}
                 <th>
-                    <a href="{{ url_for('issues.index', status=status, s='title', o='desc') }}">Title &darr;</a>
+                    <a href="{{ url_for('issues.index', status=status, 
+                        order='title', dir='desc') }}">Title &darr;</a>
                 </th>
-                {% elif sorted_by == 'title' and order == 'desc' %}
+                {% elif order == 'title' and not asc %}
                 <th>
-                    <a href="{{ url_for('issues.index', status=status, s='title', o='asc') }}">Title &uarr;</a>
+                    <a href="{{ url_for('issues.index', status=status, 
+                        order='title', dir='asc') }}">Title &uarr;</a>
                 </th>
                 {% else %}
                 <th>
-                    <a href="{{ url_for('issues.index', status=status, s='title', o='asc') }}">Title</a>
+                    <a href="{{ url_for('issues.index', status=status, 
+                        order='title', dir='asc') }}">Title</a>
                 </th>
                 {% endif %} 
                 <th>Labels</th>
                 <th>Author</th>
-                {% if sorted_by == 'updated' and (order == 'asc' or order is none) %}
+                {% if order == 'updated' and asc %}
                 <th>
-                    <a href="{{ url_for('issues.index', status=status, s='timestamp', o='desc') }}">Age &darr;</a>
+                    <a href="{{ url_for('issues.index', status=status, 
+                        order='updated', dir='desc') }}">Age &darr;</a>
                 </th>
-                {% elif sorted_by == 'updated' and order == 'desc' %}
+                {% elif order == 'updated' and not asc %}
                 <th>
-                    <a href="{{ url_for('issues.index', status=status, s='timestamp', o='asc') }}">Age &uarr;</a>
+                    <a href="{{ url_for('issues.index', status=status, 
+                        order='updated', dir='asc') }}">Age &uarr;</a>
                 </th>
                 {% else %}
                 <th>
-                    <a href="{{ url_for('issues.index', status=status, s='timestamp', o='asc') }}">Age</a>
+                    <a href="{{ url_for('issues.index', status=status, 
+                        order='updated', dir='asc') }}">Age</a>
                 </th>
                 {% endif %} 
             </tr>
@@ -61,11 +76,14 @@
             <tr class="content">
                 <td class="monospace">{{ issue.id[:6] }}</td>
                 <td style="max-width:250px">
-                    <a href="{{ url_for('issues.view', id=issue.id[:6]) }}">{{ issue.title }}</a>
+                    <a href="{{ url_for('issues.view', id=issue.id[:6]) }}">
+                        {{ issue.title }}</a>
                 </td>
                 <td>
                     {% for label in issue.labels %}
-                        <span class="fancy-monospace">{{ label }}</span>
+                        <a href="{{ url_for('issues.index', status=status, 
+                            label=label|replace(' ', '')) }}"
+                            class="fancy-monospace">{{ label }}</a>
                     {% endfor %}
                 </td>
                 <td>{{ issue.author['name'] }}</td>
@@ -77,26 +95,32 @@
         {% endif %}
     </table>
 {% if pages %}
+    <br>
     <div id="paging">
         {% if page != 1 %}
-            <a href="{{ url_for('issues.index', status=status, page=(page-1)) }}">&laquo; Previous</a>
+            <a href="{{ url_for('issues.index', status=status, 
+                page=(page-1)) }}">&laquo; Previous</a>
         {% endif %}
         &nbsp;
         {% for p in pages %}
             {% if not p %}
                 &nbsp;...&nbsp;
             {% elif p == page %}
-                <a class="cur-page" href="{{ url_for('issues.index', status=status, page=p) }}">{{ p }}</a>
+                <a class="cur-page" href="{{ url_for('issues.index', 
+                    status=status, page=p) }}">{{ p }}</a>
             {% else %}
-                <a href="{{ url_for('issues.index', status=status, page=p) }}">{{ p }}</a>
+                <a href="{{ url_for('issues.index', status=status, 
+                    page=p) }}">{{ p }}</a>
             {% endif %}
         {% endfor %}
         &nbsp;
         {% if page != num_pages %}
-            <a href="{{ url_for('issues.index', status=status, page=(page+1)) }}">Next &raquo;</a>
+            <a href="{{ url_for('issues.index', status=status, 
+                page=(page+1)) }}">Next &raquo;</a>
         {% endif %}
     </div>
 {% endif %}
 <br>
-<span id="issue-count">Showing {{ issues_|count }} of {{ n }} issues.</span>
+<span id="issue-count">Showing {{ issues_|count }} of {{ n }} 
+    {{ status }} issues.</span>
 {% endblock %}

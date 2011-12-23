@@ -10,7 +10,7 @@ from hopper.utils import to_json, get_hash
 from hopper.errors import BadReference, AmbiguousReference
 
 class Issue(JSONFile):
-    '''
+    """
     Defines an issue (or bug, if you prefer that term). Issues are
     stored in flat files using JSON.  The parent class handles the 
     conversion to and from JSON.
@@ -28,7 +28,7 @@ class Issue(JSONFile):
     The Issue class doesn't handle defaults for the 'author' field.
     The creator of the issue is often the web server, so we can't
     really assume anything about the acting user.
-    '''
+    """
 
     def __init__(self, tracker, id=None):
         self.fields = {
@@ -51,16 +51,27 @@ class Issue(JSONFile):
             self.from_file(self.paths['issue'])
         super(BaseFile, self).__init__()
 
+    def __eq__(self, other):
+        return True if self.id == other.id else False
+
+    def __ne__(self, other):
+        return True if self.id != other.id else False
+
+    def __repr__(self):
+        return '<Issue %s>' % self.id[:6]
+
     def comments(self, n=None):
-        comments = [Comment(self, sha) for sha in self.get_comments()]
+        comments = [Comment(self, sha) for sha in self._get_comments()]
         comments.sort(key=lambda x: x.timestamp)
-        return comments[:n]
+        if n:
+            return comments[:n]
+        return comments
 
     def comment(self, sha):
         return Comment(self, sha)
 
     def save(self):
-        '''Save the issue to file.'''
+        """Save the issue to file."""
 
         # We need to set updated, even if it's the same as created,
         # so we have a consistent timestamp to sort issues by.
@@ -81,25 +92,27 @@ class Issue(JSONFile):
         # Make the comments dir if it doesn't exist.
         if not os.path.isdir(self.paths['comments']):
             os.mkdir(self.paths['comments'])
+        # Save it in the db.
+        self.tracker.db.insert(self)
         # Save it.
         return self.to_file(self.paths['issue'])
 
     def delete(self):
-        '''
+        """
         Delete the disk representation of the issue.
 
         Issues should rarely be deleted. Closed issues get hidden
         from many commands, but should still be available for reference. 
         This is here for the rare times when they need to be deleted
         (such as spam).
-        '''
+        """
         if not hasattr(self, 'id'):
             raise BadReference('No matching issue on disk')
         shutil.rmtree(self.paths['root'])
 
     @classmethod
     def revision(cls, ref=None):
-        '''
+        """
         Return an Issue object, representing the issue as it was in the 
         commit referenced by the given ref. The implementation will read 
         the file from its blob in the commit's tree. 
@@ -112,33 +125,33 @@ class Issue(JSONFile):
 
         :param ref: a commit ref.
         :return: an Issue object.
-        '''
+        """
         # TODO
         raise NotImplementedError
 
     def revert(self, ref=None):
-        '''
+        """
         Does a checkout of the issue directory at the commit pointed to by
         the given ref.  After that, it will update its `fields` attribute to
         reflect any changes. Any Comment objects will need to be reinitialized. 
-        '''
+        """
         # TODO
         raise NotImplementedError
 
     def get_comment_path(self, sha):
-        '''Get the path to the comment with the given SHA.'''
+        """Get the path to the comment with the given SHA."""
         if not hasattr(self, 'id'):
             raise BadReference('No matching issue on disk')
         return os.path.join(self.paths['comments'], sha)
 
-    def get_comments(self):
-        '''Get the SHAs of all comments to the issue.'''
+    def _get_comments(self):
+        """Get the SHAs of all comments to the issue."""
         if not hasattr(self, 'id'):
             raise BadReference('No matching issue on disk')
         return filter(lambda x: len(x) == 40, os.listdir(self.paths['comments']))
 
     def _resolve_id(self, id):
-        '''Resolve partial ids and verify the issue exists.'''
+        """Resolve partial ids and verify the issue exists."""
         if len(id) == 40:
             if os.path.exists(self.tracker.get_issue_path(id)):
                 return id
@@ -158,12 +171,12 @@ class Issue(JSONFile):
         return match_id
 
     def _set_paths(self):
-        '''
+        """
         Set paths inside the issue.
 
         Issue data and comments are stored in a directory named after the
         issue's SHA. 
-        '''
+        """
         paths = {}
         tpaths = self.tracker.paths
         # path to the issue directory
@@ -176,19 +189,3 @@ class Issue(JSONFile):
         if not os.path.exists(paths['comments']) and os.path.exists(paths['root']):
             os.mkdir(paths['comments'])
         self.paths = paths
-
-
-class IssueQuery(object):
-    '''
-    List, sort, and/or search the given tracker's issues, using the 
-    db or raw JSON files, depending on what is available.
-
-    If tracker.config.db is True, it'll use the SQLite database. In
-    terms of speed, querying the database is much, much faster than
-    the JSON files. This is because each JSON issue is instantiated
-    as an Issue object, then sorted and filtered in python. However,
-    the difference is barely noticeable for <500 issues.
-    '''
-
-    def __init__(self, tracker):
-        pass

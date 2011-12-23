@@ -16,7 +16,8 @@
     <div class="issue-sidebar-heading">Labels</div>
     <div class="issue-sidebar-content">
         {% for label in issue.labels %}
-            <span class="fancy-monospace">{{ label }}</span>
+            <a href="{{ url_for('issues.index', label=label) }}" 
+                class="fancy-monospace">{{ label }}</a>
             <br><br>
         {% endfor %}
     </div>
@@ -29,7 +30,7 @@
 <div class="issue-header">
     <span id="author">{{ issue.author['name'] }}</span> 
     <span id="email">({{ issue.author['email'] }})</span> 
-    opened 
+    <span id="opened">opened</span>
     <span id="time">{{ issue.created }}</span>
 </div>
 <div class="issue">
@@ -40,16 +41,33 @@
 <br>
 {% if comments %}
     {% for comment in comments %}
-    <div class="comment-header">
-        <span id="author">{{ comment.author['name'] }}</span>
-        <span id="email">({{ comment.author['email'] }})</span>
-        commented 
-        <span id="time">{{ comment.timestamp }}</span>
-    </div>
-    <div id="comment-{{ comment.id[:6] }}" class="comment">
-        {{ comment.content|safe }}
-    </div>
-    <br>
+        {% if comment.event %}
+        <div class="comment-header comment-event">
+            <span id="author">{{ comment.author['name'] }}</span>
+            <span id="email">({{ comment.author['email'] }})</span>
+            &nbsp;
+            {% if comment.event_data == 'opened' %}
+            <span id="opened">re-opened</span>
+            {% elif comment.event_data == 'closed' %}
+            <span id="closed">closed</span>
+            {% else %}
+            <span id="event">{{ comment.event_data }}</span>
+            {% endif %}
+            &nbsp;
+            <span id="time">{{ comment.timestamp }}</span>
+        </div>
+        {% else %}
+        <div class="comment-header">
+            <span id="author">{{ comment.author['name'] }}</span>
+            <span id="email">({{ comment.author['email'] }})</span>
+            commented 
+            <span id="time">{{ comment.timestamp }}</span>
+        </div>
+        <div id="comment-{{ comment.id[:6] }}" class="comment">
+            {{ comment.content|safe }}
+        </div>
+        {% endif %}
+        <br>
     {% endfor %}
 {% endif %}
     <br>

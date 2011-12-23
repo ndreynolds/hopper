@@ -42,8 +42,28 @@ Comment
 .. automodule:: hopper.comment
    :members:
 
+Document
+--------
+
+.. automodule:: hopper.document
+   :members:
+
+Database
+--------
+
+.. automodule:: hopper.database
+   :members:
+
+Config
+------
+
+.. automodule:: hopper.config
+   :members:
+
 Git Interaction
 ---------------
+*Note:* Many of the Repo class methods are private, and therefore undocumented by Sphinx.
+See the source code for more detail.
 
 .. automodule:: hopper.git
    :members:

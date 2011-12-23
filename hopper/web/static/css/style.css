@@ -20,6 +20,13 @@
   margin-left: auto;
   margin-right: auto;
 }
+.centered-text {
+  text-align: center;
+}
+.highlighted {
+  background-color: #FFFAA8;
+  border: 1px solid #FFF778;
+}
 .clear {
   clear: both;
 }
@@ -106,7 +113,10 @@ div#menu {
   background-image: -ms-linear-gradient(top, #999999, #777777);
   background-image: -o-linear-gradient(top, #999999, #777777);
   background-image: linear-gradient(top, #999999, #777777);
-  margin: -20px;
+  margin: -21px;
+  margin-top: -20px;
+  border: 1px solid #666;
+  border-top: none;
   margin-bottom: 20px;
   text-shadow: 0 1px 1px #444;
   font-size: 105%;
@@ -132,21 +142,21 @@ div#new a {
   text-decoration: none;
 }
 div.issue-header {
-  background-image: -webkit-linear-gradient(top, #999999, #777777);
-  background-image: -moz-linear-gradient(top, #999999, #777777);
-  background-image: -ms-linear-gradient(top, #999999, #777777);
-  background-image: -o-linear-gradient(top, #999999, #777777);
-  background-image: linear-gradient(top, #999999, #777777);
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   -webkit-top-left-border-radius: 5px;
   -webkit-top-right-border-radius: 5px;
+  background-image: -webkit-linear-gradient(top, #dddddd, #cccccc);
+  background-image: -moz-linear-gradient(top, #dddddd, #cccccc);
+  background-image: -ms-linear-gradient(top, #dddddd, #cccccc);
+  background-image: -o-linear-gradient(top, #dddddd, #cccccc);
+  background-image: linear-gradient(top, #dddddd, #cccccc);
   width: 700px;
-  text-shadow: 0 1px 1px #333;
-  font-size: 105%;
-  color: #fff;
+  height: 20px;
   padding: 10px;
-  border: 1px solid #666;
+  border: 1px solid #bbb;
+  text-shadow: 0 1px 1px #fff;
+  line-height: 23px;
 }
 div#comment-form {
   width: 722px;
@@ -163,6 +173,8 @@ div.page {
   margin-top: 0px;
   background-color: white;
   padding: 20px;
+  border: 1px solid #999;
+  border-top: none;
 }
 div.page a {
   color: #5F8A42;
@@ -249,7 +261,8 @@ th a {
   text-decoration: none;
 }
 tr.content:nth-child(even) {
-  background-color: #eee;
+  background-color: #f3f3f3;
+  border: 1px solid #eeeeee;
 }
 textarea {
   padding: 5px;
@@ -298,13 +311,14 @@ textarea#content {
   cursor: pointer;
 }
 .green {
-  background-image: -webkit-linear-gradient(top, #62c462, #57a957);
-  background-image: -moz-linear-gradient(top, #62c462, #57a957);
-  background-image: -ms-linear-gradient(top, #62c462, #57a957);
-  background-image: -o-linear-gradient(top, #62c462, #57a957);
-  background-image: linear-gradient(top, #62c462, #57a957);
+  background-color: #92bd75;
   border: 1px solid #5F8A42;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  text-shadow: 0 1px 1px #555;
+}
+.blue {
+  border: 1px solid #05232b;
+  background-color: #073642;
+  text-shadow: 0 1px 1px #555;
 }
 .gray {
   border-radius: 4px;
@@ -328,21 +342,17 @@ textarea#content {
   cursor: pointer;
 }
 .red {
-  background-image: -webkit-linear-gradient(top, #ee5f5b, #c43c35);
-  background-image: -moz-linear-gradient(top, #ee5f5b, #c43c35);
-  background-image: -ms-linear-gradient(top, #ee5f5b, #c43c35);
-  background-image: -o-linear-gradient(top, #ee5f5b, #c43c35);
-  background-image: linear-gradient(top, #ee5f5b, #c43c35);
-  border: 1px solid #850003;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-  color: #fff;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #EE5F5B;
+  border: 1px solid #b71713;
+  text-shadow: 0 1px 1px #555;
+}
+.red:hover {
+  background-color: #ec4844;
 }
 div#options-wrapper {
   padding: 10px;
   background-color: #eee;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 input[type=submit] {
   border-radius: 4px;
@@ -430,6 +440,32 @@ div.issue {
   border-top: none;
   padding: 10px;
 }
+div.comment-event {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  -webkit-bottom-left-border-radius: 5px;
+  -webkit-bottom-right-border-radius: 5px;
+}
+div.comment-event span#closed {
+  background-color: #EE5F5B;
+  border: 1px solid #b71713;
+  color: white;
+  text-shadow: 0 1px 1px #666;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  padding: 3px;
+}
+span#opened {
+  background-color: #92bd75;
+  border: 1px solid #53793a;
+  color: white;
+  text-shadow: 0 1px 1px #666;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  padding: 3px;
+}
 div.comment-header {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
@@ -445,22 +481,15 @@ div.comment-header {
   padding: 10px;
   border: 1px solid #bbb;
   text-shadow: 0 1px 1px #fff;
+  line-height: 23px;
 }
-div.comment-header span#author {
+div.comment-header span#author, div.issue-header span#author {
   font-weight: bold;
   color: #444;
 }
-div.comment-header span#time {
+div.comment-header span#time, div.issue-header span#time {
   font-weight: bold;
   color: #444;
-}
-div.issue-header span#author {
-  font-weight: bold;
-  color: #eee;
-}
-div.issue-header span#time {
-  font-weight: bold;
-  color: #eee;
 }
 div.issue span#title, div.comment span#title {
   font-size: 120%;
@@ -497,6 +526,9 @@ div.codehilite {
   background-color: #002b36;
   overflow: auto;
   font-family: Menlo, Andale Mono, DejaVu, monospace;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
 }
 div.comment > div.codehilite, div.issue > div.codehilite {
   margin-top: 10px;
@@ -652,6 +684,9 @@ span.hq {
   vertical-align: super;
   font-weight: bold;
 }
+div#paging {
+  float: right;
+}
 div#paging a {
   text-decoration: none;
   color: #5f8a42;
@@ -695,6 +730,7 @@ div#feed div.snippet {
   border: 1px solid #ddd;
   border-radius: 5px;
   padding: 10px;
+  overflow: auto;
 }
 div#feed span#title {
   font-weight: bold;
@@ -786,4 +822,33 @@ div.doc {
   border: 1px solid #ddd;
   border-top: none;
   padding: 10px;
+}
+a.action-link {
+  font-weight: bold;
+  text-decoration: none;
+  color: #444 !important;
+}
+a.action-link:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+a.doc-item {
+  display: inline-block;
+  margin-left: -15px;
+  margin-right: -15px;
+  text-decoration: none;
+  padding: 10px;
+  padding-left: 15px;
+  width: 194px;
+}
+a.doc-item.selected {
+  background-color: #dcdcdc;
+  border: 1px solid #ccc;
+  color: #444;
+  border-left: none;
+  border-right: none;
+  text-shadow: 0 1px 1px #fff;
+}
+.doc #edit-field {
+  height: 50%;
 }

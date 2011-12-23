@@ -1,17 +1,19 @@
 {% extends 'base.html' %}
 {% block body %}
+<script type="text/javascript" 
+    src="{{ url_for('static', filename='js/feed.js') }}"></script>
 <div class="issue-sidebar">
     <div class="issue-sidebar-heading">
         Stats
     </div>
     <div class="issue-sidebar-content">
         <div class="graph-outer">
-            <div class="graph-open" style="width:89%"></div>
-            <div class="graph-closed" style="width:9%"></div>
+            <div class="graph-open" style="width:{{ g_open }}%"></div>
+            <div class="graph-closed" style="width:{{ g_closed }}%"></div>
         </div>
         <br>
-        <a href="/issues/open">25</a> Open, 
-        <a href="/issues/closed" style="color: #B71713">3</a> Closed
+        <a href="/issues/open">{{ n_open }}</a> Open, 
+        <a href="/issues/closed" style="color: #B71713">{{ n_closed }}</a> Closed
     </div>
     <div class="issue-sidebar-heading">
         Docs
@@ -38,14 +40,18 @@
         <li>
         <span id="author">{{ item['user']['name'] }}</span>
         ({{ item['user']['email'] }})
-        <span id="author">{{ item['message'] }}</span>
         {% if item['link'] %}
+            <a class="action-link"
+                href="{{ item['link'] }}">{{ item['message'] }}</a>&nbsp;
             <a class="fancy-monospace" 
                 href="{{ item['link'] }}">{{ item['button'] }}</a>
+        {% else %}
+        <span id="author">{{ item['message'] }}</span>
         {% endif %}
         &nbsp;
-        <span id="time">{{ item['time'] }} ↲</span>
+        <span id="time">{{ item['time'] }}</span>
         {% if item['snippet'] %}
+        ↴
         <div class="snippet">
             {% if item['title'] %}
             <span id="title">{{ item['title'] }}</span>
@@ -53,10 +59,17 @@
             {% endif %}
             {{ item['snippet']|safe }}
         </div>
+        {% elif item['title'] %}
+        <div class="snippet">
+            <span id="title">{{ item['title'] }}</span>
+        </div>
         {% endif %}
         </li>
     {% endfor %}
     </ul>
+    {% if more_history %}
+    <div id="load-stories" class="button gray centered-text">Load more stories</div>
+    {% endif %}
     <div class="clear"></div>
 </div>
 {% endblock %}

@@ -1,19 +1,32 @@
 {% extends 'base.html' %}
 {% block body %}
+<script type="text/javascript" 
+    src="{{ url_for('static', filename='js/docs.js') }}"></script>
 <div class="issue-sidebar" style="float:left">
     <div class="issue-sidebar-heading">
         Docs
     </div>
     <div class="issue-sidebar-content">
     {% for d in docs %}
-    <a href="/docs/{{ d.link }}">{{ d.name }}</a><br>
+        {% if d.link == doc.link %}
+        <a class="doc-item selected" href="/docs/{{ d.link }}">{{ d.name }}
+            &rarr;</a>
+        </a><br>
+        {% else %}
+        <a class="doc-item" href="/docs/{{ d.link }}">{{ d.name }}</a><br>
+        {% endif %}
     {% endfor %}
     </div>
 </div>
 <div class="doc-header">
     <span class="monospace">{{ doc.link + doc.ext }}</span>
+    <div class="button small-button gray" id="edit-button"
+        style="float:right; position:relative; bottom:6px;">Edit</div>
 </div>
-<div class="doc">
+<div class="doc" name="{{ doc.link }}">
     {{ converted|safe }}
+</div>
+<div class="markdown" style="display:none">
+    {{ markdown }}
 </div>
 {% endblock %}

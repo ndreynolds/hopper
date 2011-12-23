@@ -36,8 +36,9 @@
                 <a href="/">{{ tracker.config.name }}</a>
             </div>
             <div id="search">
-                <form action="issues/search">
-                <input type="text" class="unfocused" value="Search issues...">
+                <form action="{{ url_for('issues.search') }}" method="GET">
+                    <input name="query" type="text" class="unfocused" 
+                        value="Search issues...">
                 </form>
             </div>
             <div id="new">
@@ -52,7 +53,7 @@
                 <a class="{{ 'nav selected' if selected == 'docs' else 'nav' }}"
                     href="{{ url_for('docs.main') }}">Docs</a>
                 <a class="{{ 'nav selected' if selected == 'settings' else 'nav' }}"
-                    href="{{ url_for('docs.main') }}">Settings</a>
+                    href="{{ url_for('settings.main') }}">Settings</a>
             </div>
         </div>
         <div id="mid-header">
