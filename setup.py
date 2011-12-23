@@ -7,7 +7,7 @@ version = open('VERSION').read().strip()
 
 setup(name='Hopper',
       version=version,
-      description='Distributed Issue Tracking',
+      description='Portable Issue Tracker',
       long_description=readme,
       author='Nick Reynolds',
       author_email='ndreynolds@gmail.com',
@@ -41,6 +41,5 @@ To create a new issue tracker:
     hpr create-tracker [tracker]
 
 To use an existing issue tracker:
-    hpr localweb
-    hpr 
+    hpr serve
 """ % version

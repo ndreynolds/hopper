@@ -92,23 +92,28 @@ def main(args=sys.argv[1:]):
                         help='turn on debug mode')
     servep.set_defaults(func=serve)
 
+    # `setup` subcommand
+    setupp = subparsers.add_parser('setup', help='Setup Hopper to track issues')
+    setupp.set_defaults(func=setup)
+
     # `show` subcommand
     showp = subparsers.add_parser('show', help='Show a particular issue')
     showp.add_argument('issue', help='an issue id (the first 4 chars is usually enough)')
     showp.set_defaults(func=show)
 
     # `tracker` subcommand
-    trackerp = subparsers.add_parser('tracker', help='Create a new hopper tracker')
+    trackerp = subparsers.add_parser('create-tracker', 
+                                     help='Create a new hopper tracker')
     trackerp.add_argument('path', action='store', 
-                        help='path that the tracker will be created at')
-    trackerp.set_defaults(func=tracker)
+                          help='path that the tracker will be created at')
+    trackerp.set_defaults(func=create_tracker)
 
     # parse the args
     args = parser.parse_args(args)
     argsd = vars(args)
 
     # replace argsd['tracker'] with a Tracker instance.
-    if args.func != tracker:
+    if args.func not in [create_tracker, setup]:
         argsd['tracker'] = get_tracker(argsd['tracker'])
     args.func(argsd)
 
@@ -283,7 +288,11 @@ def serve(args):
     start(t.paths['root'], port=args['port'], debug=args['verbose'])
 
 
-def tracker(args):
+def setup(args):
+    raise NotImplementedError
+
+
+def create_tracker(args):
     Tracker.new(args['path'])
     print 'New tracker initialized. Edit %s to configure.' % \
             os.path.join(args['path'], 'config') 
