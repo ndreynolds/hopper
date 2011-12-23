@@ -1,12 +1,5 @@
-<pre>
-| | | |                            
-| |_| | ___  _ __  _ __   ___ _ __ 
-|  _  |/ _ \| '_ \| '_ \ / _ \ '__|
-| | | | (_) | |_) | |_) |  __/ |   
-\_| |_/\___/| .__/| .__/ \___|_|   
-            | |   | |              
-            |_|   |_|              
-</pre>
+Hopper
+======
 
 Hopper is a portable, distributed, version-controlled issue tracking
 implementation. It's sort of an experiment on distributed editing in CMS-type 
@@ -14,9 +7,15 @@ applications.
 
 It is currently in development and not ready for real use.
 
-Hopper comes with web and command-line clients. Here's the web UI in action:
+Hopper comes with web and command-line clients. You can see the web client in action
+below:
 
-[photos]
+<a href="https://github.com/ndreynolds/hopper/raw/master/images/hopper2.png">
+<img height=300 src="https://github.com/ndreynolds/hopper/raw/master/images/hopper2.png">
+</a>
+<a href="https://github.com/ndreynolds/hopper/raw/master/images/hopper.png">
+<img height=300 src="https://github.com/ndreynolds/hopper/raw/master/images/hopper.png">
+</a>
 
 How it works
 ------------
@@ -34,6 +33,7 @@ work locally, merging things back together later.
 For the full spiel, see the API documentation. (Currently, you'll need to build
 the docs yourself using [Sphinx][1].)
 
+
 Installing
 ----------
 Clone the repo and run `setup.py`:
@@ -41,6 +41,7 @@ Clone the repo and run `setup.py`:
     git clone https://ndreynolds@github.com/ndreynolds/hopper.git
     cd hopper/
     sudo python setup.py install
+
 
 Using it
 --------
