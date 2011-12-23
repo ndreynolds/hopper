@@ -3,9 +3,10 @@
 from setuptools import setup, find_packages
 
 readme = open('README.md').read()
+version = open('VERSION').read().strip()
 
 setup(name='Hopper',
-      version='1.0',
+      version=version,
       description='Distributed Issue Tracking',
       long_description=readme,
       author='Nick Reynolds',
@@ -23,8 +24,23 @@ setup(name='Hopper',
                         'sqlalchemy'],
       entry_points={
           'console_scripts': [
-              'hpr = hopper.hpr.hpr:main'
+              'hpr = hopper.hpr.cli:main'
               ]
           },
       license='MIT'
      )
+
+print """\n\n\
+**********************************************
+Hopper %s is good to go.
+
+To set this system up to serve issue trackers:
+    hpr server-setup
+
+To create a new issue tracker:
+    hpr create-tracker [tracker]
+
+To use an existing issue tracker:
+    hpr localweb
+    hpr 
+""" % version

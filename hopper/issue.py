@@ -63,7 +63,9 @@ class Issue(JSONFile):
     def comments(self, n=None):
         comments = [Comment(self, sha) for sha in self._get_comments()]
         comments.sort(key=lambda x: x.timestamp)
-        return comments[:n]
+        if n:
+            return comments[:n]
+        return comments
 
     def comment(self, sha):
         return Comment(self, sha)

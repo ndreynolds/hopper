@@ -8,40 +8,41 @@
             |_|   |_|              
 </pre>
 
-(Hopper is currently in development. Features are missing and it's not totally 
-stable)
-
 Hopper is a portable, distributed, version-controlled issue (AKA bug-) tracking
-implementation. It's quite a mouthful. 
+implementation. 
 
-It comes with a web application, command-line interface, and the core API.
+Hopper comes with web and command-line clients. Here they are in action:
+
+[photos]
 
 How it works
 ------------
-For every project, you have a completely self-contained issue tracker. The 
-tracker is a Git repository. Hopper handles all the versioning for you. Issues
-and comments are stored in a flat-file database as JSON, making them both ideal 
-for merging and human-editable. 
+For every project, you have a completely self-contained issue tracker. Issues
+and comments are stored within the tracker in a flat-file database as JSON. To
+implement versioning, the tracker is also a full-fledged Git repository. Hopper 
+handles all the Git interaction for you, so you don't need to know anything 
+about Git. 
 
-For the full spiel, see the API documentation.
+Most of the time, users would work on issues from a single tracker instance.
+This way everything is live. Sometimes, though, you know you'll be without 
+internet access, so Hopper allows you to clone the tracker's repository and
+work locally, merging things back together later.
 
-Use cases
----------
-There are many ways to use Hopper:
+For the full spiel, see the API documentation. (Currently, you'll need to build
+the docs yourself using Sphinx.)
 
-- Host the web application on a central server, like many traditional issue 
-  trackers. Users login to the web application.
-- Host the git repository on a central server. Users can push and pull,
-  viewing issues locally with the web or CLI client.
-- Pull directly from other developers. Users run the clients locally.
-- Keep your issues all to yourself. Run the clients locally.
-- **...any mix of the above.**
+Running Hopper
+--------------
+Hopper can be run locally (optionally using Git to push, pull, and clone)
 
-Why
----
-Distributed workflows allow us to work locally and offline. Anyone who's moved
-from SVN to Git or Mercurial understands these benefits.
+#### Local 
+Users run the web and CLI clients locally on trackers in the local filesystem.
 
-There are also a lot of interesting things you can do with version control.
-When you fork a project, you can fork the issue tracker too. Merge them back
-together later.
+#### Git Server
+Users run the web and CLI clients locally on trackers cloned from a central 
+server. They can push and pull to update the tracker.
+
+#### Web
+Users access the web client, running on a remote server, over the web. All 
+changes are made to a single tracker instance. This is how traditional issue
+trackers work.

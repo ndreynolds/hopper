@@ -1,3 +1,8 @@
+"""
+Classes for persistent storage of dictionaries; object access to dictionary 
+keys.
+"""
+
 from __future__ import with_statement
 import os
 import time
@@ -15,6 +20,11 @@ class BaseFile(object):
     assignment to these keys, provided they don't clash with any existing
     attributes.
     """
+
+    # For later versions, I think it'd be cleaner to abandon the fields 
+    # attribute and store everything in __dict__. Things that aren't supposed
+    # to be written to disk can be '_'-prefixed. Mostly, I want to get rid of 
+    # the super constructor calls in subclasses.
 
     def __init__(self):
         self._set_fields()
@@ -61,9 +71,11 @@ class JSONFile(BaseFile):
         """Read self.fields from file."""
         if not os.path.exists(f):
             raise OSError('File does not exist')
-        # uses a LockedFile object for file I/O
+        # Uses a LockedFile object for file I/O
         with lock(f, 'r') as fp:
-            self.fields = from_json(fp.read())
+            # Merge the current dictionary with the new one.
+            self.fields = dict(self.fields.items() + 
+                               from_json(fp.read()).items())
         return True
 
     def to_file(self, f):
