@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
+from hopper.version import VERSION
 
-readme = open('README.md').read()
-version = open('VERSION').read().strip()
+README = open('README.md').read()
 
 setup(name='Hopper',
-      version=version,
+      version=VERSION,
       description='Portable Issue Tracker',
-      long_description=readme,
+      long_description=README,
       author='Nick Reynolds',
       author_email='ndreynolds@gmail.com',
       url='hopperhq.com/hopper',
@@ -42,4 +42,4 @@ To create a new issue tracker:
 
 To use an existing issue tracker:
     hpr serve
-""" % version
+""" % VERSION

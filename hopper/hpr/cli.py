@@ -10,6 +10,7 @@ from hopper.hpr.templates import Template, IssueTemplate
 from hopper.utils import relative_time, wrap
 from hopper.errors import AmbiguousReference, BadReference
 from hopper.query import Query
+from hopper.version import VERSION
 
 
 ### Utilities
@@ -46,7 +47,7 @@ def main(args=sys.argv[1:]):
     parser = ArgumentParser(description='Manage Hopper trackers and their issues', 
                             epilog='See `hpr COMMAND -h` for command-specific help',
                             prog='hpr')
-    parser.add_argument('-v', '--version', action='version', version='1.0',
+    parser.add_argument('-v', '--version', action='version', version=VERSION,
             help='display version number')
     parser.add_argument('--tracker', action='store', metavar='PATH',
             help='set the path to the tracker, defaults to cwd')
@@ -279,7 +280,6 @@ def list_(args):
             print
 
 
-### Manage trackers
 def serve(args):
     # include the webserver stuff here. runtime is significantly faster
     # when serve() is not called.

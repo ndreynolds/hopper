@@ -8,10 +8,13 @@
             |_|   |_|              
 </pre>
 
-Hopper is a portable, distributed, version-controlled issue (AKA bug-) tracking
-implementation. 
+Hopper is a portable, distributed, version-controlled issue tracking
+implementation. It's sort of an experiment on distributed editing in CMS-type 
+applications.
 
-Hopper comes with web and command-line clients. Here they are in action:
+It is currently in development and not ready for real use.
+
+Hopper comes with web and command-line clients. Here's the web UI in action:
 
 [photos]
 
@@ -29,20 +32,24 @@ internet access, so Hopper allows you to clone the tracker's repository and
 work locally, merging things back together later.
 
 For the full spiel, see the API documentation. (Currently, you'll need to build
-the docs yourself using Sphinx.)
+the docs yourself using [Sphinx][1].)
 
-Running Hopper
---------------
-Hopper can be run locally (optionally using Git to push, pull, and clone)
+Installing
+----------
+Clone the repo and run `setup.py`:
 
-#### Local 
-Users run the web and CLI clients locally on trackers in the local filesystem.
+    git clone https://ndreynolds@github.com/ndreynolds/hopper.git
+    cd hopper/
+    sudo python setup.py install
 
-#### Git Server
-Users run the web and CLI clients locally on trackers cloned from a central 
-server. They can push and pull to update the tracker.
+Using it
+--------
+Trackers can be interfaced with locally through either client (optionally using 
+Git to share changes with remote instances) or over HTTP through the web client.
 
-#### Web
-Users access the web client, running on a remote server, over the web. All 
-changes are made to a single tracker instance. This is how traditional issue
-trackers work.
+Being able to treat the trackers just like any other Git repository makes for a 
+lot of interesting use-cases. One example would be to make the tracker available
+on a git server and provide it as a Git submodule within the project repository.
+Everyone that has the repo gets the whole as issue tracker as a freebie.
+
+[1]: http://sphinx.pocoo.org/
